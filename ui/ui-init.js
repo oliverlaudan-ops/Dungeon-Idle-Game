@@ -5,6 +5,7 @@
 
 import { gameState, saveGame } from '../src/core/game-state.js';
 import { updateUI } from './ui-render.js';
+import { initUpgradesUI } from './ui-upgrades.js';
 
 /**
  * Initialize UI
@@ -17,6 +18,9 @@ export function initUI() {
 
     // Setup button listeners
     setupButtons();
+
+    // Initialize upgrades UI
+    initUpgradesUI();
 
     // Initial UI update
     updateUI();
