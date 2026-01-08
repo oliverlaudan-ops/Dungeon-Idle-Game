@@ -103,7 +103,15 @@ export function loadGame() {
                     }
                 }
             });
+            
+            // Always reset manual run state on load (runs don't persist across page reloads)
+            gameState.manualRun.active = false;
+            gameState.manualRun.currentFloor = 0;
+            gameState.manualRun.currentRoom = 0;
+            gameState.manualRun.dungeon = null;
+            
             console.log('💾 Game loaded');
+            console.log('♻️ Manual run state reset');
             return true;
         }
         console.log('🆕 No save found, starting new game');
