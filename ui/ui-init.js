@@ -7,6 +7,7 @@ import { gameState, saveGame } from '../src/core/game-state.js';
 import { updateUI } from './ui-render.js';
 import { renderUpgrades } from './upgrades-ui.js';
 import { applyUpgradeEffects } from '../src/upgrades/upgrade-manager.js';
+import { exportSave, importSave, resetGame, formatTimestamp, formatPlayTime } from '../src/core/save-manager.js';
 
 /**
  * Initialize UI
@@ -28,6 +29,9 @@ export function initUI() {
 
     // Initial UI update
     updateUI();
+
+    // Update settings info
+    updateSettingsInfo();
 
     console.log('✅ UI initialized');
 }
@@ -58,6 +62,11 @@ function setupTabs() {
             if (targetTab === 'upgrades') {
                 renderUpgrades();
             }
+
+            // Update settings info when switching to settings tab
+            if (targetTab === 'settings') {
+                updateSettingsInfo();
+            }
         });
     });
 }
@@ -71,6 +80,24 @@ function setupButtons() {
     if (autoRunBtn) {
         autoRunBtn.addEventListener('click', toggleAutoRun);
         updateAutoRunButton();
+    }
+
+    // Export button
+    const exportBtn = document.getElementById('export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', handleExport);
+    }
+
+    // Import button
+    const importBtn = document.getElementById('import-btn');
+    if (importBtn) {
+        importBtn.addEventListener('click', handleImport);
+    }
+
+    // Reset button
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', handleReset);
     }
 }
 
@@ -105,5 +132,76 @@ function updateAutoRunButton() {
     } else {
         btn.textContent = 'Start Auto Runs';
         btn.style.background = 'var(--success)';
+    }
+}
+
+/**
+ * Handle export button click
+ */
+function handleExport() {
+    const exportText = document.getElementById('export-text');
+    if (!exportText) return;
+
+    const saveString = exportSave();
+    if (saveString) {
+        exportText.value = saveString;
+        exportText.select();
+        
+        // Try to copy to clipboard
+        try {
+            navigator.clipboard.writeText(saveString);
+            alert('✅ Spielstand exportiert und in die Zwischenablage kopiert!\n\nDu kannst ihn auch aus dem Textfeld unten kopieren.');
+        } catch (e) {
+            alert('✅ Spielstand exportiert!\n\nKopiere den Text aus dem Feld unten.');
+        }
+    } else {
+        alert('❌ Fehler beim Exportieren des Spielstands!');
+    }
+}
+
+/**
+ * Handle import button click
+ */
+function handleImport() {
+    const importText = document.getElementById('import-text');
+    if (!importText || !importText.value.trim()) {
+        alert('❌ Bitte füge zuerst einen Spielstand in das Textfeld ein!');
+        return;
+    }
+
+    const result = importSave(importText.value.trim());
+    
+    if (result.success) {
+        alert('✅ Spielstand erfolgreich importiert!\n\nDie Seite wird neu geladen...');
+        setTimeout(() => {
+            location.reload();
+        }, 500);
+    } else {
+        alert(`❌ Fehler beim Importieren!\n\n${result.error || 'Ungültiger Spielstand'}`);
+    }
+}
+
+/**
+ * Handle reset button click
+ */
+function handleReset() {
+    resetGame();
+}
+
+/**
+ * Update settings info display
+ */
+function updateSettingsInfo() {
+    const lastSaveEl = document.getElementById('last-save-time');
+    const playTimeEl = document.getElementById('play-time');
+
+    if (lastSaveEl) {
+        lastSaveEl.textContent = formatTimestamp(gameState.lastSave);
+    }
+
+    if (playTimeEl) {
+        // Calculate play time (rough estimate based on save times)
+        const playTime = Math.floor(gameState.totalPlayTime || 0);
+        playTimeEl.textContent = formatPlayTime(playTime);
     }
 }

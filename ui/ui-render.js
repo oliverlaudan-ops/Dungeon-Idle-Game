@@ -4,6 +4,7 @@
  */
 
 import { gameState } from '../src/core/game-state.js';
+import { getEffectiveStats } from '../src/upgrades/upgrade-manager.js';
 
 let runHistory = [];
 const MAX_HISTORY_ENTRIES = 10;
@@ -16,16 +17,32 @@ export function updateUI() {
     updateAutoRunInfo();
     updateStats();
     updateHeroDisplay();
+    updateUpgradeResources();
 }
 
 /**
- * Update resource displays
+ * Update resource displays (Idle tab)
  */
 function updateResources() {
     const goldEl = document.getElementById('gold-value');
     const gemsEl = document.getElementById('gems-value');
     const soulsEl = document.getElementById('souls-value');
     const keysEl = document.getElementById('keys-value');
+
+    if (goldEl) goldEl.textContent = formatNumber(gameState.resources.gold);
+    if (gemsEl) gemsEl.textContent = formatNumber(gameState.resources.gems);
+    if (soulsEl) soulsEl.textContent = formatNumber(gameState.resources.souls);
+    if (keysEl) keysEl.textContent = gameState.resources.dungeonKeys;
+}
+
+/**
+ * Update resource displays (Upgrades tab)
+ */
+function updateUpgradeResources() {
+    const goldEl = document.getElementById('upgrade-gold');
+    const gemsEl = document.getElementById('upgrade-gems');
+    const soulsEl = document.getElementById('upgrade-souls');
+    const keysEl = document.getElementById('upgrade-keys');
 
     if (goldEl) goldEl.textContent = formatNumber(gameState.resources.gold);
     if (gemsEl) gemsEl.textContent = formatNumber(gameState.resources.gems);
@@ -93,6 +110,7 @@ function updateStats() {
  */
 function updateHeroDisplay() {
     const hero = gameState.hero;
+    const effectiveStats = getEffectiveStats();
 
     // Basic info
     const nameEl = document.getElementById('hero-name');
@@ -117,18 +135,18 @@ function updateHeroDisplay() {
         xpNeededEl.textContent = `${xpLeft} XP`;
     }
 
-    // Stats
+    // Stats (show effective stats with upgrade bonuses)
     const hpEl = document.getElementById('hero-hp');
     const attackEl = document.getElementById('hero-attack');
     const defenseEl = document.getElementById('hero-defense');
     const critEl = document.getElementById('hero-crit');
     const critMultEl = document.getElementById('hero-crit-mult');
 
-    if (hpEl) hpEl.textContent = `${hero.hp} / ${hero.maxHp}`;
-    if (attackEl) attackEl.textContent = hero.attack;
-    if (defenseEl) defenseEl.textContent = hero.defense;
-    if (critEl) critEl.textContent = `${Math.round(hero.critChance * 100)}%`;
-    if (critMultEl) critMultEl.textContent = `${hero.critMultiplier.toFixed(1)}x`;
+    if (hpEl) hpEl.textContent = `${hero.hp} / ${effectiveStats.maxHp}`;
+    if (attackEl) attackEl.textContent = effectiveStats.attack;
+    if (defenseEl) defenseEl.textContent = effectiveStats.defense;
+    if (critEl) critEl.textContent = `${Math.round(effectiveStats.critChance * 100)}%`;
+    if (critMultEl) critMultEl.textContent = `${effectiveStats.critMultiplier.toFixed(1)}x`;
 }
 
 /**
@@ -189,10 +207,12 @@ function updateRunHistory() {
  * Calculate success chance (same logic as in auto-run.js)
  */
 function calculateSuccessChance() {
+    const effectiveStats = getEffectiveStats();
     let chance = 0.5;
     chance += gameState.hero.level * 0.02;
-    const statBonus = (gameState.hero.attack + gameState.hero.defense) / 1000;
+    const statBonus = (effectiveStats.attack + effectiveStats.defense) / 1000;
     chance += statBonus;
+    chance += effectiveStats.successBonus;
     return Math.min(0.95, chance);
 }
 
