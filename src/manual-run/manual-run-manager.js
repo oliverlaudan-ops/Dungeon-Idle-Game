@@ -166,6 +166,9 @@ function startCombat(monster) {
     playerState.canMove = false;
     currentCombatMonster = monster;
 
+    // Stop render loop during combat
+    stopRenderLoop();
+
     // Store max HP if not already set
     if (!monster.maxHp) {
         monster.maxHp = monster.hp;
@@ -190,7 +193,15 @@ export function endCombat(victory = true) {
         if (currentRoom.monsters && currentRoom.monsters.every(m => m.hp <= 0)) {
             currentRoom.cleared = true;
             console.log('✅ Room cleared!');
-            renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
+            
+            // Show cleared message briefly
+            setTimeout(() => {
+                renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
+                // Auto-clear message after 2 seconds
+                setTimeout(() => {
+                    // Message will be cleared when render loop restarts
+                }, 2000);
+            }, 100);
         }
     }
 
@@ -207,6 +218,9 @@ export function endCombat(victory = true) {
     playerState.inCombat = false;
     playerState.canMove = true;
     currentCombatMonster = null;
+
+    // Restart render loop
+    startRenderLoop();
 }
 
 /**
@@ -228,14 +242,23 @@ function transitionToRoom(roomIndex) {
     playerState.x = newRoom.x + Math.floor(newRoom.width / 2);
     playerState.y = newRoom.y + Math.floor(newRoom.height / 2);
 
-    // Show room message
-    renderCenterMessage(`Room ${roomIndex + 1}`, 'Clear all monsters!');
+    // Show room message briefly
+    setTimeout(() => {
+        renderCenterMessage(`Room ${roomIndex + 1}`, 'Clear all monsters!');
+        // Auto-clear message after 2 seconds
+        setTimeout(() => {
+            // Message will be cleared when render loop continues
+        }, 2000);
+    }, 100);
 }
 
 /**
  * Start render loop
  */
 function startRenderLoop() {
+    // Stop any existing loop first
+    stopRenderLoop();
+
     function render() {
         if (currentDungeon && gameState.manualRun.active && !playerState.inCombat) {
             renderDungeon(currentDungeon, playerState);
@@ -243,6 +266,7 @@ function startRenderLoop() {
         }
     }
     render();
+    console.log('🎨 Render loop started');
 }
 
 /**
@@ -252,6 +276,7 @@ function stopRenderLoop() {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
+        console.log('🛑 Render loop stopped');
     }
 }
 
