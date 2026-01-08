@@ -9,36 +9,47 @@ import { initCanvas, clearCanvas, renderCenterMessage } from '../src/manual-run/
 import { initInputHandler, removeInputHandler } from '../src/manual-run/input-handler.js';
 import { initCombatUI } from '../src/manual-run/combat-ui.js';
 
-let isInitialized = false;
+let canvasInitialized = false;
+let combatUIInitialized = false;
+let inputHandlerInitialized = false;
 
 /**
  * Initialize manual run UI
  */
 export function initManualRunUI() {
-    if (isInitialized) return;
+    console.log('🎮 Initializing manual run UI...');
 
-    // Initialize canvas
-    if (!initCanvas()) {
-        console.error('❌ Failed to initialize canvas');
-        return;
+    // Initialize canvas (only once)
+    if (!canvasInitialized) {
+        if (!initCanvas()) {
+            console.error('❌ Failed to initialize canvas');
+            return;
+        }
+        canvasInitialized = true;
     }
 
-    // Initialize combat UI
-    if (!initCombatUI()) {
-        console.error('❌ Failed to initialize combat UI');
+    // Initialize combat UI (only once)
+    if (!combatUIInitialized) {
+        if (!initCombatUI()) {
+            console.error('❌ Failed to initialize combat UI');
+        } else {
+            combatUIInitialized = true;
+        }
     }
 
-    // Show welcome message
+    // Initialize input handler (only once)
+    if (!inputHandlerInitialized) {
+        initInputHandler();
+        inputHandlerInitialized = true;
+    }
+
+    // Always show welcome screen when tab is opened
     renderWelcomeScreen();
 
-    // Setup start button
-    setupStartButton();
+    // Always ensure start button exists and has correct state
+    ensureStartButton();
 
-    // Initialize input handler
-    initInputHandler();
-
-    isInitialized = true;
-    console.log('✅ Manual run UI initialized');
+    console.log('✅ Manual run UI ready');
 }
 
 /**
@@ -49,40 +60,58 @@ function renderWelcomeScreen() {
 }
 
 /**
- * Setup start run button
+ * Ensure start button exists and has correct state
  */
-function setupStartButton() {
-    // Remove existing button if any
-    const existingBtn = document.getElementById('start-manual-run-btn');
-    if (existingBtn) {
-        existingBtn.remove();
+function ensureStartButton() {
+    let startBtn = document.getElementById('start-manual-run-btn');
+    
+    // Create button if it doesn't exist
+    if (!startBtn) {
+        const container = document.getElementById('manual-tab');
+        if (!container) return;
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.id = 'manual-run-button-container';
+        buttonContainer.style.textAlign = 'center';
+        buttonContainer.style.marginTop = '20px';
+
+        startBtn = document.createElement('button');
+        startBtn.id = 'start-manual-run-btn';
+        startBtn.className = 'btn btn-primary';
+        startBtn.style.fontSize = '1.2rem';
+        startBtn.style.padding = '15px 40px';
+
+        startBtn.addEventListener('click', handleStartRun);
+
+        buttonContainer.appendChild(startBtn);
+        
+        // Insert after canvas container
+        const canvasContainer = document.getElementById('dungeon-canvas-container');
+        if (canvasContainer && canvasContainer.nextSibling) {
+            container.insertBefore(buttonContainer, canvasContainer.nextSibling);
+        } else {
+            container.appendChild(buttonContainer);
+        }
     }
 
-    // Create start button
-    const container = document.getElementById('manual-tab');
-    if (!container) return;
+    // Set correct button state based on game state
+    updateButtonState(startBtn);
+}
 
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.textAlign = 'center';
-    buttonContainer.style.marginTop = '20px';
+/**
+ * Update button state
+ */
+function updateButtonState(btn) {
+    if (!btn) return;
 
-    const startBtn = document.createElement('button');
-    startBtn.id = 'start-manual-run-btn';
-    startBtn.className = 'btn btn-primary';
-    startBtn.textContent = 'Start Run';
-    startBtn.style.fontSize = '1.2rem';
-    startBtn.style.padding = '15px 40px';
-
-    startBtn.addEventListener('click', handleStartRun);
-
-    buttonContainer.appendChild(startBtn);
-    
-    // Insert after canvas container
-    const canvasContainer = document.getElementById('dungeon-canvas-container');
-    if (canvasContainer && canvasContainer.nextSibling) {
-        container.insertBefore(buttonContainer, canvasContainer.nextSibling);
+    if (gameState.manualRun.active) {
+        btn.textContent = 'Run in Progress...';
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
     } else {
-        container.appendChild(buttonContainer);
+        btn.textContent = 'Start Run';
+        btn.disabled = false;
+        btn.style.opacity = '1';
     }
 }
 
@@ -101,16 +130,16 @@ function handleStartRun() {
         return;
     }
 
+    console.log('🚀 Starting manual run...');
+
     // Start the run
     const floor = 1; // Start with floor 1
     startManualRun(floor);
 
-    // Update button
+    // Update button immediately
     const btn = document.getElementById('start-manual-run-btn');
     if (btn) {
-        btn.textContent = 'Run in Progress...';
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
+        updateButtonState(btn);
     }
 }
 
@@ -118,18 +147,9 @@ function handleStartRun() {
  * Update manual run UI (called from main game loop)
  */
 export function updateManualRunUI() {
-    // Update button state
     const btn = document.getElementById('start-manual-run-btn');
     if (btn) {
-        if (gameState.manualRun.active) {
-            btn.textContent = 'Run in Progress...';
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        } else {
-            btn.textContent = 'Start Run';
-            btn.disabled = false;
-            btn.style.opacity = '1';
-        }
+        updateButtonState(btn);
     }
 }
 
@@ -140,4 +160,10 @@ export function cleanupManualRunUI() {
     removeInputHandler();
     clearCanvas();
     renderWelcomeScreen();
+    
+    // Reset button state
+    const btn = document.getElementById('start-manual-run-btn');
+    if (btn) {
+        updateButtonState(btn);
+    }
 }
