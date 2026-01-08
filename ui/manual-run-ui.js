@@ -7,6 +7,7 @@ import { gameState } from '../src/core/game-state.js';
 import { startManualRun, endManualRun } from '../src/manual-run/manual-run-manager.js';
 import { initCanvas, clearCanvas, renderCenterMessage } from '../src/manual-run/canvas-renderer.js';
 import { initInputHandler, removeInputHandler } from '../src/manual-run/input-handler.js';
+import { initCombatUI } from '../src/manual-run/combat-ui.js';
 
 let isInitialized = false;
 
@@ -20,6 +21,11 @@ export function initManualRunUI() {
     if (!initCanvas()) {
         console.error('❌ Failed to initialize canvas');
         return;
+    }
+
+    // Initialize combat UI
+    if (!initCombatUI()) {
+        console.error('❌ Failed to initialize combat UI');
     }
 
     // Show welcome message
@@ -112,9 +118,6 @@ function handleStartRun() {
  * Update manual run UI (called from main game loop)
  */
 export function updateManualRunUI() {
-    // Update combat UI if in combat
-    // TODO: Implement combat UI panel
-
     // Update button state
     const btn = document.getElementById('start-manual-run-btn');
     if (btn) {
