@@ -7,6 +7,7 @@ import { gameState } from '../core/game-state.js';
 import { generateDungeon } from '../dungeons/dungeon-generator.js';
 import { renderDungeon, renderCenterMessage } from './canvas-renderer.js';
 import { showCombatUI, hideCombatUI, updateCombatUI } from './combat-ui.js';
+import { updateManualRunUI } from '../../ui/manual-run-ui.js';
 
 // Player state for manual run
 const playerState = {
@@ -89,9 +90,14 @@ export function endManualRun(success = true) {
     currentDungeon = null;
     currentCombatMonster = null;
 
+    // Update button state
+    updateManualRunUI();
+
     // Show completion message
     if (success) {
-        renderCenterMessage('Victory! 🎉', `+${50 * gameState.manualRun.currentFloor || 50} Gold, +${30 * gameState.manualRun.currentFloor || 30} XP | Click START RUN to play again`);
+        const goldReward = 50;
+        const xpReward = 30;
+        renderCenterMessage('Victory! 🎉', `+${goldReward} Gold, +${xpReward} XP | Click START RUN to play again`);
     } else {
         renderCenterMessage('Defeated 💀', 'Click START RUN to try again');
     }
