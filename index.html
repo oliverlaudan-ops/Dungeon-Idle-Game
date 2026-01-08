@@ -129,11 +129,15 @@
             <!-- Manual Run Tab -->
             <div id="manual-tab" class="tab-panel">
                 <h2>🗡️ Manual Dungeon Run</h2>
-                <div id="dungeon-canvas-container">
-                    <canvas id="dungeon-canvas" width="600" height="400"></canvas>
-                </div>
+                
+                <!-- Combat UI positioned ABOVE canvas -->
                 <div id="combat-ui">
                     <!-- Combat UI rendered by JS -->
+                </div>
+                
+                <!-- Canvas below combat UI -->
+                <div id="dungeon-canvas-container">
+                    <canvas id="dungeon-canvas" width="600" height="400"></canvas>
                 </div>
             </div>
 

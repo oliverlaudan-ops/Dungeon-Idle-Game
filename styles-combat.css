@@ -2,14 +2,14 @@
 
 #combat-ui {
     display: none;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .combat-panel {
     background: var(--bg-tertiary);
     border: 3px solid var(--accent-primary);
     border-radius: 12px;
-    padding: 25px;
+    padding: 20px;
     box-shadow: 0 8px 32px rgba(233, 69, 96, 0.3);
     animation: combatPanelSlideIn 0.3s ease;
 }
@@ -17,7 +17,7 @@
 @keyframes combatPanelSlideIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(-20px);
     }
     to {
         opacity: 1;
@@ -27,17 +27,25 @@
 
 .combat-header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 2px solid var(--border-color);
 }
 
 .combat-header h3 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: var(--accent-primary);
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 2px;
+}
+
+/* Compact Layout for Monster and Player */
+.combat-participants {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 /* Monster Display */
@@ -45,32 +53,33 @@
     background: var(--bg-secondary);
     border: 2px solid var(--danger);
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 15px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
 .combat-monster-icon {
-    font-size: 4rem;
+    font-size: 3rem;
     animation: monsterBounce 2s ease-in-out infinite;
 }
 
 @keyframes monsterBounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
 }
 
 .combat-monster-info {
-    flex: 1;
+    width: 100%;
+    text-align: center;
 }
 
 .combat-monster-name {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: var(--danger);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     text-transform: uppercase;
 }
 
@@ -79,43 +88,44 @@
     background: var(--bg-secondary);
     border: 2px solid var(--success);
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 25px;
+    padding: 15px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
 .combat-player-icon {
-    font-size: 4rem;
+    font-size: 3rem;
 }
 
 .combat-player-info {
-    flex: 1;
+    width: 100%;
+    text-align: center;
 }
 
 .combat-player-name {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: var(--success);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 /* HP Bars */
 .combat-hp-bar-container {
     width: 100%;
-    height: 25px;
+    height: 20px;
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     border: 2px solid var(--border-color);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .combat-hp-bar {
     height: 100%;
     transition: width 0.3s ease;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .combat-hp-bar.monster-hp {
@@ -129,24 +139,23 @@
 }
 
 .combat-hp-text {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    text-align: right;
 }
 
 /* Combat Actions */
 .combat-actions {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 15px;
 }
 
 .combat-btn {
     flex: 1;
-    padding: 15px 25px;
+    padding: 12px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -187,24 +196,24 @@
     cursor: not-allowed;
 }
 
-/* Combat Log */
+/* Combat Log - More Compact */
 .combat-log {
     background: rgba(0, 0, 0, 0.3);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    padding: 15px;
-    max-height: 200px;
+    padding: 12px;
+    max-height: 120px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .combat-log-entry {
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--bg-secondary);
     border-radius: 4px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     animation: logEntrySlide 0.3s ease;
 }
 
@@ -258,17 +267,17 @@
 
 /* Combat Log Scrollbar */
 .combat-log::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .combat-log::-webkit-scrollbar-track {
     background: var(--bg-secondary);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .combat-log::-webkit-scrollbar-thumb {
     background: var(--border-color);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .combat-log::-webkit-scrollbar-thumb:hover {
@@ -281,15 +290,13 @@
         padding: 15px;
     }
 
-    .combat-monster,
-    .combat-player {
-        flex-direction: column;
-        text-align: center;
+    .combat-participants {
+        grid-template-columns: 1fr;
     }
 
     .combat-monster-icon,
     .combat-player-icon {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
 
     .combat-actions {

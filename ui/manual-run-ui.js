@@ -80,14 +80,7 @@ function ensureStartButton() {
         startBtn.addEventListener('click', handleStartRun);
 
         buttonContainer.appendChild(startBtn);
-        
-        // Insert after canvas container
-        const canvasContainer = document.getElementById('dungeon-canvas-container');
-        if (canvasContainer && canvasContainer.nextSibling) {
-            container.insertBefore(buttonContainer, canvasContainer.nextSibling);
-        } else {
-            container.appendChild(buttonContainer);
-        }
+        container.appendChild(buttonContainer);
     }
 
     // Set correct button state based on game state
