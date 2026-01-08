@@ -103,28 +103,15 @@ export function movePlayer(dx, dy) {
 
     const newX = playerState.x + dx;
     const newY = playerState.y + dy;
-
-    // Check if position is valid (within current room)
     const currentRoom = currentDungeon.rooms[playerState.currentRoom];
-    if (!isPositionInRoom(newX, newY, currentRoom)) {
-        return false;
-    }
 
-    // Check for collisions with monsters
-    if (currentRoom.monsters && !currentRoom.cleared) {
-        const monster = currentRoom.monsters.find(m => m.x === newX && m.y === newY && m.hp > 0);
-        if (monster) {
-            // Start combat
-            startCombat(monster);
-            return false;
-        }
-    }
-
-    // Check for doors (room transitions)
+    // Check for doors FIRST (before room boundary check)
+    // This allows doors at the edge of rooms to be accessible
     if (currentRoom.doors) {
         const door = currentRoom.doors.find(d => d.x === newX && d.y === newY);
         if (door) {
             if (currentRoom.cleared) {
+                console.log('🚪 Door found! Transitioning to room', door.targetRoom + 1);
                 // Move to next room
                 transitionToRoom(door.targetRoom);
                 return true;
@@ -136,6 +123,21 @@ export function movePlayer(dx, dy) {
                 }, 2000);
                 return false;
             }
+        }
+    }
+
+    // Check if position is valid (within current room)
+    if (!isPositionInRoom(newX, newY, currentRoom)) {
+        return false;
+    }
+
+    // Check for collisions with monsters
+    if (currentRoom.monsters && !currentRoom.cleared) {
+        const monster = currentRoom.monsters.find(m => m.x === newX && m.y === newY && m.hp > 0);
+        if (monster) {
+            // Start combat
+            startCombat(monster);
+            return false;
         }
     }
 
