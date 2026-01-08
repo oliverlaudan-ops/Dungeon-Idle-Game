@@ -14,8 +14,8 @@ export const ACHIEVEMENTS = {
     // === PROGRESS ACHIEVEMENTS ===
     first_steps: {
         id: 'first_steps',
-        name: 'Erste Schritte',
-        description: 'Erreiche Level 5',
+        name: 'First Steps',
+        description: 'Reach Level 5',
         icon: '🌱',
         category: ACHIEVEMENT_CATEGORIES.PROGRESS,
         condition: (state) => state.hero.level >= 5,
@@ -24,8 +24,8 @@ export const ACHIEVEMENTS = {
     },
     apprentice: {
         id: 'apprentice',
-        name: 'Lehrling',
-        description: 'Erreiche Level 10',
+        name: 'Apprentice',
+        description: 'Reach Level 10',
         icon: '⚔️',
         category: ACHIEVEMENT_CATEGORIES.PROGRESS,
         condition: (state) => state.hero.level >= 10,
@@ -35,7 +35,7 @@ export const ACHIEVEMENTS = {
     veteran: {
         id: 'veteran',
         name: 'Veteran',
-        description: 'Erreiche Level 20',
+        description: 'Reach Level 20',
         icon: '🛡️',
         category: ACHIEVEMENT_CATEGORIES.PROGRESS,
         condition: (state) => state.hero.level >= 20,
@@ -44,8 +44,8 @@ export const ACHIEVEMENTS = {
     },
     master: {
         id: 'master',
-        name: 'Meister',
-        description: 'Erreiche Level 50',
+        name: 'Master',
+        description: 'Reach Level 50',
         icon: '👑',
         category: ACHIEVEMENT_CATEGORIES.PROGRESS,
         condition: (state) => state.hero.level >= 50,
@@ -56,8 +56,8 @@ export const ACHIEVEMENTS = {
     // === COMBAT ACHIEVEMENTS ===
     first_run: {
         id: 'first_run',
-        name: 'Erste Erkundung',
-        description: 'Schließe deinen ersten Run ab',
+        name: 'First Exploration',
+        description: 'Complete your first run',
         icon: '🎯',
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         condition: (state) => state.idle.totalAutoRuns >= 1,
@@ -66,8 +66,8 @@ export const ACHIEVEMENTS = {
     },
     dungeon_explorer: {
         id: 'dungeon_explorer',
-        name: 'Dungeon Erkunder',
-        description: 'Schließe 50 Runs ab',
+        name: 'Dungeon Explorer',
+        description: 'Complete 50 runs',
         icon: '🗺️',
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         condition: (state) => state.idle.totalAutoRuns >= 50,
@@ -76,8 +76,8 @@ export const ACHIEVEMENTS = {
     },
     dungeon_master: {
         id: 'dungeon_master',
-        name: 'Dungeon Meister',
-        description: 'Schließe 100 erfolgreiche Runs ab',
+        name: 'Dungeon Master',
+        description: 'Complete 100 successful runs',
         icon: '🏆',
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         condition: (state) => state.idle.successfulRuns >= 100,
@@ -86,8 +86,8 @@ export const ACHIEVEMENTS = {
     },
     perfectionist: {
         id: 'perfectionist',
-        name: 'Perfektionist',
-        description: 'Erreiche 90% Erfolgsrate (min. 50 Runs)',
+        name: 'Perfectionist',
+        description: 'Achieve 90% success rate (min. 50 runs)',
         icon: '⭐',
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         condition: (state) => {
@@ -100,8 +100,8 @@ export const ACHIEVEMENTS = {
     },
     unstoppable: {
         id: 'unstoppable',
-        name: 'Unaufhaltsam',
-        description: 'Schließe 500 Runs ab',
+        name: 'Unstoppable',
+        description: 'Complete 500 runs',
         icon: '🔥',
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         condition: (state) => state.idle.totalAutoRuns >= 500,
@@ -112,8 +112,8 @@ export const ACHIEVEMENTS = {
     // === WEALTH ACHIEVEMENTS ===
     penny_pincher: {
         id: 'penny_pincher',
-        name: 'Sparsam',
-        description: 'Verdiene 1.000 Gold',
+        name: 'Penny Pincher',
+        description: 'Earn 1,000 Gold',
         icon: '💰',
         category: ACHIEVEMENT_CATEGORIES.WEALTH,
         condition: (state) => state.stats.totalGoldEarned >= 1000,
@@ -122,8 +122,8 @@ export const ACHIEVEMENTS = {
     },
     treasure_hunter: {
         id: 'treasure_hunter',
-        name: 'Schatzjäger',
-        description: 'Verdiene 10.000 Gold',
+        name: 'Treasure Hunter',
+        description: 'Earn 10,000 Gold',
         icon: '💎',
         category: ACHIEVEMENT_CATEGORIES.WEALTH,
         condition: (state) => state.stats.totalGoldEarned >= 10000,
@@ -132,8 +132,8 @@ export const ACHIEVEMENTS = {
     },
     gold_baron: {
         id: 'gold_baron',
-        name: 'Gold-Baron',
-        description: 'Verdiene 100.000 Gold',
+        name: 'Gold Baron',
+        description: 'Earn 100,000 Gold',
         icon: '👑',
         category: ACHIEVEMENT_CATEGORIES.WEALTH,
         condition: (state) => state.stats.totalGoldEarned >= 100000,
@@ -142,8 +142,8 @@ export const ACHIEVEMENTS = {
     },
     gem_collector: {
         id: 'gem_collector',
-        name: 'Edelstein-Sammler',
-        description: 'Sammle 100 Gems',
+        name: 'Gem Collector',
+        description: 'Collect 100 Gems',
         icon: '💠',
         category: ACHIEVEMENT_CATEGORIES.WEALTH,
         condition: (state) => state.resources.gems >= 100,
@@ -152,8 +152,8 @@ export const ACHIEVEMENTS = {
     },
     soul_keeper: {
         id: 'soul_keeper',
-        name: 'Seelenhüter',
-        description: 'Sammle 50 Souls',
+        name: 'Soul Keeper',
+        description: 'Collect 50 Souls',
         icon: '👻',
         category: ACHIEVEMENT_CATEGORIES.WEALTH,
         condition: (state) => state.resources.souls >= 50,
@@ -164,8 +164,8 @@ export const ACHIEVEMENTS = {
     // === MASTERY ACHIEVEMENTS ===
     upgrade_novice: {
         id: 'upgrade_novice',
-        name: 'Upgrade-Anfänger',
-        description: 'Kaufe dein erstes Upgrade',
+        name: 'Upgrade Novice',
+        description: 'Buy your first upgrade',
         icon: '⬆️',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => {
@@ -176,8 +176,8 @@ export const ACHIEVEMENTS = {
     },
     upgrade_enthusiast: {
         id: 'upgrade_enthusiast',
-        name: 'Upgrade-Enthusiast',
-        description: 'Kaufe 10 Upgrade-Level',
+        name: 'Upgrade Enthusiast',
+        description: 'Buy 10 upgrade levels',
         icon: '📈',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => {
@@ -189,8 +189,8 @@ export const ACHIEVEMENTS = {
     },
     upgrade_master: {
         id: 'upgrade_master',
-        name: 'Upgrade-Meister',
-        description: 'Bringe ein Upgrade auf Max-Level',
+        name: 'Upgrade Master',
+        description: 'Max out an upgrade',
         icon: '✨',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => {
@@ -201,8 +201,8 @@ export const ACHIEVEMENTS = {
     },
     completionist: {
         id: 'completionist',
-        name: 'Vollender',
-        description: 'Bringe alle Upgrades auf Max-Level',
+        name: 'Completionist',
+        description: 'Max out all upgrades',
         icon: '🌟',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => {
@@ -216,8 +216,8 @@ export const ACHIEVEMENTS = {
     },
     dedicated: {
         id: 'dedicated',
-        name: 'Engagiert',
-        description: 'Spiele 1 Stunde',
+        name: 'Dedicated',
+        description: 'Play for 1 hour',
         icon: '⏰',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => state.totalPlayTime >= 3600,
@@ -227,7 +227,7 @@ export const ACHIEVEMENTS = {
     no_life: {
         id: 'no_life',
         name: 'Hardcore Gamer',
-        description: 'Spiele 10 Stunden',
+        description: 'Play for 10 hours',
         icon: '🎮',
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => state.totalPlayTime >= 36000,
