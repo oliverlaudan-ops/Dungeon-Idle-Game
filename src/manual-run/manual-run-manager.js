@@ -45,6 +45,7 @@ export function startManualRun(floor = 1) {
     gameState.manualRun.dungeon = currentDungeon;
 
     console.log('✅ Manual run started:', currentDungeon);
+    console.log(`🏰 Dungeon has ${currentDungeon.rooms.length} rooms`);
 
     // Start render loop
     startRenderLoop();
@@ -74,6 +75,7 @@ export function endManualRun(success = true) {
         
         gameState.resources.gold += goldReward;
         gameState.hero.xp += xpReward;
+        gameState.stats.totalRunsCompleted++;
         
         console.log(`🎉 Rewards: +${goldReward} Gold, +${xpReward} XP`);
     }
@@ -89,7 +91,7 @@ export function endManualRun(success = true) {
 
     // Show completion message
     if (success) {
-        renderCenterMessage('Victory! 🎉', 'Click START RUN to play again');
+        renderCenterMessage('Victory! 🎉', `+${50 * gameState.manualRun.currentFloor || 50} Gold, +${30 * gameState.manualRun.currentFloor || 30} XP | Click START RUN to play again`);
     } else {
         renderCenterMessage('Defeated 💀', 'Click START RUN to try again');
     }
@@ -194,14 +196,26 @@ export function endCombat(victory = true) {
             currentRoom.cleared = true;
             console.log('✅ Room cleared!');
             
-            // Show cleared message briefly
-            setTimeout(() => {
-                renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
-                // Auto-clear message after 2 seconds
+            // Check if this was the final room
+            const isLastRoom = playerState.currentRoom === currentDungeon.rooms.length - 1;
+            
+            if (isLastRoom) {
+                // Final room cleared - Victory!
+                console.log('🎆 Final room cleared! Victory!');
                 setTimeout(() => {
-                    // Message will be cleared when render loop restarts
-                }, 2000);
-            }, 100);
+                    endManualRun(true);
+                }, 1500);
+                return; // Don't restart render loop, run is ending
+            } else {
+                // Show cleared message briefly
+                setTimeout(() => {
+                    renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
+                    // Auto-clear message after 2 seconds
+                    setTimeout(() => {
+                        // Message will be cleared when render loop restarts
+                    }, 2000);
+                }, 100);
+            }
         }
     }
 
@@ -244,7 +258,7 @@ function transitionToRoom(roomIndex) {
 
     // Show room message briefly
     setTimeout(() => {
-        renderCenterMessage(`Room ${roomIndex + 1}`, 'Clear all monsters!');
+        renderCenterMessage(`Room ${roomIndex + 1}/${currentDungeon.rooms.length}`, 'Clear all monsters!');
         // Auto-clear message after 2 seconds
         setTimeout(() => {
             // Message will be cleared when render loop continues
