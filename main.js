@@ -1,24 +1,45 @@
 /**
- * Dungeon Idle Game - Main Entry Point
- * Version: 0.1.0-alpha
+ * Main Game Entry Point
+ * Initializes and runs the game loop
  */
 
+import { gameState, loadGame, saveGame } from './src/core/game-state.js';
 import { initUI } from './ui/ui-init.js';
-import { gameLoop } from './src/core/game-loop.js';
-import { loadGame } from './src/core/game-state.js';
+import { updateUI } from './ui/ui-render.js';
+import { processAutoRun } from './src/idle/auto-run.js';
 
-// Initialize game on page load
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('🏰 Dungeon Idle Game starting...');
+// Load game on start
+loadGame();
+
+// Initialize UI
+initUI();
+
+// Track play time
+let lastPlayTimeUpdate = Date.now();
+
+// Main game loop
+function gameLoop() {
+    const now = Date.now();
     
-    // Load saved game state
-    loadGame();
-    
-    // Initialize UI
-    initUI();
-    
-    // Start game loop
-    gameLoop();
-    
-    console.log('✅ Game initialized successfully!');
-});
+    // Update play time (track seconds)
+    const deltaTime = (now - lastPlayTimeUpdate) / 1000;
+    gameState.totalPlayTime += deltaTime;
+    lastPlayTimeUpdate = now;
+
+    // Process auto-runs if enabled
+    if (gameState.idle.autoRunEnabled) {
+        processAutoRun();
+    }
+
+    // Update UI
+    updateUI();
+
+    // Continue loop
+    requestAnimationFrame(gameLoop);
+}
+
+// Start game loop
+gameLoop();
+
+console.log('🎮 Dungeon Idle Game started!');
+console.log('💾 Game State:', gameState);
