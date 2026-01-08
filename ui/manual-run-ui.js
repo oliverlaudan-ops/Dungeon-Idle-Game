@@ -17,8 +17,6 @@ let inputHandlerInitialized = false;
  * Initialize manual run UI
  */
 export function initManualRunUI() {
-    console.log('🎮 Initializing manual run UI...');
-
     // Initialize canvas (only once)
     if (!canvasInitialized) {
         if (!initCanvas()) {
@@ -48,8 +46,6 @@ export function initManualRunUI() {
 
     // Always ensure start button exists and has correct state
     ensureStartButton();
-
-    console.log('✅ Manual run UI ready');
 }
 
 /**
@@ -107,8 +103,6 @@ function updateButtonState(btn) {
         if (!btn) return;
     }
 
-    console.log('🔄 Updating button state. manualRun.active:', gameState.manualRun.active);
-
     if (gameState.manualRun.active) {
         btn.textContent = 'Run in Progress...';
         btn.disabled = true;
@@ -126,10 +120,7 @@ function updateButtonState(btn) {
  * Handle start run button click
  */
 function handleStartRun() {
-    console.log('👆 Start button clicked');
-    
     if (gameState.manualRun.active) {
-        console.log('⚠️ Run already active');
         return;
     }
 
@@ -138,8 +129,6 @@ function handleStartRun() {
         alert('⚠️ Your hero has no HP! Heal first.');
         return;
     }
-
-    console.log('🚀 Starting manual run...');
 
     // Start the run
     const floor = 1; // Start with floor 1
