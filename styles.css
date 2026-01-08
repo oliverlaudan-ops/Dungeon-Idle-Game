@@ -135,6 +135,12 @@ main {
     font-size: 1.3rem;
 }
 
+.tab-panel h4 {
+    margin-bottom: 10px;
+    color: var(--accent-secondary);
+    font-size: 1.1rem;
+}
+
 /* ===== IDLE TAB SPECIFIC ===== */
 
 /* Resource Panel */
@@ -518,9 +524,49 @@ main {
 
 .upgrades-intro {
     color: var(--text-secondary);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     font-size: 1.1rem;
     text-align: center;
+}
+
+/* Upgrade Resources Display */
+.upgrade-resources {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+}
+
+.upgrade-resource-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease;
+}
+
+.upgrade-resource-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.2);
+}
+
+.upgrade-resource-icon {
+    font-size: 1.8rem;
+}
+
+.upgrade-resource-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--accent-secondary);
+    min-width: 60px;
+    text-align: left;
 }
 
 .upgrade-category {
@@ -654,6 +700,55 @@ main {
     font-size: 1rem;
 }
 
+/* ===== SETTINGS TAB ===== */
+
+.settings-panel {
+    background: var(--bg-tertiary);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-description {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.save-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    resize: vertical;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.save-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.save-textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
 /* ===== BUTTONS ===== */
 .btn {
     padding: 12px 24px;
@@ -678,7 +773,31 @@ main {
     box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
 }
 
-.btn-primary:active {
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.btn-primary:active,
+.btn-success:active,
+.btn-danger:active {
     transform: translateY(0);
 }
 
@@ -776,8 +895,8 @@ footer a:hover {
     }
 
     .tab-btn {
-        font-size: 0.9rem;
-        padding: 12px;
+        font-size: 0.85rem;
+        padding: 12px 8px;
     }
 
     main {
@@ -806,5 +925,15 @@ footer a:hover {
 
     .upgrades-grid {
         grid-template-columns: 1fr;
+    }
+
+    .upgrade-resources {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .upgrade-resource-item {
+        flex: 1;
+        min-width: 120px;
     }
 }
