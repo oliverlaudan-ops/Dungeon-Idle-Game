@@ -145,10 +145,10 @@ function renderRoom(room, offsetX, offsetY, playerState) {
         height * TILE_SIZE
     );
 
-    // Draw doors
+    // Draw doors (check if room is cleared to determine if door is open)
     if (room.doors) {
         room.doors.forEach(door => {
-            renderDoor(door, offsetX, offsetY);
+            renderDoor(door, offsetX, offsetY, room.cleared);
         });
     }
 
@@ -175,11 +175,13 @@ function renderRoom(room, offsetX, offsetY, playerState) {
 /**
  * Render a door
  */
-function renderDoor(door, offsetX, offsetY) {
+function renderDoor(door, offsetX, offsetY, roomCleared) {
     const x = offsetX + door.x * TILE_SIZE;
     const y = offsetY + door.y * TILE_SIZE;
     
-    ctx.fillStyle = door.isOpen ? COLORS.doorOpen : COLORS.door;
+    // Door is open if room is cleared
+    const isOpen = roomCleared;
+    ctx.fillStyle = isOpen ? COLORS.doorOpen : COLORS.door;
     
     if (door.direction === 'north' || door.direction === 'south') {
         // Horizontal door
@@ -194,7 +196,7 @@ function renderDoor(door, offsetX, offsetY) {
     ctx.font = '16px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(door.isOpen ? '🚪' : '🔒', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+    ctx.fillText(isOpen ? '🚪' : '🔒', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
 }
 
 /**
