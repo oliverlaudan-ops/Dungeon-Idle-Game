@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Idle Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>🏰 Dungeon Idle Game</h1>
+            <div id="version">v0.1.0-alpha</div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="idle">Idle Runs</button>
+            <button class="tab-btn" data-tab="manual">Manual Run</button>
+            <button class="tab-btn" data-tab="hero">Hero</button>
+            <button class="tab-btn" data-tab="upgrades">Upgrades</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main id="tab-content">
+            <!-- Idle Tab -->
+            <div id="idle-tab" class="tab-panel active">
+                <h2>Automatische Dungeon Runs</h2>
+                <div id="idle-stats">
+                    <p>Coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Manual Run Tab -->
+            <div id="manual-tab" class="tab-panel">
+                <h2>Manueller Dungeon Run</h2>
+                <div id="dungeon-canvas-container">
+                    <canvas id="dungeon-canvas" width="600" height="400"></canvas>
+                </div>
+                <div id="combat-ui">
+                    <p>Coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Hero Tab -->
+            <div id="hero-tab" class="tab-panel">
+                <h2>Dein Held</h2>
+                <div id="hero-stats">
+                    <p>Coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Upgrades Tab -->
+            <div id="upgrades-tab" class="tab-panel">
+                <h2>Permanente Upgrades</h2>
+                <div id="upgrades-list">
+                    <p>Coming soon...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Dungeon Idle Game © 2026 | <a href="https://github.com/oliverlaudan-ops/Dungeon-Idle-Game" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
