@@ -136,8 +136,130 @@
             <!-- Hero Tab -->
             <div id="hero-tab" class="tab-panel">
                 <h2>🦸 Dein Held</h2>
-                <div id="hero-stats">
-                    <p class="text-muted">Coming soon...</p>
+                
+                <!-- Hero Overview -->
+                <div class="hero-overview">
+                    <div class="hero-portrait">
+                        <div class="portrait-icon">🦸</div>
+                        <div class="hero-name-level">
+                            <h3 id="hero-name">Adventurer</h3>
+                            <div class="level-badge">
+                                <span>Level</span>
+                                <span id="hero-level" class="level-number">1</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- XP Progress -->
+                    <div class="xp-section">
+                        <div class="xp-header">
+                            <span class="xp-label">Experience</span>
+                            <span class="xp-values">
+                                <span id="hero-xp">0</span> / <span id="hero-xp-next">100</span>
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="xp-progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Stats -->
+                <div class="hero-stats-panel">
+                    <h3>💪 Attribute</h3>
+                    <div class="stats-list">
+                        <!-- HP -->
+                        <div class="stat-row">
+                            <div class="stat-info">
+                                <span class="stat-icon">❤️</span>
+                                <span class="stat-name">Health Points</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar">
+                                    <div id="hp-bar" class="stat-bar-fill hp-bar" style="width: 100%"></div>
+                                </div>
+                                <span class="stat-value">
+                                    <span id="hero-hp">100</span> / <span id="hero-max-hp">100</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Attack -->
+                        <div class="stat-row">
+                            <div class="stat-info">
+                                <span class="stat-icon">⚔️</span>
+                                <span class="stat-name">Attack Power</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar">
+                                    <div class="stat-bar-fill attack-bar" style="width: 20%"></div>
+                                </div>
+                                <span class="stat-value" id="hero-attack">10</span>
+                            </div>
+                        </div>
+
+                        <!-- Defense -->
+                        <div class="stat-row">
+                            <div class="stat-info">
+                                <span class="stat-icon">🛡️</span>
+                                <span class="stat-name">Defense</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar">
+                                    <div class="stat-bar-fill defense-bar" style="width: 10%"></div>
+                                </div>
+                                <span class="stat-value" id="hero-defense">5</span>
+                            </div>
+                        </div>
+
+                        <!-- Crit Chance -->
+                        <div class="stat-row">
+                            <div class="stat-info">
+                                <span class="stat-icon">⚡</span>
+                                <span class="stat-name">Critical Chance</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar">
+                                    <div class="stat-bar-fill crit-bar" style="width: 5%"></div>
+                                </div>
+                                <span class="stat-value" id="hero-crit-chance">5%</span>
+                            </div>
+                        </div>
+
+                        <!-- Crit Multiplier -->
+                        <div class="stat-row">
+                            <div class="stat-info">
+                                <span class="stat-icon">💥</span>
+                                <span class="stat-name">Critical Damage</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <span class="stat-value" id="hero-crit-multi">2.0x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combat Stats -->
+                <div class="combat-stats-panel">
+                    <h3>⚔️ Kampf-Statistiken</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Besiegte Monster:</span>
+                            <span class="stat-value" id="monsters-killed">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tiefste Ebene:</span>
+                            <span class="stat-value" id="deepest-floor">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tode:</span>
+                            <span class="stat-value danger" id="total-deaths">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Runs Abgeschlossen:</span>
+                            <span class="stat-value success" id="runs-completed">0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -154,6 +276,9 @@
             <p>Dungeon Idle Game © 2026 | <a href="https://github.com/oliverlaudan-ops/Dungeon-Idle-Game" target="_blank">GitHub</a></p>
         </footer>
     </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
 
     <script type="module" src="main.js"></script>
 </body>
