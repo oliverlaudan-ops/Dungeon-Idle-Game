@@ -49,6 +49,12 @@ export const gameState = {
     // Upgrade bonuses (calculated from upgrades)
     upgradeBonuses: {},
 
+    // Achievements
+    achievements: {
+        unlocked: {}, // { achievementId: timestamp }
+        newlyUnlocked: [] // Array of achievement IDs for notification
+    },
+
     // Statistics
     stats: {
         totalGoldEarned: 0,
