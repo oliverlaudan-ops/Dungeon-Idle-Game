@@ -7,6 +7,7 @@ import { gameState, saveGame } from '../src/core/game-state.js';
 import { updateUI } from './ui-render.js';
 import { renderUpgrades } from './upgrades-ui.js';
 import { renderAchievements } from './achievements-ui.js';
+import { initManualRunUI, updateManualRunUI } from './manual-run-ui.js';
 import { applyUpgradeEffects } from '../src/upgrades/upgrade-manager.js';
 import { exportSave, importSave, resetGame, formatTimestamp, formatPlayTime } from '../src/core/save-manager.js';
 
@@ -30,6 +31,9 @@ export function initUI() {
 
     // Render achievements
     renderAchievements();
+
+    // Initialize manual run UI
+    initManualRunUI();
 
     // Initial UI update
     updateUI();
@@ -70,6 +74,11 @@ function setupTabs() {
             // Refresh achievements when switching to achievements tab
             if (targetTab === 'achievements') {
                 renderAchievements();
+            }
+
+            // Initialize manual run when switching to manual tab
+            if (targetTab === 'manual') {
+                initManualRunUI();
             }
 
             // Update settings info when switching to settings tab
@@ -209,8 +218,14 @@ function updateSettingsInfo() {
     }
 
     if (playTimeEl) {
-        // Calculate play time (rough estimate based on save times)
         const playTime = Math.floor(gameState.totalPlayTime || 0);
         playTimeEl.textContent = formatPlayTime(playTime);
     }
+}
+
+/**
+ * Update manual run UI (exported for main.js)
+ */
+export function updateManualRunUIState() {
+    updateManualRunUI();
 }
