@@ -15,17 +15,22 @@ export function updateUI() {
     updateResources();
     updateAutoRunInfo();
     updateStats();
-    updateHeroTab();
+    // updateHeroDisplay() will be added when Hero tab is implemented
 }
 
 /**
  * Update resource displays
  */
 function updateResources() {
-    document.getElementById('gold-value').textContent = formatNumber(gameState.resources.gold);
-    document.getElementById('gems-value').textContent = formatNumber(gameState.resources.gems);
-    document.getElementById('souls-value').textContent = formatNumber(gameState.resources.souls);
-    document.getElementById('keys-value').textContent = gameState.resources.dungeonKeys;
+    const goldEl = document.getElementById('gold-value');
+    const gemsEl = document.getElementById('gems-value');
+    const soulsEl = document.getElementById('souls-value');
+    const keysEl = document.getElementById('keys-value');
+
+    if (goldEl) goldEl.textContent = formatNumber(gameState.resources.gold);
+    if (gemsEl) gemsEl.textContent = formatNumber(gameState.resources.gems);
+    if (soulsEl) soulsEl.textContent = formatNumber(gameState.resources.souls);
+    if (keysEl) keysEl.textContent = gameState.resources.dungeonKeys;
 }
 
 /**
@@ -36,6 +41,8 @@ function updateAutoRunInfo() {
     const timerEl = document.getElementById('next-run-timer');
     const successRateEl = document.getElementById('success-rate');
     const intervalEl = document.getElementById('auto-run-interval');
+
+    if (!statusEl || !timerEl || !successRateEl || !intervalEl) return;
 
     // Status
     if (gameState.idle.autoRunEnabled) {
@@ -70,36 +77,15 @@ function updateStats() {
     const failedRuns = totalRuns - successfulRuns;
     const successRatio = totalRuns > 0 ? (successfulRuns / totalRuns * 100) : 0;
 
-    document.getElementById('total-runs').textContent = totalRuns;
-    document.getElementById('successful-runs').textContent = successfulRuns;
-    document.getElementById('failed-runs').textContent = failedRuns;
-    document.getElementById('success-ratio').textContent = Math.round(successRatio) + '%';
-}
+    const totalEl = document.getElementById('total-runs');
+    const successEl = document.getElementById('successful-runs');
+    const failedEl = document.getElementById('failed-runs');
+    const ratioEl = document.getElementById('success-ratio');
 
-/**
- * Update Hero Tab displays
- */
-function updateHeroTab() {
-    const hero = gameState.hero;
-
-    // Hero name and level
-    document.getElementById('hero-name').textContent = hero.name;
-    document.getElementById('hero-level').textContent = hero.level;
-
-    // XP Bar
-    const xpPercent = (hero.xp / hero.xpToNextLevel) * 100;
-    document.getElementById('xp-text').textContent = `${Math.floor(hero.xp)} / ${hero.xpToNextLevel}`;
-    document.getElementById('xp-bar').style.width = xpPercent + '%';
-
-    // Combat Stats
-    document.getElementById('hero-hp').textContent = `${hero.hp} / ${hero.maxHp}`;
-    const hpPercent = (hero.hp / hero.maxHp) * 100;
-    document.getElementById('hp-bar').style.width = hpPercent + '%';
-
-    document.getElementById('hero-attack').textContent = hero.attack;
-    document.getElementById('hero-defense').textContent = hero.defense;
-    document.getElementById('hero-crit').textContent = Math.round(hero.critChance * 100) + '%';
-    document.getElementById('hero-crit-dmg').textContent = Math.round(hero.critMultiplier * 100) + '%';
+    if (totalEl) totalEl.textContent = totalRuns;
+    if (successEl) successEl.textContent = successfulRuns;
+    if (failedEl) failedEl.textContent = failedRuns;
+    if (ratioEl) ratioEl.textContent = Math.round(successRatio) + '%';
 }
 
 /**
@@ -125,6 +111,7 @@ export function addRunHistoryEntry(success, rewards = null) {
  */
 function updateRunHistory() {
     const historyEl = document.getElementById('run-history');
+    if (!historyEl) return;
     
     if (runHistory.length === 0) {
         historyEl.innerHTML = '<p class="text-muted">Noch keine Runs durchgeführt...</p>';
