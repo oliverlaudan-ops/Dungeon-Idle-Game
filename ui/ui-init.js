@@ -5,7 +5,8 @@
 
 import { gameState, saveGame } from '../src/core/game-state.js';
 import { updateUI } from './ui-render.js';
-import { initUpgradesUI } from './ui-upgrades.js';
+import { renderUpgrades } from './upgrades-ui.js';
+import { applyUpgradeEffects } from '../src/upgrades/upgrade-manager.js';
 
 /**
  * Initialize UI
@@ -13,14 +14,17 @@ import { initUpgradesUI } from './ui-upgrades.js';
 export function initUI() {
     console.log('📱 Initializing UI...');
 
+    // Apply upgrades from save game
+    applyUpgradeEffects();
+
     // Setup tab navigation
     setupTabs();
 
     // Setup button listeners
     setupButtons();
 
-    // Initialize upgrades UI
-    initUpgradesUI();
+    // Render upgrades
+    renderUpgrades();
 
     // Initial UI update
     updateUI();
@@ -48,6 +52,11 @@ function setupTabs() {
             const targetPanel = document.getElementById(`${targetTab}-tab`);
             if (targetPanel) {
                 targetPanel.classList.add('active');
+            }
+
+            // Refresh upgrades when switching to upgrades tab
+            if (targetTab === 'upgrades') {
+                renderUpgrades();
             }
         });
     });

@@ -5,6 +5,7 @@
 
 import { gameState } from '../core/game-state.js';
 import { addRunHistoryEntry } from '../../ui/ui-render.js';
+import { getEffectiveStats } from '../upgrades/upgrade-manager.js';
 
 /**
  * Process auto-run if enough time has passed
@@ -25,7 +26,7 @@ export function processAutoRun() {
 function executeAutoRun() {
     console.log('🎯 Executing auto-run...');
 
-    // Calculate success chance based on hero stats
+    // Calculate success chance based on hero stats + upgrades
     const successChance = calculateSuccessChance();
     const success = Math.random() < successChance;
 
@@ -62,15 +63,20 @@ function executeAutoRun() {
  * Calculate success chance for auto-runs
  */
 function calculateSuccessChance() {
+    const effectiveStats = getEffectiveStats();
+    
     // Base 50% + bonuses from stats and upgrades
     let chance = 0.5;
     
     // Hero level bonus (2% per level)
     chance += gameState.hero.level * 0.02;
     
-    // Hero stats bonus
-    const statBonus = (gameState.hero.attack + gameState.hero.defense) / 1000;
+    // Hero stats bonus (with upgrades)
+    const statBonus = (effectiveStats.attack + effectiveStats.defense) / 1000;
     chance += statBonus;
+    
+    // Direct success bonus from upgrades
+    chance += effectiveStats.successBonus;
     
     // Cap at 95%
     return Math.min(0.95, chance);
@@ -81,21 +87,30 @@ function calculateSuccessChance() {
  */
 function calculateRewards() {
     const level = gameState.hero.level;
+    const effectiveStats = getEffectiveStats();
     
     // Base rewards scale with level
     const baseGold = 10 + (level * 2);
     const baseXP = 5 + level;
-    const gemChance = 0.1 + (level * 0.01); // 10% + 1% per level
-    const soulChance = 0.05 + (level * 0.005); // 5% + 0.5% per level
+    const baseGemChance = 0.1 + (level * 0.01); // 10% + 1% per level
+    const baseSoulChance = 0.05 + (level * 0.005); // 5% + 0.5% per level
 
     // Add some variance (80-120%)
     const variance = 0.8 + Math.random() * 0.4;
 
+    // Apply multipliers from upgrades
+    const finalGold = Math.floor(baseGold * variance * (1 + level * 0.1) * effectiveStats.goldMultiplier);
+    const finalXP = Math.floor(baseXP * variance * (1 + level * 0.05) * effectiveStats.xpMultiplier);
+    
+    // Drop chances with upgrade bonuses
+    const finalGemChance = Math.min(0.9, baseGemChance + effectiveStats.gemChanceBonus);
+    const finalSoulChance = Math.min(0.8, baseSoulChance + effectiveStats.soulChanceBonus);
+
     return {
-        gold: Math.floor(baseGold * variance * (1 + level * 0.1)),
-        xp: Math.floor(baseXP * variance * (1 + level * 0.05)),
-        gems: Math.random() < gemChance ? 1 : 0,
-        souls: Math.random() < soulChance ? 1 : 0
+        gold: finalGold,
+        xp: finalXP,
+        gems: Math.random() < finalGemChance ? 1 : 0,
+        souls: Math.random() < finalSoulChance ? 1 : 0
     };
 }
 
