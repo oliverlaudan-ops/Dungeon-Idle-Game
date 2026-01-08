@@ -84,7 +84,16 @@ export function loadGame() {
         const saved = localStorage.getItem('dungeonIdleGame');
         if (saved) {
             const loaded = JSON.parse(saved);
-            Object.assign(gameState, loaded);
+            // Merge loaded state with default state to handle new properties
+            Object.keys(gameState).forEach(key => {
+                if (loaded[key] !== undefined) {
+                    if (typeof gameState[key] === 'object' && !Array.isArray(gameState[key])) {
+                        gameState[key] = { ...gameState[key], ...loaded[key] };
+                    } else {
+                        gameState[key] = loaded[key];
+                    }
+                }
+            });
             console.log('💾 Game loaded');
             return true;
         }
