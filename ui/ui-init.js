@@ -3,7 +3,8 @@
  * Sets up all UI event listeners and interactions
  */
 
-import { gameState } from '../src/core/game-state.js';
+import { gameState, saveGame } from '../src/core/game-state.js';
+import { updateUI } from './ui-render.js';
 
 /**
  * Initialize UI
@@ -16,6 +17,9 @@ export function initUI() {
 
     // Setup button listeners
     setupButtons();
+
+    // Initial UI update
+    updateUI();
 
     console.log('✅ UI initialized');
 }
@@ -49,5 +53,44 @@ function setupTabs() {
  * Setup button event listeners
  */
 function setupButtons() {
-    // Buttons will be added as we implement features
+    // Auto-run toggle button
+    const autoRunBtn = document.getElementById('toggle-auto-run');
+    if (autoRunBtn) {
+        autoRunBtn.addEventListener('click', toggleAutoRun);
+        updateAutoRunButton();
+    }
+}
+
+/**
+ * Toggle auto-run on/off
+ */
+function toggleAutoRun() {
+    gameState.idle.autoRunEnabled = !gameState.idle.autoRunEnabled;
+    
+    if (gameState.idle.autoRunEnabled) {
+        console.log('✅ Auto-runs aktiviert');
+        // Set last run time to now so first run happens after full interval
+        gameState.idle.lastAutoRun = Date.now();
+    } else {
+        console.log('❌ Auto-runs deaktiviert');
+    }
+
+    updateAutoRunButton();
+    saveGame();
+}
+
+/**
+ * Update auto-run button text and style
+ */
+function updateAutoRunButton() {
+    const btn = document.getElementById('toggle-auto-run');
+    if (!btn) return;
+
+    if (gameState.idle.autoRunEnabled) {
+        btn.textContent = 'Stop Auto Runs';
+        btn.style.background = 'var(--danger)';
+    } else {
+        btn.textContent = 'Start Auto Runs';
+        btn.style.background = 'var(--success)';
+    }
 }
