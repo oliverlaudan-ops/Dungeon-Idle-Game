@@ -20,6 +20,7 @@
             <button class="tab-btn" data-tab="manual">Manual Run</button>
             <button class="tab-btn" data-tab="hero">Hero</button>
             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
         </nav>
 
         <!-- Tab Content -->
@@ -233,6 +234,26 @@
                 
                 <p class="upgrades-intro">Investiere deine Ressourcen in permanente Verbesserungen!</p>
 
+                <!-- Resource Display on Upgrades Tab -->
+                <div class="upgrade-resources">
+                    <div class="upgrade-resource-item">
+                        <span class="upgrade-resource-icon">💰</span>
+                        <span class="upgrade-resource-value" id="upgrade-gold">0</span>
+                    </div>
+                    <div class="upgrade-resource-item">
+                        <span class="upgrade-resource-icon">💎</span>
+                        <span class="upgrade-resource-value" id="upgrade-gems">0</span>
+                    </div>
+                    <div class="upgrade-resource-item">
+                        <span class="upgrade-resource-icon">👻</span>
+                        <span class="upgrade-resource-value" id="upgrade-souls">0</span>
+                    </div>
+                    <div class="upgrade-resource-item">
+                        <span class="upgrade-resource-icon">🗝️</span>
+                        <span class="upgrade-resource-value" id="upgrade-keys">3</span>
+                    </div>
+                </div>
+
                 <!-- Combat Upgrades -->
                 <div class="upgrade-category">
                     <h3 class="category-title">💪 Kampf-Upgrades</h3>
@@ -254,6 +275,55 @@
                     <h3 class="category-title">✨ Spezial-Upgrades</h3>
                     <div class="upgrades-grid" id="special-upgrades">
                         <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-panel">
+                <h2>⚙️ Einstellungen</h2>
+
+                <!-- Save Management -->
+                <div class="settings-panel">
+                    <h3>💾 Speicherverwaltung</h3>
+                    
+                    <div class="settings-section">
+                        <h4>Export Save</h4>
+                        <p class="settings-description">Exportiere deinen Spielstand als Text. Damit kannst du dein Spiel sichern oder auf einem anderen Gerät weiterspielen.</p>
+                        <button id="export-btn" class="btn btn-primary">Spielstand exportieren</button>
+                        <textarea id="export-text" class="save-textarea" placeholder="Dein exportierter Spielstand erscheint hier..." readonly></textarea>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>Import Save</h4>
+                        <p class="settings-description">Füge einen exportierten Spielstand ein, um diesen zu laden.</p>
+                        <textarea id="import-text" class="save-textarea" placeholder="Füge hier deinen exportierten Spielstand ein..."></textarea>
+                        <button id="import-btn" class="btn btn-success">Spielstand importieren</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>⚠️ Danger Zone</h4>
+                        <p class="settings-description">Lösche deinen gesamten Spielstand und starte komplett von vorne. <strong>Diese Aktion kann nicht rückgängig gemacht werden!</strong></p>
+                        <button id="reset-btn" class="btn btn-danger">Spielstand zurücksetzen</button>
+                    </div>
+                </div>
+
+                <!-- Game Info -->
+                <div class="settings-panel">
+                    <h3>📊 Spiel-Informationen</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Version:</span>
+                            <span class="info-value">0.1.0-alpha</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Letzter Save:</span>
+                            <span class="info-value" id="last-save-time">--</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Spielzeit:</span>
+                            <span class="info-value" id="play-time">--</span>
+                        </div>
                     </div>
                 </div>
             </div>
