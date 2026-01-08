@@ -10,7 +10,7 @@
     <div id="game-container">
         <header>
             <h1>🏰 Dungeon Idle Game</h1>
-            <div id="version">v0.2.0-alpha</div>
+            <div id="version">v0.1.0-alpha</div>
         </header>
 
         <!-- Tab Navigation -->
@@ -138,70 +138,73 @@
                 <h2>🦸 Dein Held</h2>
                 
                 <!-- Hero Overview -->
-                <div class="hero-overview">
-                    <div class="hero-portrait">
+                <div class="hero-panel">
+                    <div class="hero-header">
                         <div class="hero-avatar">🦸</div>
-                        <div class="hero-name-level">
-                            <span class="hero-name" id="hero-name">Adventurer</span>
-                            <span class="hero-level">Level <span id="hero-level">1</span></span>
+                        <div class="hero-title">
+                            <h3 id="hero-name">Adventurer</h3>
+                            <p class="hero-level">Level <span id="hero-level">1</span></p>
                         </div>
                     </div>
-                    
+
+                    <!-- XP Bar -->
                     <div class="xp-section">
                         <div class="xp-label">
-                            <span>Experience</span>
+                            <span>Erfahrung</span>
                             <span id="xp-text">0 / 100</span>
                         </div>
                         <div class="xp-bar-container">
-                            <div class="xp-bar" id="xp-bar" style="width: 0%"></div>
+                            <div id="xp-bar" class="xp-bar" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Combat Stats -->
+                <!-- Hero Stats -->
                 <div class="hero-stats-panel">
-                    <h3>⚔️ Kampf-Statistiken</h3>
+                    <h3>💪 Attribute</h3>
                     <div class="hero-stats-grid">
-                        <div class="hero-stat-item hp">
+                        <!-- HP -->
+                        <div class="stat-card">
                             <div class="stat-icon">❤️</div>
                             <div class="stat-details">
-                                <span class="stat-name">Health Points</span>
+                                <span class="stat-name">Leben</span>
                                 <span class="stat-value" id="hero-hp">100 / 100</span>
-                                <div class="stat-bar">
-                                    <div class="stat-bar-fill hp-bar" id="hp-bar" style="width: 100%"></div>
-                                </div>
                             </div>
                         </div>
-                        
-                        <div class="hero-stat-item attack">
-                            <div class="stat-icon">🗡️</div>
+
+                        <!-- Attack -->
+                        <div class="stat-card">
+                            <div class="stat-icon">⚔️</div>
                             <div class="stat-details">
-                                <span class="stat-name">Attack</span>
+                                <span class="stat-name">Angriff</span>
                                 <span class="stat-value" id="hero-attack">10</span>
                             </div>
                         </div>
-                        
-                        <div class="hero-stat-item defense">
+
+                        <!-- Defense -->
+                        <div class="stat-card">
                             <div class="stat-icon">🛡️</div>
                             <div class="stat-details">
-                                <span class="stat-name">Defense</span>
+                                <span class="stat-name">Verteidigung</span>
                                 <span class="stat-value" id="hero-defense">5</span>
                             </div>
                         </div>
-                        
-                        <div class="hero-stat-item crit">
+
+                        <!-- Crit Chance -->
+                        <div class="stat-card">
                             <div class="stat-icon">✨</div>
                             <div class="stat-details">
-                                <span class="stat-name">Critical Chance</span>
+                                <span class="stat-name">Krit. Chance</span>
                                 <span class="stat-value" id="hero-crit">5%</span>
                             </div>
                         </div>
-                        
-                        <div class="hero-stat-item crit-dmg">
+
+                        <!-- Crit Multiplier -->
+                        <div class="stat-card">
                             <div class="stat-icon">💥</div>
                             <div class="stat-details">
-                                <span class="stat-name">Critical Damage</span>
-                                <span class="stat-value" id="hero-crit-dmg">200%</span>
+                                <span class="stat-name">Krit. Schaden</span>
+                                <span class="stat-value" id="hero-crit-mult">2.0x</span>
                             </div>
                         </div>
                     </div>
@@ -209,43 +212,25 @@
 
                 <!-- Hero Info -->
                 <div class="hero-info-panel">
-                    <h3>📊 Status-Effekte</h3>
-                    <p class="text-muted">Dein Held wird mit jedem Level stärker!</p>
-                    <ul class="hero-bonuses">
-                        <li>❤️ +10 Max HP pro Level</li>
-                        <li>🗡️ +2 Attack pro Level</li>
-                        <li>🛡️ +1 Defense pro Level</li>
-                        <li>🎯 +2% Auto-Run Erfolgsrate pro Level</li>
-                    </ul>
+                    <h3>📊 Informationen</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Steigerung pro Level:</span>
+                            <span class="info-value">+10 HP, +2 ATK, +1 DEF</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Nächstes Level:</span>
+                            <span class="info-value" id="xp-needed">100 XP</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Upgrades Tab -->
             <div id="upgrades-tab" class="tab-panel">
                 <h2>⬆️ Permanente Upgrades</h2>
-                
-                <!-- Hero Upgrades -->
-                <div class="upgrade-category">
-                    <h3>🦸 Hero Upgrades</h3>
-                    <div id="hero-upgrades" class="upgrades-grid">
-                        <!-- Dynamically populated -->
-                    </div>
-                </div>
-
-                <!-- Idle Upgrades -->
-                <div class="upgrade-category">
-                    <h3>🔄 Idle System Upgrades</h3>
-                    <div id="idle-upgrades" class="upgrades-grid">
-                        <!-- Dynamically populated -->
-                    </div>
-                </div>
-
-                <!-- Combat Upgrades -->
-                <div class="upgrade-category">
-                    <h3>⚔️ Combat Upgrades</h3>
-                    <div id="combat-upgrades" class="upgrades-grid">
-                        <!-- Dynamically populated -->
-                    </div>
+                <div id="upgrades-list">
+                    <p class="text-muted">Coming soon...</p>
                 </div>
             </div>
         </main>
