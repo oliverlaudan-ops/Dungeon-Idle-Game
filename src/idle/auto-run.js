@@ -4,7 +4,7 @@
  */
 
 import { gameState } from '../core/game-state.js';
-import { addRunHistoryEntry, showNotification } from '../../ui/ui-render.js';
+import { addRunHistoryEntry } from '../../ui/ui-render.js';
 
 /**
  * Process auto-run if enough time has passed
@@ -43,7 +43,6 @@ function executeAutoRun() {
 
         // Update statistics
         gameState.stats.totalGoldEarned += rewards.gold;
-        gameState.stats.totalRunsCompleted++;
 
         // Check for level up
         checkLevelUp();
@@ -115,21 +114,10 @@ function checkLevelUp() {
         gameState.hero.attack += 2;
         gameState.hero.defense += 1;
 
-        // Small increase to crit chance
-        if (gameState.hero.level % 5 === 0) {
-            gameState.hero.critChance += 0.01; // +1% every 5 levels
-        }
-
         // Increase XP required for next level
         gameState.hero.xpToNextLevel = Math.floor(gameState.hero.xpToNextLevel * 1.15);
 
         console.log(`🎉 Level Up! Now level ${gameState.hero.level}`);
-        
-        // Show notification
-        showNotification(
-            '🎉 Level Up!',
-            `You reached level ${gameState.hero.level}! Stats increased.`,
-            'success'
-        );
+        console.log(`💪 Stats: HP ${gameState.hero.maxHp}, ATK ${gameState.hero.attack}, DEF ${gameState.hero.defense}`);
     }
 }
