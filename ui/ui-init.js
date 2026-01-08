@@ -6,6 +6,7 @@
 import { gameState, saveGame } from '../src/core/game-state.js';
 import { updateUI } from './ui-render.js';
 import { renderUpgrades } from './upgrades-ui.js';
+import { renderAchievements } from './achievements-ui.js';
 import { applyUpgradeEffects } from '../src/upgrades/upgrade-manager.js';
 import { exportSave, importSave, resetGame, formatTimestamp, formatPlayTime } from '../src/core/save-manager.js';
 
@@ -26,6 +27,9 @@ export function initUI() {
 
     // Render upgrades
     renderUpgrades();
+
+    // Render achievements
+    renderAchievements();
 
     // Initial UI update
     updateUI();
@@ -61,6 +65,11 @@ function setupTabs() {
             // Refresh upgrades when switching to upgrades tab
             if (targetTab === 'upgrades') {
                 renderUpgrades();
+            }
+
+            // Refresh achievements when switching to achievements tab
+            if (targetTab === 'achievements') {
+                renderAchievements();
             }
 
             // Update settings info when switching to settings tab
