@@ -31,14 +31,14 @@ function renderAchievementHeader() {
             <div class="achievement-stat-card">
                 <span class="achievement-stat-icon">🏆</span>
                 <div class="achievement-stat-info">
-                    <span class="achievement-stat-label">Freigeschaltet</span>
+                    <span class="achievement-stat-label">Unlocked</span>
                     <span class="achievement-stat-value">${unlockedCount} / ${totalAchievements}</span>
                 </div>
             </div>
             <div class="achievement-stat-card">
                 <span class="achievement-stat-icon">📊</span>
                 <div class="achievement-stat-info">
-                    <span class="achievement-stat-label">Fortschritt</span>
+                    <span class="achievement-stat-label">Progress</span>
                     <span class="achievement-stat-value">${percentage}%</span>
                 </div>
             </div>
@@ -54,10 +54,10 @@ function renderAchievementHeader() {
  */
 function renderAchievementsByCategory() {
     const categories = [
-        { key: ACHIEVEMENT_CATEGORIES.PROGRESS, name: 'Fortschritt', icon: '📈' },
-        { key: ACHIEVEMENT_CATEGORIES.COMBAT, name: 'Kampf', icon: '⚔️' },
-        { key: ACHIEVEMENT_CATEGORIES.WEALTH, name: 'Reichtum', icon: '💰' },
-        { key: ACHIEVEMENT_CATEGORIES.MASTERY, name: 'Meisterschaft', icon: '✨' }
+        { key: ACHIEVEMENT_CATEGORIES.PROGRESS, name: 'Progress', icon: '📈' },
+        { key: ACHIEVEMENT_CATEGORIES.COMBAT, name: 'Combat', icon: '⚔️' },
+        { key: ACHIEVEMENT_CATEGORIES.WEALTH, name: 'Wealth', icon: '💰' },
+        { key: ACHIEVEMENT_CATEGORIES.MASTERY, name: 'Mastery', icon: '✨' }
     ];
 
     categories.forEach(cat => {
@@ -94,7 +94,7 @@ function createAchievementCard(achievement) {
                 </div>
                 <p class="achievement-description">${achievement.description}</p>
                 <div class="achievement-reward">
-                    <span class="achievement-reward-label">Belohnung:</span>
+                    <span class="achievement-reward-label">Reward:</span>
                     <span class="achievement-reward-value">${rewardText.join(' ')}</span>
                 </div>
                 ${!isUnlocked ? `
@@ -107,7 +107,7 @@ function createAchievementCard(achievement) {
                 ` : ''}
                 ${isUnlocked ? `
                     <div class="achievement-unlocked-date">
-                        Freigeschaltet: ${formatDate(gameState.achievements.unlocked[achievement.id])}
+                        Unlocked: ${formatDate(gameState.achievements.unlocked[achievement.id])}
                     </div>
                 ` : ''}
             </div>
@@ -125,7 +125,7 @@ export function showAchievementNotification(achievement) {
         <div class="achievement-notification-content">
             <div class="achievement-notification-icon">${achievement.icon}</div>
             <div class="achievement-notification-text">
-                <div class="achievement-notification-title">🏆 Achievement Freigeschaltet!</div>
+                <div class="achievement-notification-title">🏆 Achievement Unlocked!</div>
                 <div class="achievement-notification-name">${achievement.name}</div>
             </div>
         </div>
@@ -152,9 +152,9 @@ export function showAchievementNotification(achievement) {
  */
 function formatDate(timestamp) {
     const date = new Date(timestamp);
-    return date.toLocaleDateString('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'

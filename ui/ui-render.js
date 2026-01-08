@@ -63,7 +63,7 @@ function updateAutoRunInfo() {
 
     // Status
     if (gameState.idle.autoRunEnabled) {
-        statusEl.textContent = 'Aktiv';
+        statusEl.textContent = 'Active';
         statusEl.className = 'status-active';
 
         // Timer
@@ -72,7 +72,7 @@ function updateAutoRunInfo() {
         const timeUntilNext = Math.max(0, gameState.idle.autoRunInterval - timeSinceLastRun);
         timerEl.textContent = formatTime(timeUntilNext);
     } else {
-        statusEl.textContent = 'Inaktiv';
+        statusEl.textContent = 'Inactive';
         statusEl.className = 'status-inactive';
         timerEl.textContent = '--';
     }
@@ -175,17 +175,17 @@ function updateRunHistory() {
     if (!historyEl) return;
     
     if (runHistory.length === 0) {
-        historyEl.innerHTML = '<p class="text-muted">Noch keine Runs durchgeführt...</p>';
+        historyEl.innerHTML = '<p class="text-muted">No runs completed yet...</p>';
         return;
     }
 
     historyEl.innerHTML = runHistory.map(entry => {
         const icon = entry.success ? '✅' : '❌';
         const cssClass = entry.success ? 'success' : 'failure';
-        const result = entry.success ? 'Erfolgreich' : 'Fehlgeschlagen';
+        const result = entry.success ? 'Successful' : 'Failed';
         const rewardsText = entry.success && entry.rewards 
             ? `+${entry.rewards.gold} Gold, +${entry.rewards.xp} XP${entry.rewards.gems > 0 ? ', +' + entry.rewards.gems + ' Gems' : ''}${entry.rewards.souls > 0 ? ', +' + entry.rewards.souls + ' Souls' : ''}`
-            : 'Keine Belohnungen';
+            : 'No rewards';
         const timeAgo = formatTimeAgo(entry.timestamp);
 
         return `
@@ -244,8 +244,8 @@ function formatTime(seconds) {
 function formatTimeAgo(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
     
-    if (seconds < 60) return 'Gerade eben';
-    if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
-    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h';
-    return Math.floor(seconds / 86400) + 'd';
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    return Math.floor(seconds / 86400) + 'd ago';
 }
