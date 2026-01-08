@@ -15,6 +15,7 @@ export function updateUI() {
     updateResources();
     updateAutoRunInfo();
     updateStats();
+    updateHeroDisplay();
 }
 
 /**
@@ -76,6 +77,65 @@ function updateStats() {
 }
 
 /**
+ * Update hero display
+ */
+function updateHeroDisplay() {
+    const hero = gameState.hero;
+
+    // Basic info
+    document.getElementById('hero-name').textContent = hero.name;
+    document.getElementById('hero-level').textContent = hero.level;
+
+    // XP
+    document.getElementById('hero-xp').textContent = Math.floor(hero.xp);
+    document.getElementById('hero-xp-next').textContent = hero.xpToNextLevel;
+    const xpPercent = (hero.xp / hero.xpToNextLevel) * 100;
+    document.getElementById('xp-progress-fill').style.width = xpPercent + '%';
+
+    // Stats
+    document.getElementById('hero-hp').textContent = Math.floor(hero.hp);
+    document.getElementById('hero-max-hp').textContent = hero.maxHp;
+    const hpPercent = (hero.hp / hero.maxHp) * 100;
+    document.getElementById('hp-bar').style.width = hpPercent + '%';
+
+    document.getElementById('hero-attack').textContent = hero.attack;
+    document.getElementById('hero-defense').textContent = hero.defense;
+    document.getElementById('hero-crit-chance').textContent = Math.round(hero.critChance * 100) + '%';
+    document.getElementById('hero-crit-multi').textContent = hero.critMultiplier.toFixed(1) + 'x';
+
+    // Update stat bars (visual representation)
+    updateStatBars();
+
+    // Combat stats
+    document.getElementById('monsters-killed').textContent = gameState.stats.totalMonstersKilled;
+    document.getElementById('deepest-floor').textContent = gameState.stats.deepestFloor;
+    document.getElementById('total-deaths').textContent = gameState.stats.totalDeaths;
+    document.getElementById('runs-completed').textContent = gameState.stats.totalRunsCompleted;
+}
+
+/**
+ * Update visual stat bars (not HP)
+ */
+function updateStatBars() {
+    const hero = gameState.hero;
+    
+    // Attack bar (max at 100 attack = 100%)
+    const attackPercent = Math.min((hero.attack / 100) * 100, 100);
+    const attackBar = document.querySelector('.attack-bar');
+    if (attackBar) attackBar.style.width = attackPercent + '%';
+
+    // Defense bar (max at 50 defense = 100%)
+    const defensePercent = Math.min((hero.defense / 50) * 100, 100);
+    const defenseBar = document.querySelector('.defense-bar');
+    if (defenseBar) defenseBar.style.width = defensePercent + '%';
+
+    // Crit bar (shows crit chance directly)
+    const critPercent = hero.critChance * 100;
+    const critBar = document.querySelector('.crit-bar');
+    if (critBar) critBar.style.width = critPercent + '%';
+}
+
+/**
  * Add entry to run history
  */
 export function addRunHistoryEntry(success, rewards = null) {
@@ -109,7 +169,7 @@ function updateRunHistory() {
         const cssClass = entry.success ? 'success' : 'failure';
         const result = entry.success ? 'Erfolgreich' : 'Fehlgeschlagen';
         const rewardsText = entry.success && entry.rewards 
-            ? `+${entry.rewards.gold} Gold, +${entry.rewards.xp} XP${entry.rewards.gems > 0 ? ', +' + entry.rewards.gems + ' Gems' : ''}`
+            ? `+${entry.rewards.gold} Gold, +${entry.rewards.xp} XP${entry.rewards.gems > 0 ? ', +' + entry.rewards.gems + ' Gems' : ''}${entry.rewards.souls > 0 ? ', +' + entry.rewards.souls + ' Souls' : ''}`
             : 'Keine Belohnungen';
         const timeAgo = formatTimeAgo(entry.timestamp);
 
@@ -129,11 +189,45 @@ function updateRunHistory() {
 }
 
 /**
+ * Show notification
+ */
+export function showNotification(title, message, type = 'info') {
+    const container = document.getElementById('notification-container');
+    if (!container) return;
+
+    const icons = {
+        success: '✅',
+        warning: '⚠️',
+        danger: '❌',
+        info: 'ℹ️'
+    };
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span class="notification-icon">${icons[type] || icons.info}</span>
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+    `;
+
+    container.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+/**
  * Calculate success chance (same logic as in auto-run.js)
  */
 function calculateSuccessChance() {
     let chance = 0.5;
     chance += gameState.hero.level * 0.02;
+    const statBonus = (gameState.hero.attack + gameState.hero.defense) / 1000;
+    chance += statBonus;
     return Math.min(0.95, chance);
 }
 
