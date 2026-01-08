@@ -6,6 +6,7 @@
 import { gameState } from '../core/game-state.js';
 import { generateDungeon } from '../dungeons/dungeon-generator.js';
 import { renderDungeon, renderCenterMessage } from './canvas-renderer.js';
+import { showCombatUI, hideCombatUI, updateCombatUI } from './combat-ui.js';
 
 // Player state for manual run
 const playerState = {
@@ -18,6 +19,7 @@ const playerState = {
 
 let currentDungeon = null;
 let animationFrameId = null;
+let currentCombatMonster = null;
 
 /**
  * Start a manual dungeon run
@@ -49,7 +51,7 @@ export function startManualRun(floor = 1) {
 
     // Show start message
     setTimeout(() => {
-        renderCenterMessage('Floor ' + floor, 'Press any key to begin');
+        renderCenterMessage('Floor ' + floor, 'Use Arrow Keys or WASD to move');
     }, 100);
 }
 
@@ -62,6 +64,20 @@ export function endManualRun(success = true) {
     // Stop render loop
     stopRenderLoop();
 
+    // Hide combat UI if open
+    hideCombatUI();
+
+    // Award rewards if successful
+    if (success) {
+        const goldReward = 50 * gameState.manualRun.currentFloor;
+        const xpReward = 30 * gameState.manualRun.currentFloor;
+        
+        gameState.resources.gold += goldReward;
+        gameState.hero.xp += xpReward;
+        
+        console.log(`🎉 Rewards: +${goldReward} Gold, +${xpReward} XP`);
+    }
+
     // Reset game state
     gameState.manualRun.active = false;
     gameState.manualRun.currentFloor = 0;
@@ -69,12 +85,13 @@ export function endManualRun(success = true) {
     gameState.manualRun.dungeon = null;
 
     currentDungeon = null;
+    currentCombatMonster = null;
 
     // Show completion message
     if (success) {
-        renderCenterMessage('Victory! 🎉', 'Press SPACE to continue');
+        renderCenterMessage('Victory! 🎉', 'Click START RUN to play again');
     } else {
-        renderCenterMessage('Defeated 💀', 'Press SPACE to continue');
+        renderCenterMessage('Defeated 💀', 'Click START RUN to try again');
     }
 }
 
@@ -82,7 +99,7 @@ export function endManualRun(success = true) {
  * Handle player movement
  */
 export function movePlayer(dx, dy) {
-    if (!playerState.canMove || !currentDungeon) return false;
+    if (!playerState.canMove || !currentDungeon || playerState.inCombat) return false;
 
     const newX = playerState.x + dx;
     const newY = playerState.y + dy;
@@ -113,6 +130,10 @@ export function movePlayer(dx, dy) {
                 return true;
             } else {
                 console.log('🚪 Door is locked - clear the room first!');
+                renderCenterMessage('🚪 Locked', 'Clear all monsters first!');
+                setTimeout(() => {
+                    // Clear message after 2 seconds
+                }, 2000);
                 return false;
             }
         }
@@ -138,51 +159,52 @@ function isPositionInRoom(x, y, room) {
  */
 function startCombat(monster) {
     console.log('⚔️ Combat started with', monster.name);
+    
     playerState.inCombat = true;
     playerState.canMove = false;
+    currentCombatMonster = monster;
 
-    // TODO: Show combat UI
-    // For now, just auto-resolve
-    setTimeout(() => {
-        resolveCombat(monster);
-    }, 1000);
+    // Store max HP if not already set
+    if (!monster.maxHp) {
+        monster.maxHp = monster.hp;
+    }
+
+    // Show combat UI
+    showCombatUI(monster);
 }
 
 /**
- * Resolve combat (temporary auto-resolve)
+ * End combat (called when monster is defeated or player wins)
  */
-function resolveCombat(monster) {
-    // Simple combat calculation
-    const playerDamage = gameState.hero.attack;
-    const monsterDamage = Math.max(1, monster.attack - gameState.hero.defense);
+export function endCombat(victory = true) {
+    console.log(victory ? '✅ Combat won!' : '❌ Combat lost!');
 
-    // Deal damage
-    monster.hp -= playerDamage;
-
-    if (monster.hp <= 0) {
-        console.log('✅ Monster defeated!');
-        monster.hp = 0;
+    if (victory && currentCombatMonster) {
+        // Mark monster as defeated
+        currentCombatMonster.hp = 0;
         
         // Check if room is cleared
         const currentRoom = currentDungeon.rooms[playerState.currentRoom];
-        if (currentRoom.monsters.every(m => m.hp <= 0)) {
+        if (currentRoom.monsters && currentRoom.monsters.every(m => m.hp <= 0)) {
             currentRoom.cleared = true;
             console.log('✅ Room cleared!');
-        }
-    } else {
-        // Player takes damage
-        gameState.hero.hp -= monsterDamage;
-        console.log('💔 Player took', monsterDamage, 'damage');
-
-        if (gameState.hero.hp <= 0) {
-            gameState.hero.hp = 0;
-            endManualRun(false);
-            return;
+            renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
         }
     }
 
+    if (!victory) {
+        // Player defeated - end run
+        endManualRun(false);
+        return;
+    }
+
+    // Hide combat UI
+    hideCombatUI();
+
+    // Reset combat state
     playerState.inCombat = false;
     playerState.canMove = true;
+    currentCombatMonster = null;
 }
 
 /**
@@ -203,6 +225,9 @@ function transitionToRoom(roomIndex) {
     const newRoom = currentDungeon.rooms[roomIndex];
     playerState.x = newRoom.x + Math.floor(newRoom.width / 2);
     playerState.y = newRoom.y + Math.floor(newRoom.height / 2);
+
+    // Show room message
+    renderCenterMessage(`Room ${roomIndex + 1}`, 'Clear all monsters!');
 }
 
 /**
@@ -210,7 +235,7 @@ function transitionToRoom(roomIndex) {
  */
 function startRenderLoop() {
     function render() {
-        if (currentDungeon && gameState.manualRun.active) {
+        if (currentDungeon && gameState.manualRun.active && !playerState.inCombat) {
             renderDungeon(currentDungeon, playerState);
             animationFrameId = requestAnimationFrame(render);
         }
@@ -240,4 +265,11 @@ export function getPlayerState() {
  */
 export function getCurrentDungeon() {
     return currentDungeon;
+}
+
+/**
+ * Get current combat monster
+ */
+export function getCurrentCombatMonster() {
+    return currentCombatMonster;
 }
