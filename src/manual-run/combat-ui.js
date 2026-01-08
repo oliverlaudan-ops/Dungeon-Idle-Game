@@ -4,6 +4,7 @@
  */
 
 import { gameState } from '../core/game-state.js';
+import { endCombat } from './manual-run-manager.js';
 
 let currentMonster = null;
 let combatContainer = null;
@@ -132,12 +133,13 @@ function handleCombatAction(action) {
             
             gameState.hero.xp += xpGain;
             gameState.resources.gold += goldGain;
+            gameState.stats.totalMonstersKilled++;
             
             addCombatLog(`+${xpGain} XP, +${goldGain} Gold`, 'reward');
 
             // Close combat after 2 seconds
             setTimeout(() => {
-                hideCombatUI();
+                endCombat(true);
             }, 2000);
             return;
         }
@@ -175,12 +177,12 @@ function monsterAttack(damageMultiplier = 1.0) {
     // Check if player defeated
     if (gameState.hero.hp <= 0) {
         gameState.hero.hp = 0;
+        gameState.stats.totalDeaths++;
         addCombatLog('💀 Du wurdest besiegt!', 'defeat');
         
-        // End run after 2 seconds
+        // End combat after 2 seconds
         setTimeout(() => {
-            hideCombatUI();
-            // TODO: Trigger game over
+            endCombat(false);
         }, 2000);
         return;
     }
