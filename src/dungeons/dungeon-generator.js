@@ -79,18 +79,20 @@ function generateRoom(floor, roomIndex, x, y) {
  */
 function generateMonster(floor, room) {
     const types = [
-        { name: 'Goblin', icon: '👺', hpMult: 1.0, atkMult: 1.0 },
-        { name: 'Skeleton', icon: '💀', hpMult: 0.8, atkMult: 1.2 },
-        { name: 'Orc', icon: '👹', hpMult: 1.5, atkMult: 0.9 },
-        { name: 'Ghost', icon: '👻', hpMult: 0.6, atkMult: 1.3 },
-        { name: 'Spider', icon: '🕷️', hpMult: 0.7, atkMult: 1.1 }
+        { name: 'Goblin', icon: '👺', hpMult: 1.0, atkMult: 1.0, xpMult: 1.0, goldMult: 1.0 },
+        { name: 'Skeleton', icon: '💀', hpMult: 0.8, atkMult: 1.2, xpMult: 0.9, goldMult: 0.8 },
+        { name: 'Orc', icon: '👹', hpMult: 1.5, atkMult: 0.9, xpMult: 1.3, goldMult: 1.5 },
+        { name: 'Ghost', icon: '👻', hpMult: 0.6, atkMult: 1.3, xpMult: 1.1, goldMult: 0.7 },
+        { name: 'Spider', icon: '🕷️', hpMult: 0.7, atkMult: 1.1, xpMult: 0.8, goldMult: 0.9 }
     ];
 
     const type = types[Math.floor(Math.random() * types.length)];
     const baseHp = 20 + floor * 10;
     const baseAtk = 5 + floor * 2;
+    const baseXp = 10 + floor * 5;
+    const baseGold = 5 + floor * 3;
 
-    // Random position within room
+    // Random position within room (avoid edges)
     const x = room.x + 1 + Math.floor(Math.random() * (room.width - 2));
     const y = room.y + 1 + Math.floor(Math.random() * (room.height - 2));
 
@@ -101,6 +103,8 @@ function generateMonster(floor, room) {
         maxHp: Math.floor(baseHp * type.hpMult),
         attack: Math.floor(baseAtk * type.atkMult),
         defense: Math.floor(floor * 0.5),
+        xp: Math.floor(baseXp * type.xpMult),
+        gold: Math.floor(baseGold * type.goldMult),
         x,
         y
     };
@@ -172,7 +176,8 @@ export function simulateDungeonRun(floor = 1) {
                     break;
                 }
 
-                totalXp += 10 + floor * 5;
+                totalXp += monster.xp || 10;
+                totalGold += monster.gold || 5;
             }
         }
 
