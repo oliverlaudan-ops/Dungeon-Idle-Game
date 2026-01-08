@@ -15,7 +15,7 @@ export function updateUI() {
     updateResources();
     updateAutoRunInfo();
     updateStats();
-    // updateHeroDisplay() will be added when Hero tab is implemented
+    updateHeroDisplay();
 }
 
 /**
@@ -86,6 +86,49 @@ function updateStats() {
     if (successEl) successEl.textContent = successfulRuns;
     if (failedEl) failedEl.textContent = failedRuns;
     if (ratioEl) ratioEl.textContent = Math.round(successRatio) + '%';
+}
+
+/**
+ * Update hero display
+ */
+function updateHeroDisplay() {
+    const hero = gameState.hero;
+
+    // Basic info
+    const nameEl = document.getElementById('hero-name');
+    const levelEl = document.getElementById('hero-level');
+    if (nameEl) nameEl.textContent = hero.name;
+    if (levelEl) levelEl.textContent = hero.level;
+
+    // XP Bar
+    const xpTextEl = document.getElementById('xp-text');
+    const xpBarEl = document.getElementById('xp-bar');
+    const xpNeededEl = document.getElementById('xp-needed');
+    
+    if (xpTextEl) {
+        xpTextEl.textContent = `${Math.floor(hero.xp)} / ${hero.xpToNextLevel}`;
+    }
+    if (xpBarEl) {
+        const xpPercent = (hero.xp / hero.xpToNextLevel) * 100;
+        xpBarEl.style.width = `${Math.min(100, xpPercent)}%`;
+    }
+    if (xpNeededEl) {
+        const xpLeft = hero.xpToNextLevel - Math.floor(hero.xp);
+        xpNeededEl.textContent = `${xpLeft} XP`;
+    }
+
+    // Stats
+    const hpEl = document.getElementById('hero-hp');
+    const attackEl = document.getElementById('hero-attack');
+    const defenseEl = document.getElementById('hero-defense');
+    const critEl = document.getElementById('hero-crit');
+    const critMultEl = document.getElementById('hero-crit-mult');
+
+    if (hpEl) hpEl.textContent = `${hero.hp} / ${hero.maxHp}`;
+    if (attackEl) attackEl.textContent = hero.attack;
+    if (defenseEl) defenseEl.textContent = hero.defense;
+    if (critEl) critEl.textContent = `${Math.round(hero.critChance * 100)}%`;
+    if (critMultEl) critMultEl.textContent = `${hero.critMultiplier.toFixed(1)}x`;
 }
 
 /**
