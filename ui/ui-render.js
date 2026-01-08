@@ -15,7 +15,7 @@ export function updateUI() {
     updateResources();
     updateAutoRunInfo();
     updateStats();
-    updateHeroDisplay();
+    updateHeroTab();
 }
 
 /**
@@ -77,62 +77,29 @@ function updateStats() {
 }
 
 /**
- * Update hero display
+ * Update Hero Tab displays
  */
-function updateHeroDisplay() {
+function updateHeroTab() {
     const hero = gameState.hero;
 
-    // Basic info
+    // Hero name and level
     document.getElementById('hero-name').textContent = hero.name;
     document.getElementById('hero-level').textContent = hero.level;
 
-    // XP
-    document.getElementById('hero-xp').textContent = Math.floor(hero.xp);
-    document.getElementById('hero-xp-next').textContent = hero.xpToNextLevel;
+    // XP Bar
     const xpPercent = (hero.xp / hero.xpToNextLevel) * 100;
-    document.getElementById('xp-progress-fill').style.width = xpPercent + '%';
+    document.getElementById('xp-text').textContent = `${Math.floor(hero.xp)} / ${hero.xpToNextLevel}`;
+    document.getElementById('xp-bar').style.width = xpPercent + '%';
 
-    // Stats
-    document.getElementById('hero-hp').textContent = Math.floor(hero.hp);
-    document.getElementById('hero-max-hp').textContent = hero.maxHp;
+    // Combat Stats
+    document.getElementById('hero-hp').textContent = `${hero.hp} / ${hero.maxHp}`;
     const hpPercent = (hero.hp / hero.maxHp) * 100;
     document.getElementById('hp-bar').style.width = hpPercent + '%';
 
     document.getElementById('hero-attack').textContent = hero.attack;
     document.getElementById('hero-defense').textContent = hero.defense;
-    document.getElementById('hero-crit-chance').textContent = Math.round(hero.critChance * 100) + '%';
-    document.getElementById('hero-crit-multi').textContent = hero.critMultiplier.toFixed(1) + 'x';
-
-    // Update stat bars (visual representation)
-    updateStatBars();
-
-    // Combat stats
-    document.getElementById('monsters-killed').textContent = gameState.stats.totalMonstersKilled;
-    document.getElementById('deepest-floor').textContent = gameState.stats.deepestFloor;
-    document.getElementById('total-deaths').textContent = gameState.stats.totalDeaths;
-    document.getElementById('runs-completed').textContent = gameState.stats.totalRunsCompleted;
-}
-
-/**
- * Update visual stat bars (not HP)
- */
-function updateStatBars() {
-    const hero = gameState.hero;
-    
-    // Attack bar (max at 100 attack = 100%)
-    const attackPercent = Math.min((hero.attack / 100) * 100, 100);
-    const attackBar = document.querySelector('.attack-bar');
-    if (attackBar) attackBar.style.width = attackPercent + '%';
-
-    // Defense bar (max at 50 defense = 100%)
-    const defensePercent = Math.min((hero.defense / 50) * 100, 100);
-    const defenseBar = document.querySelector('.defense-bar');
-    if (defenseBar) defenseBar.style.width = defensePercent + '%';
-
-    // Crit bar (shows crit chance directly)
-    const critPercent = hero.critChance * 100;
-    const critBar = document.querySelector('.crit-bar');
-    if (critBar) critBar.style.width = critPercent + '%';
+    document.getElementById('hero-crit').textContent = Math.round(hero.critChance * 100) + '%';
+    document.getElementById('hero-crit-dmg').textContent = Math.round(hero.critMultiplier * 100) + '%';
 }
 
 /**
@@ -186,38 +153,6 @@ function updateRunHistory() {
             </div>
         `;
     }).join('');
-}
-
-/**
- * Show notification
- */
-export function showNotification(title, message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    if (!container) return;
-
-    const icons = {
-        success: '✅',
-        warning: '⚠️',
-        danger: '❌',
-        info: 'ℹ️'
-    };
-
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <span class="notification-icon">${icons[type] || icons.info}</span>
-        <div class="notification-content">
-            <div class="notification-title">${title}</div>
-            <div class="notification-message">${message}</div>
-        </div>
-    `;
-
-    container.appendChild(notification);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
 }
 
 /**
