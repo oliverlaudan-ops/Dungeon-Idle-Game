@@ -51,7 +51,7 @@ function generateRoom(floor, roomIndex, x, y) {
         y,
         width,
         height,
-        cleared: false,
+        cleared: roomIndex === 0, // First room is always cleared (safe spawn)
         looted: false,
         monsters: [],
         treasure: null,
