@@ -25,36 +25,127 @@
         <main id="tab-content">
             <!-- Idle Tab -->
             <div id="idle-tab" class="tab-panel active">
-                <h2>Automatische Dungeon Runs</h2>
-                <div id="idle-stats">
-                    <p>Coming soon...</p>
+                <h2>⚔️ Automatische Dungeon Runs</h2>
+                
+                <!-- Resources Display -->
+                <div class="resource-panel">
+                    <h3>💰 Ressourcen</h3>
+                    <div class="resource-grid">
+                        <div class="resource-item">
+                            <span class="resource-icon">💰</span>
+                            <div class="resource-info">
+                                <span class="resource-name">Gold</span>
+                                <span class="resource-value" id="gold-value">0</span>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">💎</span>
+                            <div class="resource-info">
+                                <span class="resource-name">Gems</span>
+                                <span class="resource-value" id="gems-value">0</span>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">👻</span>
+                            <div class="resource-info">
+                                <span class="resource-name">Souls</span>
+                                <span class="resource-value" id="souls-value">0</span>
+                            </div>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">🗝️</span>
+                            <div class="resource-info">
+                                <span class="resource-name">Keys</span>
+                                <span class="resource-value" id="keys-value">3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto Run Controls -->
+                <div class="auto-run-panel">
+                    <h3>🔄 Auto Run System</h3>
+                    <div class="auto-run-controls">
+                        <button id="toggle-auto-run" class="btn btn-primary">
+                            Start Auto Runs
+                        </button>
+                        <div class="auto-run-info">
+                            <div class="info-row">
+                                <span class="info-label">Status:</span>
+                                <span id="auto-run-status" class="status-inactive">Inaktiv</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Intervall:</span>
+                                <span id="auto-run-interval">60s</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Nächster Run in:</span>
+                                <span id="next-run-timer">--</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Erfolgsrate:</span>
+                                <span id="success-rate">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-panel">
+                    <h3>📊 Statistiken</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Runs:</span>
+                            <span class="stat-value" id="total-runs">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Erfolgreiche:</span>
+                            <span class="stat-value success" id="successful-runs">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Fehlgeschlagen:</span>
+                            <span class="stat-value danger" id="failed-runs">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Erfolgsquote:</span>
+                            <span class="stat-value" id="success-ratio">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Run History -->
+                <div class="history-panel">
+                    <h3>📜 Letzte Runs</h3>
+                    <div id="run-history" class="run-history">
+                        <p class="text-muted">Noch keine Runs durchgeführt...</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Manual Run Tab -->
             <div id="manual-tab" class="tab-panel">
-                <h2>Manueller Dungeon Run</h2>
+                <h2>🗡️ Manueller Dungeon Run</h2>
                 <div id="dungeon-canvas-container">
                     <canvas id="dungeon-canvas" width="600" height="400"></canvas>
                 </div>
                 <div id="combat-ui">
-                    <p>Coming soon...</p>
+                    <p class="text-muted">Coming soon...</p>
                 </div>
             </div>
 
             <!-- Hero Tab -->
             <div id="hero-tab" class="tab-panel">
-                <h2>Dein Held</h2>
+                <h2>🦸 Dein Held</h2>
                 <div id="hero-stats">
-                    <p>Coming soon...</p>
+                    <p class="text-muted">Coming soon...</p>
                 </div>
             </div>
 
             <!-- Upgrades Tab -->
             <div id="upgrades-tab" class="tab-panel">
-                <h2>Permanente Upgrades</h2>
+                <h2>⬆️ Permanente Upgrades</h2>
                 <div id="upgrades-list">
-                    <p>Coming soon...</p>
+                    <p class="text-muted">Coming soon...</p>
                 </div>
             </div>
         </main>
