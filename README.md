@@ -31,42 +31,45 @@ Ein innovatives Spiel, das Roguelike-Dungeon-Crawling mit Idle-Game-Mechaniken v
 - Idle-Effizienz-Verbesserungen
 - Freischaltbare Dungeon-Tiefen
 
-## 🚀 Geplante Features
+## 🚀 Entwicklungs-Status
 
-### Phase 1: MVP (In Entwicklung)
+### Phase 1: MVP ✅ **ABGESCHLOSSEN**
 - [x] Repository Setup
-- [ ] Basis-UI mit Tabs (Idle, Manual Run, Upgrades)
-- [ ] Einfaches Auto-Run-System
-- [ ] 3-4 Basis-Ressourcen
-- [ ] Grundlegende Hero-Stats
-- [ ] Simpler manueller Dungeon-Run
-- [ ] 5-10 permanente Upgrades
+- [x] Basis-UI mit Tabs (Idle, Manual Run, Hero, Upgrades)
+- [x] Auto-Run-System mit Start/Stop
+- [x] 4 Ressourcen (Gold, Gems, Souls, Keys)
+- [x] Hero-Level-System mit XP
+- [x] Run-History mit visuellen Feedback
+- [x] Statistiken-Tracking
+- [x] Auto-Save System
 
-### Phase 2: Combat & Dungeons
+### Phase 2: Hero & Upgrades (In Planung)
+- [ ] Hero-Tab mit vollständiger Stats-Anzeige
+- [ ] Attribute-System und Level-Up-Boni
+- [ ] 10-15 permanente Upgrades
+- [ ] Upgrade-Kategorien (Attack, Defense, Idle-Speed)
+- [ ] Tooltips und Beschreibungen
+
+### Phase 3: Combat & Dungeons
 - [ ] Turn-based Combat-System
 - [ ] 5+ Gegnertypen
 - [ ] Procedural Dungeon-Generator
 - [ ] Loot-System mit Items
 - [ ] Verschiedene Raum-Typen
 
-### Phase 3: Tiefe & Balance
+### Phase 4: Polish & Erweiterung
 - [ ] Boss-Kämpfe
 - [ ] Skill-System
 - [ ] Equipment-System
 - [ ] Achievements
 - [ ] Multiple Dungeon-Tiefen
-
-### Phase 4: Polish & Erweiterung
 - [ ] Prestige-System
-- [ ] Special Events
-- [ ] Statistiken & Analytics
-- [ ] Sound & Visual Effects
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Vanilla JavaScript (ES6+)
 - **Rendering**: HTML5 Canvas für Dungeon-Visualisierung
-- **Styling**: Pure CSS
+- **Styling**: Pure CSS mit Custom Properties
 - **State Management**: LocalStorage Persistence
 - **Architecture**: Modulares ES6 Module Design
 
@@ -74,39 +77,23 @@ Ein innovatives Spiel, das Roguelike-Dungeon-Crawling mit Idle-Game-Mechaniken v
 
 ```
 Dungeon-Idle-Game/
-├── index.html
-├── styles.css
-├── main.js
+├── index.html              # Haupt-HTML mit Tab-System
+├── styles.css             # Komplettes Styling
+├── main.js                # Entry Point
 ├── src/
 │   ├── core/
-│   │   ├── game-loop.js
-│   │   ├── game-state.js
-│   │   └── save-manager.js
-│   ├── idle/
-│   │   ├── auto-run.js
-│   │   ├── resources.js
-│   │   └── offline-progress.js
-│   ├── roguelike/
-│   │   ├── dungeon-generator.js
-│   │   ├── combat-system.js
-│   │   ├── enemy-ai.js
-│   │   └── loot-system.js
-│   ├── hero/
-│   │   ├── hero-stats.js
-│   │   ├── skills.js
-│   │   └── equipment.js
-│   └── meta/
-│       ├── upgrades.js
-│       └── progression.js
+│   │   ├── game-loop.js       # Haupt-Game-Loop
+│   │   └── game-state.js      # State Management & Save/Load
+│   └── idle/
+│       └── auto-run.js        # Auto-Run-System
 └── ui/
-    ├── ui-init.js
-    ├── ui-render.js
-    └── canvas-renderer.js
+    ├── ui-init.js         # UI Initialisierung
+    └── ui-render.js       # Rendering & Updates
 ```
 
 ## 🎮 Spielen
 
-**Live Demo**: [dungeon.future-pulse.tech](https://dungeon.future-pulse.tech/) *(coming soon)*
+**Live Demo**: [dungeon.future-pulse.tech](https://dungeon.future-pulse.tech/)
 
 ### Lokal ausführen
 
@@ -132,11 +119,23 @@ open http://localhost:8000
 4. **Respekt für Zeit**: Offline-Progress und keine künstlichen Wartezeiten
 5. **Wiederspielbarkeit**: Procedural Generation und Meta-Progression
 
-## 📊 Entwicklungs-Status
+## 👏 Aktueller Stand
 
-**Aktuell**: Phase 1 - MVP Development  
 **Version**: 0.1.0-alpha  
 **Letzte Aktualisierung**: Januar 2026
+
+### Spielbare Features
+- ✅ Auto-Run-System aktivieren/deaktivieren
+- ✅ Ressourcen sammeln (Gold, Gems, Souls)
+- ✅ Hero levelt automatisch durch XP
+- ✅ Run-History mit Erfolgen/Fehlschlägen
+- ✅ Statistiken-Tracking
+- ✅ Auto-Save (alle 30 Sekunden)
+
+### Nächste Schritte
+1. Hero-Tab mit Stats-Visualisierung
+2. Upgrade-System implementieren
+3. Manual Run Grundgerüst
 
 ## 👥 Contributing
 
