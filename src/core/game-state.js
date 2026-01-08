@@ -43,8 +43,11 @@ export const gameState = {
         dungeon: null
     },
 
-    // Upgrades
+    // Upgrades (key: upgradeId, value: level)
     upgrades: {},
+
+    // Upgrade bonuses (calculated from upgrades)
+    upgradeBonuses: {},
 
     // Statistics
     stats: {
