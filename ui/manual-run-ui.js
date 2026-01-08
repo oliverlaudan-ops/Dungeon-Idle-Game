@@ -102,16 +102,23 @@ function ensureStartButton() {
  * Update button state
  */
 function updateButtonState(btn) {
-    if (!btn) return;
+    if (!btn) {
+        btn = document.getElementById('start-manual-run-btn');
+        if (!btn) return;
+    }
+
+    console.log('🔄 Updating button state. manualRun.active:', gameState.manualRun.active);
 
     if (gameState.manualRun.active) {
         btn.textContent = 'Run in Progress...';
         btn.disabled = true;
         btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
     } else {
         btn.textContent = 'Start Run';
         btn.disabled = false;
         btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
     }
 }
 
@@ -119,6 +126,8 @@ function updateButtonState(btn) {
  * Handle start run button click
  */
 function handleStartRun() {
+    console.log('👆 Start button clicked');
+    
     if (gameState.manualRun.active) {
         console.log('⚠️ Run already active');
         return;
@@ -137,20 +146,15 @@ function handleStartRun() {
     startManualRun(floor);
 
     // Update button immediately
-    const btn = document.getElementById('start-manual-run-btn');
-    if (btn) {
-        updateButtonState(btn);
-    }
+    updateManualRunUI();
 }
 
 /**
- * Update manual run UI (called from main game loop)
+ * Update manual run UI (called from main game loop and manual-run-manager)
  */
 export function updateManualRunUI() {
     const btn = document.getElementById('start-manual-run-btn');
-    if (btn) {
-        updateButtonState(btn);
-    }
+    updateButtonState(btn);
 }
 
 /**
@@ -162,8 +166,5 @@ export function cleanupManualRunUI() {
     renderWelcomeScreen();
     
     // Reset button state
-    const btn = document.getElementById('start-manual-run-btn');
-    if (btn) {
-        updateButtonState(btn);
-    }
+    updateManualRunUI();
 }
