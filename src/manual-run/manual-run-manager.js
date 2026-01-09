@@ -1,6 +1,7 @@
 /**
- * Manual Run Manager
+ * Manual Run Manager v2.0
  * Manages the state and logic for manual dungeon runs
+ * NOW WITH: Toast notifications instead of alerts
  */
 
 import { gameState } from '../core/game-state.js';
@@ -8,6 +9,7 @@ import { generateDungeon } from '../dungeons/dungeon-generator.js';
 import { renderDungeon, renderCenterMessage } from './canvas-renderer.js';
 import { showCombatUI, hideCombatUI, updateCombatUI } from './combat-ui.js';
 import { updateManualRunUI } from '../../ui/manual-run-ui.js';
+import { showVictoryNotification, showDefeatNotification } from '../../ui/notifications.js';
 
 // Player state for manual run
 const playerState = {
@@ -46,7 +48,7 @@ export function startManualRun(floor = 1) {
     gameState.manualRun.dungeon = currentDungeon;
 
     console.log('✅ Manual run started:', currentDungeon);
-    console.log(`🏰 Dungeon has ${currentDungeon.rooms.length} rooms`);
+    console.log(`🎰 Dungeon has ${currentDungeon.rooms.length} rooms`);
 
     // Start render loop
     startRenderLoop();
@@ -79,6 +81,12 @@ export function endManualRun(success = true) {
         gameState.stats.totalRunsCompleted++;
         
         console.log(`🎉 Rewards: +${goldReward} Gold, +${xpReward} XP`);
+        
+        // Show victory toast notification
+        showVictoryNotification(goldReward, xpReward, gameState.manualRun.currentFloor);
+    } else {
+        // Show defeat toast notification
+        showDefeatNotification(gameState.manualRun.currentFloor);
     }
 
     // Reset game state
@@ -93,11 +101,9 @@ export function endManualRun(success = true) {
     // Update button state
     updateManualRunUI();
 
-    // Show completion message
+    // Show canvas message (can be dismissed by starting new run)
     if (success) {
-        const goldReward = 50;
-        const xpReward = 30;
-        renderCenterMessage('Victory! 🎉', `+${goldReward} Gold, +${xpReward} XP | Click START RUN to play again`);
+        renderCenterMessage('Victory! 🎉', 'Click START RUN to play again');
     } else {
         renderCenterMessage('Defeated 💀', 'Click START RUN to try again');
     }
@@ -114,13 +120,11 @@ export function movePlayer(dx, dy) {
     const currentRoom = currentDungeon.rooms[playerState.currentRoom];
 
     // Check for doors FIRST (before room boundary check)
-    // This allows doors at the edge of rooms to be accessible
     if (currentRoom.doors) {
         const door = currentRoom.doors.find(d => d.x === newX && d.y === newY);
         if (door) {
             if (currentRoom.cleared) {
                 console.log('🚪 Door found! Transitioning to room', door.targetRoom + 1);
-                // Move to next room
                 transitionToRoom(door.targetRoom);
                 return true;
             } else {
@@ -216,7 +220,6 @@ export function endCombat(victory = true) {
                 // Show cleared message briefly
                 setTimeout(() => {
                     renderCenterMessage('✅ Room Cleared!', 'Find the door to continue');
-                    // Auto-clear message after 2 seconds
                     setTimeout(() => {
                         // Message will be cleared when render loop restarts
                     }, 2000);
@@ -265,7 +268,6 @@ function transitionToRoom(roomIndex) {
     // Show room message briefly
     setTimeout(() => {
         renderCenterMessage(`Room ${roomIndex + 1}/${currentDungeon.rooms.length}`, 'Clear all monsters!');
-        // Auto-clear message after 2 seconds
         setTimeout(() => {
             // Message will be cleared when render loop continues
         }, 2000);
