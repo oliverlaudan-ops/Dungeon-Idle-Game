@@ -1,10 +1,20 @@
 /**
- * Combat UI
+ * Combat UI v2.0
  * Handles combat interface and interactions
+ * UPDATED: Boss abilities integration
  */
 
 import { gameState } from '../core/game-state.js';
 import { endCombat } from './manual-run-manager.js';
+import { 
+    shouldUseBossAbility, 
+    selectBossAbility, 
+    telegraphBossAbility,
+    executeBossAbility,
+    processBossTurn,
+    calculateDamageToBoss,
+    getBossStatus
+} from './boss-abilities.js';
 
 let currentMonster = null;
 let combatContainer = null;
@@ -30,15 +40,19 @@ export function showCombatUI(monster) {
     }
 
     currentMonster = monster;
+    
+    // Get boss status if applicable
+    const bossStatus = monster.isBoss ? getBossStatus(monster) : '';
 
     combatContainer.innerHTML = `
         <div class="combat-panel">
             <div class="combat-header">
                 <h3>⚔️ Combat!</h3>
+                ${monster.isBoss ? '<span class="boss-badge">👑 BOSS</span>' : ''}
             </div>
 
             <!-- Monster Info -->
-            <div class="combat-monster">
+            <div class="combat-monster ${monster.isBoss ? 'boss-monster' : ''}">
                 <div class="combat-monster-icon">${monster.icon || '👹'}</div>
                 <div class="combat-monster-info">
                     <div class="combat-monster-name">${monster.name}</div>
@@ -46,6 +60,7 @@ export function showCombatUI(monster) {
                         <div class="combat-hp-bar monster-hp" style="width: ${(monster.hp / monster.maxHp) * 100}%"></div>
                     </div>
                     <div class="combat-hp-text">${monster.hp} / ${monster.maxHp} HP</div>
+                    ${bossStatus ? `<div class="boss-status">${bossStatus}</div>` : ''}
                 </div>
             </div>
 
@@ -111,13 +126,27 @@ function handleCombatAction(action) {
     if (action === 'attack') {
         // Player attacks
         const isCrit = Math.random() < gameState.hero.critChance;
-        let damage = gameState.hero.attack;
+        let baseDamage = gameState.hero.attack;
+        
+        // Apply crit multiplier
+        if (isCrit) {
+            baseDamage = Math.floor(baseDamage * gameState.hero.critMultiplier);
+        }
+        
+        // Calculate final damage (accounting for boss shield)
+        const damage = currentMonster.isBoss ? 
+            calculateDamageToBoss(currentMonster, baseDamage) : 
+            baseDamage;
         
         if (isCrit) {
-            damage = Math.floor(damage * gameState.hero.critMultiplier);
             addCombatLog(`✨ Kritischer Treffer! ${damage} Schaden!`, 'crit');
         } else {
             addCombatLog(`Du triffst für ${damage} Schaden!`, 'player-action');
+        }
+        
+        // Show shield message if active
+        if (currentMonster.isBoss && currentMonster.shielded && baseDamage !== damage) {
+            addCombatLog(`🛡️ Schild reduziert Schaden!`, 'info');
         }
 
         currentMonster.hp -= damage;
@@ -144,17 +173,25 @@ function handleCombatAction(action) {
             return;
         }
 
-        // Monster attacks back
+        // Monster/Boss attacks back
         setTimeout(() => {
-            monsterAttack();
-        }, 500);
+            if (currentMonster.isBoss) {
+                handleBossAction();
+            } else {
+                monsterAttack();
+            }
+        }, 800);
     } else if (action === 'defend') {
         addCombatLog('Du verteidigst dich!', 'player-action');
         
         // Monster attacks with reduced damage
         setTimeout(() => {
-            monsterAttack(0.5);
-        }, 500);
+            if (currentMonster.isBoss) {
+                handleBossAction(0.5);
+            } else {
+                monsterAttack(0.5);
+            }
+        }, 800);
     }
 
     // Update combat UI
@@ -162,7 +199,66 @@ function handleCombatAction(action) {
 }
 
 /**
- * Monster attacks
+ * Handle boss action (ability or normal attack)
+ */
+function handleBossAction(damageMultiplier = 1.0) {
+    if (!currentMonster || !currentMonster.isBoss) return;
+    
+    // Process boss turn (cooldowns, buffs, etc.)
+    const turnResult = processBossTurn(currentMonster);
+    if (turnResult && turnResult.message) {
+        addCombatLog(turnResult.message, 'info');
+    }
+    
+    // Check if boss is telegraphing an ability
+    if (currentMonster.telegraphing) {
+        // Execute telegraphed ability
+        const result = executeBossAbility(currentMonster, gameState.hero);
+        
+        if (result) {
+            addCombatLog(result.message, result.isCrit ? 'crit' : 'monster-action');
+            
+            if (result.damage > 0) {
+                const finalDamage = Math.floor(result.damage * damageMultiplier);
+                gameState.hero.hp -= finalDamage;
+                
+                if (damageMultiplier < 1.0) {
+                    addCombatLog(`Deine Verteidigung reduziert den Schaden!`, 'info');
+                }
+            }
+            
+            if (result.heal) {
+                addCombatLog(`Der Boss wurde geheilt!`, 'monster-action');
+            }
+        }
+        
+        updateCombatUI();
+        checkPlayerDefeat();
+        return;
+    }
+    
+    // Decide if boss should use ability
+    if (shouldUseBossAbility(currentMonster)) {
+        const abilityKey = selectBossAbility(currentMonster);
+        
+        if (abilityKey) {
+            // Telegraph the ability (warning to player)
+            const telegraph = telegraphBossAbility(currentMonster, abilityKey);
+            
+            if (telegraph) {
+                addCombatLog(telegraph.message, 'boss-telegraph');
+                updateCombatUI();
+                return; // Ability will execute next turn
+            }
+        }
+    }
+    
+    // Normal boss attack if no ability
+    monsterAttack(damageMultiplier);
+}
+
+/**
+ * Monster/Boss normal attack
  */
 function monsterAttack(damageMultiplier = 1.0) {
     if (!currentMonster || currentMonster.hp <= 0) return;
@@ -173,8 +269,15 @@ function monsterAttack(damageMultiplier = 1.0) {
 
     gameState.hero.hp -= damage;
     addCombatLog(`${currentMonster.name} trifft dich für ${damage} Schaden!`, 'monster-action');
+    
+    updateCombatUI();
+    checkPlayerDefeat();
+}
 
-    // Check if player defeated
+/**
+ * Check if player is defeated
+ */
+function checkPlayerDefeat() {
     if (gameState.hero.hp <= 0) {
         gameState.hero.hp = 0;
         gameState.stats.totalDeaths++;
@@ -184,10 +287,7 @@ function monsterAttack(damageMultiplier = 1.0) {
         setTimeout(() => {
             endCombat(false);
         }, 2000);
-        return;
     }
-
-    updateCombatUI();
 }
 
 /**
@@ -206,7 +306,7 @@ function addCombatLog(message, type = '') {
 }
 
 /**
- * Update combat UI (HP bars, etc.)
+ * Update combat UI (HP bars, status, etc.)
  */
 export function updateCombatUI() {
     if (!currentMonster) return;
@@ -222,6 +322,16 @@ export function updateCombatUI() {
     const monsterHpText = document.querySelector('.combat-monster-info .combat-hp-text');
     if (monsterHpText) {
         monsterHpText.textContent = `${currentMonster.hp} / ${currentMonster.maxHp} HP`;
+    }
+    
+    // Update boss status
+    if (currentMonster.isBoss) {
+        const bossStatusElement = document.querySelector('.boss-status');
+        if (bossStatusElement) {
+            const status = getBossStatus(currentMonster);
+            bossStatusElement.textContent = status;
+            bossStatusElement.style.display = status ? 'block' : 'none';
+        }
     }
 
     // Update player HP bar
