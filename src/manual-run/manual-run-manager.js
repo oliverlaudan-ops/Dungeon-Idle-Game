@@ -30,6 +30,10 @@ let currentCombatMonster = null;
 export function startManualRun(floor = 1) {
     console.log('🎮 Starting manual run on floor', floor);
 
+    // CRITICAL FIX: Reset hero HP to full before starting
+    gameState.hero.hp = gameState.hero.maxHp;
+    console.log('❤️ Hero HP reset to', gameState.hero.hp);
+
     // Generate dungeon
     currentDungeon = generateDungeon(floor);
     
