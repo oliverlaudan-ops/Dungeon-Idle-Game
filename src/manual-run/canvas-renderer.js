@@ -1,7 +1,14 @@
 /**
- * Canvas Renderer
+ * Canvas Renderer v2.0
  * Handles all visual rendering of the dungeon on canvas
+ * NOW WITH: Combat effects (damage numbers, screen shake, hit flashes)
  */
+
+import { 
+    updateEffects, 
+    renderEffects, 
+    getScreenShakeOffset 
+} from './combat-effects.js';
 
 // Canvas settings
 const TILE_SIZE = 40; // Size of each tile in pixels
@@ -20,6 +27,7 @@ const COLORS = {
 
 let canvas = null;
 let ctx = null;
+let lastFrameTime = Date.now();
 
 /**
  * Initialize the canvas renderer
@@ -56,22 +64,42 @@ export function clearCanvas() {
 export function renderDungeon(dungeon, playerState) {
     if (!ctx || !dungeon) return;
 
+    // Calculate delta time for animations
+    const now = Date.now();
+    const deltaTime = now - lastFrameTime;
+    lastFrameTime = now;
+
+    // Update effects (damage numbers, screen shake, etc.)
+    updateEffects(deltaTime);
+
     clearCanvas();
 
-    // Calculate camera offset to center on player
-    const cameraX = Math.floor(canvas.width / 2 - playerState.x * TILE_SIZE);
-    const cameraY = Math.floor(canvas.height / 2 - playerState.y * TILE_SIZE);
+    // Get screen shake offset
+    const shakeOffset = getScreenShakeOffset();
+
+    // Calculate camera offset to center on player (with shake)
+    const cameraX = Math.floor(canvas.width / 2 - playerState.x * TILE_SIZE) + shakeOffset.x;
+    const cameraY = Math.floor(canvas.height / 2 - playerState.y * TILE_SIZE) + shakeOffset.y;
+
+    // Apply screen shake to context
+    ctx.save();
+    ctx.translate(shakeOffset.x, shakeOffset.y);
 
     // Render current room
     const currentRoom = dungeon.rooms[playerState.currentRoom];
     if (currentRoom) {
-        renderRoom(currentRoom, cameraX, cameraY, playerState);
+        renderRoom(currentRoom, cameraX - shakeOffset.x, cameraY - shakeOffset.y, playerState);
     }
 
     // Render player
-    renderPlayer(playerState, cameraX, cameraY);
+    renderPlayer(playerState, cameraX - shakeOffset.x, cameraY - shakeOffset.y);
 
-    // Render UI overlay
+    ctx.restore();
+
+    // Render effects (damage numbers, hit flashes) - no shake
+    renderEffects(ctx);
+
+    // Render UI overlay (no shake)
     renderUIOverlay(dungeon, playerState);
 }
 
@@ -228,7 +256,7 @@ function renderPlayer(playerState, offsetX, offsetY) {
     ctx.font = 'bold 24px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🦸', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+    ctx.fillText('🦾', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
 }
 
 /**
@@ -250,10 +278,23 @@ function renderMonster(monster, offsetX, offsetY) {
     ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // Monster border
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // Monster border (glow if boss)
+    if (monster.isBoss) {
+        ctx.strokeStyle = '#f39c12';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Boss crown emoji
+        ctx.fillStyle = '#f39c12';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👑', x + TILE_SIZE / 2, y + 5);
+    } else {
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
 
     // Monster emoji
     ctx.fillStyle = '#fff';
