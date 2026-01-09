@@ -1,15 +1,14 @@
 /**
- * Manual Run UI with Difficulty Selection & Loot Display
- * Updated with Fantasy Theme and Loot Drop System
+ * Manual Run UI
+ * Canvas-based dungeon crawler interface
  */
 
 import { gameState } from '../src/core/game-state.js';
-import { shouldDropLoot, generateLootDrops, addLootToInventory, getLootNotificationMessage, getDropRateForDifficulty } from '../src/upgrades/loot-system.js';
-import { getHeroClass, getClassInfo } from '../src/upgrades/equipment-system.js';
+import { ManualRunController } from '../src/manual/manual-run-controller.js';
+import { getHeroClass } from '../src/upgrades/equipment-system.js';
 
 let selectedDifficulty = 'NORMAL';
-let runInProgress = false;
-let lastRunLoot = [];
+let runController = null;
 
 /**
  * Initialize Manual Run UI
@@ -22,53 +21,48 @@ export function initManualRunUI() {
         <div class="manual-run-container">
             <!-- Difficulty Selector -->
             <div class="difficulty-section">
-                <h3>⚔️ Wähle die Schwierigkeit</h3>
+                <h3>⚔️ Select Difficulty</h3>
                 <div class="difficulty-selector">
-                    <button class="difficulty-btn selected" data-difficulty="EASY">
+                    <button class="difficulty-btn" data-difficulty="EASY">
                         <span>😊 Easy</span>
-                        <span class="difficulty-label">5-8 Räume • 0.75x Feinde • 1.0x Belohnungen</span>
+                        <span class="difficulty-label">5-8 Rooms • 0.75x Enemies • 1.0x Rewards</span>
                     </button>
-                    <button class="difficulty-btn" data-difficulty="NORMAL">
+                    <button class="difficulty-btn selected" data-difficulty="NORMAL">
                         <span>😀 Normal</span>
-                        <span class="difficulty-label">7-10 Räume • 1.2x Feinde • 1.5x Belohnungen</span>
+                        <span class="difficulty-label">7-10 Rooms • 1.0x Enemies • 1.5x Rewards</span>
                     </button>
                     <button class="difficulty-btn" data-difficulty="HARD">
                         <span>😠 Hard</span>
-                        <span class="difficulty-label">10-13 Räume • 1.6x Feinde • 2.5x Belohnungen</span>
+                        <span class="difficulty-label">10-13 Rooms • 1.3x Enemies • 2.5x Rewards</span>
                     </button>
                     <button class="difficulty-btn" data-difficulty="EXPERT">
                         <span>🔥 Expert</span>
-                        <span class="difficulty-label">12-15 Räume • 2.0x Feinde • 4.0x Belohnungen</span>
+                        <span class="difficulty-label">12-15 Rooms • 1.6x Enemies • 4.0x Rewards</span>
                     </button>
-                </div>
-                <div class="loot-chance-info">
-                    <p>🎲 <strong>Loot-Quote:</strong> <span id="loot-chance">15%</span> Chance auf Equipment-Drops</p>
                 </div>
             </div>
 
-            <!-- Equipment & Stats Preview -->
+            <!-- Equipment Preview -->
             <div class="equipment-section">
-                <h3>⚔️ Dein Equipment & Hero-Stats</h3>
+                <h3>⚔️ Your Equipment</h3>
                 <div class="equipment-preview">
                     <div class="equipment-slot">
                         <span class="slot-icon">🗡️</span>
                         <div class="slot-info">
-                            <div class="slot-name" id="weapon-name">Keine Waffe ausgerüstet</div>
-                            <div class="slot-class" id="weapon-class">Klasse: Warrior</div>
+                            <div class="slot-name" id="weapon-name">No Weapon</div>
+                            <div class="slot-class" id="weapon-class">Class: Warrior</div>
                         </div>
                     </div>
                     <div class="equipment-slot">
                         <span class="slot-icon">🛡️</span>
                         <div class="slot-info">
-                            <div class="slot-name" id="armor-name">Keine Rüstung ausgerüstet</div>
-                            <div class="slot-class">Basis Defense</div>
+                            <div class="slot-name" id="armor-name">No Armor</div>
                         </div>
                     </div>
                     <div class="equipment-slot">
                         <span class="slot-icon">💍</span>
                         <div class="slot-info">
-                            <div class="slot-name" id="accessory-name">Kein Accessory</div>
-                            <div class="slot-class">Basis Stats</div>
+                            <div class="slot-name" id="accessory-name">No Accessory</div>
                         </div>
                     </div>
                 </div>
@@ -87,22 +81,16 @@ export function initManualRunUI() {
                         <span class="stat-value" id="preview-hp">100</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">💥 CRIT:</span>
+                        <span class="stat-label">✨ CRIT:</span>
                         <span class="stat-value" id="preview-crit">5%</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Loot History -->
-            <div class="loot-history-section" id="loot-history-section" style="display: none;">
-                <h3>🎁 Letzte Belohnungen</h3>
-                <div class="loot-container" id="loot-container"></div>
-            </div>
-
             <!-- Start Button -->
             <div class="manual-run-actions">
                 <button class="btn btn-primary btn-lg" id="start-manual-run">
-                    <span>🎮 Dungeon Betreten</span>
+                    <span>🎮 Start Dungeon Run</span>
                 </button>
             </div>
         </div>
@@ -114,9 +102,7 @@ export function initManualRunUI() {
     });
     document.getElementById('start-manual-run')?.addEventListener('click', handleStartManualRun);
 
-    // Initialize with default difficulty
-    selectedDifficulty = 'EASY';
-    updateLootChanceDisplay();
+    // Update equipment preview
     updateEquipmentPreview();
 }
 
@@ -131,17 +117,6 @@ function handleDifficultySelect(e) {
     btn.classList.add('selected');
 
     selectedDifficulty = difficulty;
-    updateLootChanceDisplay();
-}
-
-/**
- * Update loot chance display
- */
-function updateLootChanceDisplay() {
-    const chanceElement = document.getElementById('loot-chance');
-    if (chanceElement) {
-        chanceElement.textContent = getDropRateForDifficulty(selectedDifficulty);
-    }
 }
 
 /**
@@ -153,164 +128,73 @@ function updateEquipmentPreview() {
     const accessory = gameState.equipped?.accessory;
 
     // Update weapon
-    if (weapon) {
-        document.getElementById('weapon-name').textContent = weapon.name;
-        const classInfo = getHeroClass();
-        document.getElementById('weapon-class').textContent = `Klasse: ${weapon.classInfo?.name || 'Unknown'}`;
+    const weaponNameEl = document.getElementById('weapon-name');
+    const weaponClassEl = document.getElementById('weapon-class');
+    if (weaponNameEl && weaponClassEl) {
+        if (weapon) {
+            weaponNameEl.textContent = weapon.name;
+            const classInfo = getHeroClass();
+            weaponClassEl.textContent = `Class: ${classInfo?.name || 'Warrior'}`;
+        } else {
+            weaponNameEl.textContent = 'No Weapon';
+            weaponClassEl.textContent = 'Class: Warrior';
+        }
     }
 
     // Update armor
-    if (armor) {
-        document.getElementById('armor-name').textContent = armor.name;
+    const armorNameEl = document.getElementById('armor-name');
+    if (armorNameEl) {
+        armorNameEl.textContent = armor ? armor.name : 'No Armor';
     }
 
     // Update accessory
-    if (accessory) {
-        document.getElementById('accessory-name').textContent = accessory.name;
+    const accessoryNameEl = document.getElementById('accessory-name');
+    if (accessoryNameEl) {
+        accessoryNameEl.textContent = accessory ? accessory.name : 'No Accessory';
     }
 
     // Update stats
     const hero = gameState.hero;
-    document.getElementById('preview-atk').textContent = hero.attack || 10;
-    document.getElementById('preview-def').textContent = hero.defense || 5;
-    document.getElementById('preview-hp').textContent = hero.maxHp || 100;
-    document.getElementById('preview-crit').textContent = `${Math.round((hero.critChance || 0.05) * 100)}%`;
+    const atkEl = document.getElementById('preview-atk');
+    const defEl = document.getElementById('preview-def');
+    const hpEl = document.getElementById('preview-hp');
+    const critEl = document.getElementById('preview-crit');
+
+    if (atkEl) atkEl.textContent = hero.attack || 10;
+    if (defEl) defEl.textContent = hero.defense || 5;
+    if (hpEl) hpEl.textContent = hero.maxHp || 100;
+    if (critEl) critEl.textContent = `${Math.round((hero.critChance || 0.05) * 100)}%`;
 }
 
 /**
  * Handle manual run start
  */
 function handleStartManualRun() {
-    if (runInProgress) return;
-
-    runInProgress = true;
-    const btn = document.getElementById('start-manual-run');
-    btn.disabled = true;
-    btn.textContent = '⏳ Dungeon wird betreten...';
-
-    // Simulate dungeon run
-    simulateManualRun();
-}
-
-/**
- * Simulate a manual dungeon run
- */
-function simulateManualRun() {
-    // Simulate success/failure
-    const successRate = 0.7; // 70% success rate for testing
-    const success = Math.random() < successRate;
-
-    // Generate loot if successful
-    lastRunLoot = [];
-    let lootMessage = '';
-
-    if (success) {
-        lastRunLoot = generateLootDrops(selectedDifficulty, true);
-        addLootToInventory(lastRunLoot);
-        lootMessage = getLootNotificationMessage(lastRunLoot);
-        
-        // Add to history
-        const reward = getRewardForDifficulty(selectedDifficulty);
-        gameState.resources.gold += reward.gold;
-        gameState.hero.xp += reward.xp;
+    // Hide selection UI
+    const manualPanel = document.getElementById('manual-run-panel');
+    if (manualPanel) {
+        manualPanel.style.display = 'none';
     }
 
-    // Show result
-    setTimeout(() => {
-        showManualRunResult(success, lootMessage);
-        runInProgress = false;
-    }, 1500);
-}
+    // Show canvas
+    const canvasContainer = document.getElementById('dungeon-canvas-container');
+    const canvas = document.getElementById('dungeon-canvas');
+    
+    if (canvasContainer && canvas) {
+        canvasContainer.style.display = 'block';
 
-/**
- * Get reward values for difficulty
- */
-function getRewardForDifficulty(difficulty) {
-    const baseGold = 50;
-    const baseXP = 20;
+        // Initialize controller
+        if (!runController) {
+            runController = new ManualRunController(canvas);
+        } else {
+            runController.stop(); // Stop any previous run
+        }
 
-    const multipliers = {
-        EASY: { gold: 1.0, xp: 1.0 },
-        NORMAL: { gold: 1.5, xp: 1.5 },
-        HARD: { gold: 2.5, xp: 2.5 },
-        EXPERT: { gold: 4.0, xp: 4.0 }
-    };
+        // Start run
+        runController.startRun(selectedDifficulty);
 
-    const mult = multipliers[difficulty] || multipliers.NORMAL;
-    return {
-        gold: Math.round(baseGold * mult.gold),
-        xp: Math.round(baseXP * mult.xp)
-    };
-}
-
-/**
- * Show manual run result
- */
-function showManualRunResult(success, lootMessage) {
-    const resultHTML = `
-        <div class="manual-run-result ${success ? 'success' : 'failure'}">
-            <div class="result-icon">${success ? '✅ Sieg!' : '❌ Niederlage!'}</div>
-            <div class="result-message">
-                ${success ? `Du hast den Dungeon erfolgreich besiegt!` : `Du bist im Dungeon gefallen...`}
-            </div>
-            ${lastRunLoot.length > 0 ? `
-                <div class="result-loot">
-                    <h4>🎁 ${lootMessage}</h4>
-                    <div class="loot-items">
-                        ${lastRunLoot.map(item => `
-                            <div class="loot-item" style="border-color: ${item.color}">
-                                <span class="loot-icon">${item.icon}</span>
-                                <div class="loot-info">
-                                    <div class="loot-name">${item.name}</div>
-                                    <div class="loot-rarity" style="color: ${item.color}">${item.rarity}</div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-
-    // Show result in modal or panel
-    alert(`${success ? '✅ Sieg!' : '❌ Niederlage!'}\n${lootMessage}`);
-
-    // Reset button
-    const btn = document.getElementById('start-manual-run');
-    btn.disabled = false;
-    btn.textContent = '🎮 Dungeon Betreten';
-
-    // Display loot if any
-    if (lastRunLoot.length > 0) {
-        displayLootHistory();
+        console.log(`🎮 Starting manual run on difficulty: ${selectedDifficulty}`);
     }
-}
-
-/**
- * Display loot history
- */
-function displayLootHistory() {
-    const section = document.getElementById('loot-history-section');
-    const container = document.getElementById('loot-container');
-
-    if (!section || !container) return;
-
-    if (lastRunLoot.length === 0) {
-        section.style.display = 'none';
-        return;
-    }
-
-    section.style.display = 'block';
-    container.innerHTML = lastRunLoot.map(item => `
-        <div class="loot-item-card" style="border-color: ${item.color}">
-            <span class="loot-card-icon">${item.icon}</span>
-            <div class="loot-card-info">
-                <div class="loot-card-name">${item.name}</div>
-                <div class="loot-card-rarity" style="color: ${item.color}">${item.rarity.toUpperCase()}</div>
-                <div class="loot-card-type">${item.type}</div>
-            </div>
-        </div>
-    `).join('');
 }
 
 /**
