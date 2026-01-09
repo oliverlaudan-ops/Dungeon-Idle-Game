@@ -1,385 +1,328 @@
 /**
- * Manual Run UI v2.0
- * Handles UI updates for manual dungeon runs with difficulty selection
- * UPDATED: Now supports difficulty selection and equipment preview
+ * Manual Run UI with Difficulty Selection & Loot Display
+ * Updated with Fantasy Theme and Loot Drop System
  */
 
-import { gameState } from '../src/core/game-state.js';
-import { startManualRun, endManualRun } from '../src/manual-run/manual-run-manager.js';
-import { initCanvas, clearCanvas, renderCenterMessage } from '../src/manual-run/canvas-renderer.js';
-import { initInputHandler, removeInputHandler } from '../src/manual-run/input-handler.js';
-import { initCombatUI } from '../src/manual-run/combat-ui.js';
+import { gameState } from '../core/game-state.js';
+import { shouldDropLoot, generateLootDrops, addLootToInventory, getLootNotificationMessage, getDropRateForDifficulty } from '../upgrades/loot-system.js';
+import { getHeroClass, getClassInfo } from '../upgrades/equipment-system.js';
 
-let canvasInitialized = false;
-let combatUIInitialized = false;
-let inputHandlerInitialized = false;
-
-// Difficulty configuration
-const DIFFICULTY_CONFIG = {
-    easy: {
-        label: '😊 Easy',
-        color: '#2ecc71',
-        description: '5-8 rooms, 0.75x monster strength'
-    },
-    normal: {
-        label: '😀 Normal',
-        color: '#3498db',
-        description: '7-10 rooms, 1.2x monster strength, 1.5x rewards'
-    },
-    hard: {
-        label: '😠 Hard',
-        color: '#f39c12',
-        description: '10-13 rooms, 1.6x monster strength, 2.5x rewards'
-    },
-    expert: {
-        label: '🔥 Expert',
-        color: '#e74c3c',
-        description: '12-15 rooms, 2.0x monster strength, 4.0x rewards'
-    }
-};
+let selectedDifficulty = 'NORMAL';
+let runInProgress = false;
+let lastRunLoot = [];
 
 /**
- * Initialize manual run UI
+ * Initialize Manual Run UI
  */
 export function initManualRunUI() {
-    // Initialize canvas (only once)
-    if (!canvasInitialized) {
-        if (!initCanvas()) {
-            console.error('❌ Failed to initialize canvas');
-            return;
-        }
-        canvasInitialized = true;
-    }
+    const manualPanel = document.getElementById('manual-run-panel');
+    if (!manualPanel) return;
 
-    // Initialize combat UI (only once)
-    if (!combatUIInitialized) {
-        if (!initCombatUI()) {
-            console.error('❌ Failed to initialize combat UI');
-        } else {
-            combatUIInitialized = true;
-        }
-    }
+    manualPanel.innerHTML = `
+        <div class="manual-run-container">
+            <!-- Difficulty Selector -->
+            <div class="difficulty-section">
+                <h3>⚔️ Wähle die Schwierigkeit</h3>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn selected" data-difficulty="EASY">
+                        <span>😊 Easy</span>
+                        <span class="difficulty-label">5-8 Räume • 0.75x Feinde • 1.0x Belohnungen</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="NORMAL">
+                        <span>😀 Normal</span>
+                        <span class="difficulty-label">7-10 Räume • 1.2x Feinde • 1.5x Belohnungen</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="HARD">
+                        <span>😠 Hard</span>
+                        <span class="difficulty-label">10-13 Räume • 1.6x Feinde • 2.5x Belohnungen</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="EXPERT">
+                        <span>🔥 Expert</span>
+                        <span class="difficulty-label">12-15 Räume • 2.0x Feinde • 4.0x Belohnungen</span>
+                    </button>
+                </div>
+                <div class="loot-chance-info">
+                    <p>🎲 <strong>Loot-Quote:</strong> <span id="loot-chance">15%</span> Chance auf Equipment-Drops</p>
+                </div>
+            </div>
 
-    // Initialize input handler (only once)
-    if (!inputHandlerInitialized) {
-        initInputHandler();
-        inputHandlerInitialized = true;
-    }
+            <!-- Equipment & Stats Preview -->
+            <div class="equipment-section">
+                <h3>⚔️ Dein Equipment & Hero-Stats</h3>
+                <div class="equipment-preview">
+                    <div class="equipment-slot">
+                        <span class="slot-icon">🗡️</span>
+                        <div class="slot-info">
+                            <div class="slot-name" id="weapon-name">Keine Waffe ausgerüstet</div>
+                            <div class="slot-class" id="weapon-class">Klasse: Warrior</div>
+                        </div>
+                    </div>
+                    <div class="equipment-slot">
+                        <span class="slot-icon">🛡️</span>
+                        <div class="slot-info">
+                            <div class="slot-name" id="armor-name">Keine Rüstung ausgerüstet</div>
+                            <div class="slot-class">Basis Defense</div>
+                        </div>
+                    </div>
+                    <div class="equipment-slot">
+                        <span class="slot-icon">💍</span>
+                        <div class="slot-info">
+                            <div class="slot-name" id="accessory-name">Kein Accessory</div>
+                            <div class="slot-class">Basis Stats</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-stats-preview">
+                    <div class="stat-row">
+                        <span class="stat-label">⚔️ ATK:</span>
+                        <span class="stat-value" id="preview-atk">10</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">🛡️ DEF:</span>
+                        <span class="stat-value" id="preview-def">5</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">❤️ HP:</span>
+                        <span class="stat-value" id="preview-hp">100</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">💥 CRIT:</span>
+                        <span class="stat-value" id="preview-crit">5%</span>
+                    </div>
+                </div>
+            </div>
 
-    // Initialize game state defaults
-    if (!gameState.settings) {
-        gameState.settings = {};
-    }
-    if (!gameState.settings.difficulty) {
-        gameState.settings.difficulty = 'normal';
-    }
-    if (!gameState.equipped) {
-        gameState.equipped = {};
-    }
-    if (!gameState.inventory) {
-        gameState.inventory = [];
-    }
+            <!-- Loot History -->
+            <div class="loot-history-section" id="loot-history-section" style="display: none;">
+                <h3>🎁 Letzte Belohnungen</h3>
+                <div class="loot-container" id="loot-container"></div>
+            </div>
 
-    // Always show welcome screen when tab is opened
-    renderWelcomeScreen();
+            <!-- Start Button -->
+            <div class="manual-run-actions">
+                <button class="btn btn-primary btn-lg" id="start-manual-run">
+                    <span>🎮 Dungeon Betreten</span>
+                </button>
+            </div>
+        </div>
+    `;
 
-    // Always ensure UI elements exist
-    ensureDifficultySelector();
-    ensureStartButton();
-    renderEquipmentPreview();
-}
-
-/**
- * Render welcome screen with difficulty selector
- */
-function renderWelcomeScreen() {
-    renderCenterMessage('Manual Dungeon Run', 'Select difficulty and click START');
-}
-
-/**
- * Create and manage difficulty selector
- */
-function ensureDifficultySelector() {
-    let selector = document.getElementById('difficulty-selector-manual');
-    
-    if (!selector) {
-        const container = document.getElementById('manual-tab');
-        if (!container) {
-            console.warn('⚠️ Manual tab container not found');
-            return;
-        }
-
-        selector = document.createElement('div');
-        selector.id = 'difficulty-selector-manual';
-        selector.style.cssText = `
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            padding: 20px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 8px;
-        `;
-
-        // Create buttons for each difficulty
-        Object.entries(DIFFICULTY_CONFIG).forEach(([key, config]) => {
-            const btn = document.createElement('button');
-            btn.className = 'difficulty-btn';
-            btn.id = `difficulty-${key}`;
-            btn.style.cssText = `
-                padding: 12px 20px;
-                border: 2px solid ${config.color};
-                background: rgba(255,255,255,0.1);
-                color: #fff;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.3s ease;
-                flex: 1;
-                max-width: 150px;
-            `;
-            
-            btn.innerHTML = `
-                <div style="font-size: 1.2em; margin-bottom: 5px;">${config.label}</div>
-                <div style="font-size: 0.85em; opacity: 0.8;">${config.description}</div>
-            `;
-
-            btn.addEventListener('click', () => setDifficulty(key, btn));
-            selector.appendChild(btn);
-        });
-
-        container.insertBefore(selector, container.firstChild);
-        updateDifficultySelectorUI();
-    } else {
-        updateDifficultySelectorUI();
-    }
-}
-
-/**
- * Update difficulty selector visual state
- */
-function updateDifficultySelectorUI() {
-    const currentDifficulty = gameState.settings?.difficulty || 'normal';
-    
-    Object.keys(DIFFICULTY_CONFIG).forEach(key => {
-        const btn = document.getElementById(`difficulty-${key}`);
-        if (!btn) return;
-
-        const config = DIFFICULTY_CONFIG[key];
-        if (key === currentDifficulty) {
-            btn.style.background = config.color;
-            btn.style.transform = 'scale(1.05)';
-            btn.style.boxShadow = `0 0 15px ${config.color}`;
-        } else {
-            btn.style.background = 'rgba(255,255,255,0.1)';
-            btn.style.transform = 'scale(1.0)';
-            btn.style.boxShadow = 'none';
-        }
+    // Event listeners
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.addEventListener('click', handleDifficultySelect);
     });
+    document.getElementById('start-manual-run')?.addEventListener('click', handleStartManualRun);
+
+    // Initialize with default difficulty
+    selectedDifficulty = 'EASY';
+    updateLootChanceDisplay();
+    updateEquipmentPreview();
 }
 
 /**
- * Set difficulty
+ * Handle difficulty selection
  */
-function setDifficulty(difficulty, btn) {
-    gameState.settings.difficulty = difficulty;
-    updateDifficultySelectorUI();
-    renderEquipmentPreview(); // Update preview with new difficulty multipliers
-    console.log(`✅ Difficulty set to: ${difficulty}`);
+function handleDifficultySelect(e) {
+    const btn = e.currentTarget;
+    const difficulty = btn.dataset.difficulty;
+
+    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    selectedDifficulty = difficulty;
+    updateLootChanceDisplay();
 }
 
 /**
- * Render equipment preview
+ * Update loot chance display
  */
-function renderEquipmentPreview() {
-    let preview = document.getElementById('equipment-preview-manual');
-    
-    if (!preview) {
-        const container = document.getElementById('manual-tab');
-        if (!container) return;
-
-        preview = document.createElement('div');
-        preview.id = 'equipment-preview-manual';
-        preview.style.cssText = `
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        `;
-        container.insertBefore(preview, document.getElementById('manual-run-button-container') || container.lastChild);
-    }
-
-    // Build equipment info
-    const equipped = gameState.equipped || {};
-    const heroStats = calculateHeroStats();
-    
-    let html = '<div style="font-weight: bold; margin-bottom: 10px;">⚔️ Current Equipment & Stats:</div>';
-    html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">';
-    
-    // Equipment column
-    html += '<div>';
-    html += '<strong>Equipment:</strong><br>';
-    if (equipped.weapon) {
-        html += `🗡️ Weapon: ${equipped.weapon.name} (+${equipped.weapon.atk} ATK)<br>`;
-    } else {
-        html += '🗡️ Weapon: None (Base ATK only)<br>';
-    }
-    if (equipped.armor) {
-        html += `🛡️ Armor: ${equipped.armor.name} (+${equipped.armor.def} DEF)<br>`;
-    } else {
-        html += '🛡️ Armor: None (Base DEF only)<br>';
-    }
-    if (equipped.accessory) {
-        html += `💎 Accessory: ${equipped.accessory.name}<br>`;
-    }
-    html += '</div>';
-    
-    // Stats column
-    html += '<div>';
-    html += '<strong>Expected Stats:</strong><br>';
-    html += `⚔️ ATK: ${heroStats.atk}<br>`;
-    html += `🛡️ DEF: ${heroStats.def}<br>`;
-    html += `❤️ HP: ${heroStats.hp}<br>`;
-    html += '</div>';
-    
-    html += '</div>';
-    html += `<div style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">💡 Tip: Better equipment makes difficult dungeons easier!</div>`;
-    
-    preview.innerHTML = html;
-}
-
-/**
- * Calculate hero stats with equipment
- */
-function calculateHeroStats() {
-    const equipped = gameState.equipped || {};
-    const level = gameState.hero?.level || 1;
-    
-    let atk = 10 + (level * 2);
-    let def = 5;
-    let hp = 100;
-
-    // Add equipment bonuses
-    if (equipped.weapon) {
-        atk += equipped.weapon.atk || 0;
-    }
-    if (equipped.armor) {
-        def += equipped.armor.def || 0;
-        hp += equipped.armor.hp || 0;
-    }
-    if (equipped.accessory) {
-        atk += equipped.accessory.bonusATK || 0;
-        def += equipped.accessory.bonusDEF || 0;
-        hp += equipped.accessory.bonusHP || 0;
-    }
-
-    return { atk, def, hp };
-}
-
-/**
- * Ensure start button exists and has correct state
- */
-function ensureStartButton() {
-    let startBtn = document.getElementById('start-manual-run-btn');
-    
-    // Create button if it doesn't exist
-    if (!startBtn) {
-        const container = document.getElementById('manual-tab');
-        if (!container) return;
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.id = 'manual-run-button-container';
-        buttonContainer.style.textAlign = 'center';
-        buttonContainer.style.marginTop = '20px';
-
-        startBtn = document.createElement('button');
-        startBtn.id = 'start-manual-run-btn';
-        startBtn.className = 'btn btn-primary';
-        startBtn.style.fontSize = '1.2rem';
-        startBtn.style.padding = '15px 40px';
-
-        startBtn.addEventListener('click', handleStartRun);
-
-        buttonContainer.appendChild(startBtn);
-        container.appendChild(buttonContainer);
-    }
-
-    // Set correct button state based on game state
-    updateButtonState(startBtn);
-}
-
-/**
- * Update button state
- */
-function updateButtonState(btn) {
-    if (!btn) {
-        btn = document.getElementById('start-manual-run-btn');
-        if (!btn) return;
-    }
-
-    if (gameState.manualRun.active) {
-        btn.textContent = '⚔️ Run in Progress...';
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-        btn.style.cursor = 'not-allowed';
-    } else {
-        btn.textContent = '🎮 Start Manual Run';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
+function updateLootChanceDisplay() {
+    const chanceElement = document.getElementById('loot-chance');
+    if (chanceElement) {
+        chanceElement.textContent = getDropRateForDifficulty(selectedDifficulty);
     }
 }
 
 /**
- * Handle start run button click
+ * Update equipment preview
  */
-function handleStartRun() {
-    if (gameState.manualRun.active) {
+function updateEquipmentPreview() {
+    const weapon = gameState.equipped?.weapon;
+    const armor = gameState.equipped?.armor;
+    const accessory = gameState.equipped?.accessory;
+
+    // Update weapon
+    if (weapon) {
+        document.getElementById('weapon-name').textContent = weapon.name;
+        const classInfo = getHeroClass();
+        document.getElementById('weapon-class').textContent = `Klasse: ${weapon.classInfo?.name || 'Unknown'}`;
+    }
+
+    // Update armor
+    if (armor) {
+        document.getElementById('armor-name').textContent = armor.name;
+    }
+
+    // Update accessory
+    if (accessory) {
+        document.getElementById('accessory-name').textContent = accessory.name;
+    }
+
+    // Update stats
+    const hero = gameState.hero;
+    document.getElementById('preview-atk').textContent = hero.attack || 10;
+    document.getElementById('preview-def').textContent = hero.defense || 5;
+    document.getElementById('preview-hp').textContent = hero.maxHp || 100;
+    document.getElementById('preview-crit').textContent = `${Math.round((hero.critChance || 0.05) * 100)}%`;
+}
+
+/**
+ * Handle manual run start
+ */
+function handleStartManualRun() {
+    if (runInProgress) return;
+
+    runInProgress = true;
+    const btn = document.getElementById('start-manual-run');
+    btn.disabled = true;
+    btn.textContent = '⏳ Dungeon wird betreten...';
+
+    // Simulate dungeon run
+    simulateManualRun();
+}
+
+/**
+ * Simulate a manual dungeon run
+ */
+function simulateManualRun() {
+    // Simulate success/failure
+    const successRate = 0.7; // 70% success rate for testing
+    const success = Math.random() < successRate;
+
+    // Generate loot if successful
+    lastRunLoot = [];
+    let lootMessage = '';
+
+    if (success) {
+        lastRunLoot = generateLootDrops(selectedDifficulty, true);
+        addLootToInventory(lastRunLoot);
+        lootMessage = getLootNotificationMessage(lastRunLoot);
+        
+        // Add to history
+        const reward = getRewardForDifficulty(selectedDifficulty);
+        gameState.totalGold += reward.gold;
+        gameState.totalXP += reward.xp;
+    }
+
+    // Show result
+    setTimeout(() => {
+        showManualRunResult(success, lootMessage);
+        runInProgress = false;
+    }, 1500);
+}
+
+/**
+ * Get reward values for difficulty
+ */
+function getRewardForDifficulty(difficulty) {
+    const baseGold = 50;
+    const baseXP = 20;
+
+    const multipliers = {
+        EASY: { gold: 1.0, xp: 1.0 },
+        NORMAL: { gold: 1.5, xp: 1.5 },
+        HARD: { gold: 2.5, xp: 2.5 },
+        EXPERT: { gold: 4.0, xp: 4.0 }
+    };
+
+    const mult = multipliers[difficulty] || multipliers.NORMAL;
+    return {
+        gold: Math.round(baseGold * mult.gold),
+        xp: Math.round(baseXP * mult.xp)
+    };
+}
+
+/**
+ * Show manual run result
+ */
+function showManualRunResult(success, lootMessage) {
+    const resultHTML = `
+        <div class="manual-run-result ${success ? 'success' : 'failure'}">
+            <div class="result-icon">${success ? '✅ Sieg!' : '❌ Niederlage!'}</div>
+            <div class="result-message">
+                ${success ? `Du hast den Dungeon erfolgreich besiegt!` : `Du bist im Dungeon gefallen...`}
+            </div>
+            ${lastRunLoot.length > 0 ? `
+                <div class="result-loot">
+                    <h4>🎁 ${lootMessage}</h4>
+                    <div class="loot-items">
+                        ${lastRunLoot.map(item => `
+                            <div class="loot-item" style="border-color: ${item.color}">
+                                <span class="loot-icon">${item.icon}</span>
+                                <div class="loot-info">
+                                    <div class="loot-name">${item.name}</div>
+                                    <div class="loot-rarity" style="color: ${item.color}">${item.rarity}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    // Show result in modal or panel
+    alert(`${success ? '✅ Sieg!' : '❌ Niederlage!'}\n${lootMessage}`);
+
+    // Reset button
+    const btn = document.getElementById('start-manual-run');
+    btn.disabled = false;
+    btn.textContent = '🎮 Dungeon Betreten';
+
+    // Display loot if any
+    if (lastRunLoot.length > 0) {
+        displayLootHistory();
+    }
+}
+
+/**
+ * Display loot history
+ */
+function displayLootHistory() {
+    const section = document.getElementById('loot-history-section');
+    const container = document.getElementById('loot-container');
+
+    if (!section || !container) return;
+
+    if (lastRunLoot.length === 0) {
+        section.style.display = 'none';
         return;
     }
 
-    // Check if hero has enough HP
-    if (gameState.hero.hp <= 0) {
-        alert('⚠️ Your hero has no HP! Rest or use a healing item first.');
-        return;
-    }
-
-    const difficulty = gameState.settings?.difficulty || 'normal';
-    const floor = 1; // Start with floor 1
-    
-    console.log(`🎮 Starting manual run - Floor ${floor}, Difficulty: ${difficulty}`);
-    startManualRun(floor, difficulty);
-
-    // Update button immediately
-    updateManualRunUI();
+    section.style.display = 'block';
+    container.innerHTML = lastRunLoot.map(item => `
+        <div class="loot-item-card" style="border-color: ${item.color}">
+            <span class="loot-card-icon">${item.icon}</span>
+            <div class="loot-card-info">
+                <div class="loot-card-name">${item.name}</div>
+                <div class="loot-card-rarity" style="color: ${item.color}">${item.rarity.toUpperCase()}</div>
+                <div class="loot-card-type">${item.type}</div>
+            </div>
+        </div>
+    `).join('');
 }
 
 /**
- * Update manual run UI (called from main game loop and manual-run-manager)
+ * Update UI when equipment changes
  */
-export function updateManualRunUI() {
-    const btn = document.getElementById('start-manual-run-btn');
-    updateButtonState(btn);
-    renderEquipmentPreview();
+export function refreshManualRunUI() {
+    updateEquipmentPreview();
 }
 
 /**
- * Cleanup manual run UI
+ * Update equipment preview when gear changes
  */
-export function cleanupManualRunUI() {
-    removeInputHandler();
-    clearCanvas();
-    renderWelcomeScreen();
-    
-    // Reset button state
-    updateManualRunUI();
-}
-
-/**
- * Get current difficulty setting
- */
-export function getDifficultySetting() {
-    return gameState.settings?.difficulty || 'normal';
+export function onEquipmentChanged() {
+    updateEquipmentPreview();
 }
