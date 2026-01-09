@@ -1,19 +1,20 @@
 /**
- * Dungeon Generator v2
+ * Dungeon Generator v2.1
  * Generates procedural dungeons with:
  * - Difficulty Scaling (Easy, Normal, Hard, Expert)
  * - Longer Dungeons (5-15 rooms depending on difficulty)
  * - Boss Encounters (every 5 rooms)
  * - Monster Scaling based on floor and difficulty
+ * - REBALANCED: Higher HP/ATK for normal monsters to match boss difficulty
  */
 
 import { gameState } from '../core/game-state.js';
 
-// Difficulty configuration
+// Difficulty configuration - REBALANCED
 const DIFFICULTY_CONFIG = {
     easy: {
         roomCount: { min: 5, max: 8 },
-        monsterMult: 0.6,
+        monsterMult: 0.75,        // INCREASED from 0.6 (too weak before)
         bossMult: 0.8,
         goldMult: 1.0,
         xpMult: 1.0,
@@ -21,7 +22,7 @@ const DIFFICULTY_CONFIG = {
     },
     normal: {
         roomCount: { min: 7, max: 10 },
-        monsterMult: 1.0,
+        monsterMult: 1.2,         // INCREASED from 1.0 (was too easy)
         bossMult: 1.0,
         goldMult: 1.5,
         xpMult: 1.5,
@@ -29,7 +30,7 @@ const DIFFICULTY_CONFIG = {
     },
     hard: {
         roomCount: { min: 10, max: 13 },
-        monsterMult: 1.4,
+        monsterMult: 1.6,         // INCREASED from 1.4 (more challenging)
         bossMult: 1.3,
         goldMult: 2.5,
         xpMult: 2.5,
@@ -37,7 +38,7 @@ const DIFFICULTY_CONFIG = {
     },
     expert: {
         roomCount: { min: 12, max: 15 },
-        monsterMult: 1.8,
+        monsterMult: 2.0,         // INCREASED from 1.8 (hardcore only)
         bossMult: 1.6,
         goldMult: 4.0,
         xpMult: 4.0,
@@ -51,7 +52,7 @@ const BOSS_TYPES = [
     { name: 'Lich King', icon: '👑', hpMult: 3.5, atkMult: 3.5, xpMult: 5.0, goldMult: 5.0 },
     { name: 'Giant Golem', icon: '🗿', hpMult: 5.0, atkMult: 2.0, xpMult: 5.0, goldMult: 5.0 },
     { name: 'Dark Sorcerer', icon: '🧙', hpMult: 2.5, atkMult: 4.0, xpMult: 5.0, goldMult: 5.0 },
-    { name: 'Ancient Wyvern', icon: '🐲', hpMult: 4.5, atkMult: 3.5, xpMult: 5.0, goldMult: 5.0 }
+    { name: 'Ancient Wyvern', icon: '🐍', hpMult: 4.5, atkMult: 3.5, xpMult: 5.0, goldMult: 5.0 }
 ];
 
 // Regular monster types
@@ -202,8 +203,9 @@ function generateBossRoom(floor, roomIndex, x, y, difficulty) {
 function generateMonster(floor, room, difficulty, monsterMult = 1.0) {
     const type = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
     
-    const baseHp = 20 + floor * 10;
-    const baseAtk = 5 + floor * 2;
+    // REBALANCED: Higher base stats
+    const baseHp = 30 + floor * 15;    // INCREASED from 20 + 10*floor
+    const baseAtk = 8 + floor * 3;     // INCREASED from 5 + 2*floor
     const baseXp = 10 + floor * 5;
     const baseGold = 5 + floor * 3;
 
@@ -235,6 +237,7 @@ function generateMonster(floor, room, difficulty, monsterMult = 1.0) {
 function generateBoss(floor, room, difficulty, bossMult = 1.0) {
     const type = BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)];
     
+    // KEPT SAME: Boss difficulty was perfect!
     const baseHp = 100 + floor * 40;
     const baseAtk = 15 + floor * 5;
     const baseXp = 100 + floor * 50;
