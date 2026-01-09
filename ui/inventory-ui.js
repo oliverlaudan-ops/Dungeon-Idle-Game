@@ -4,8 +4,8 @@
  * Equip/Unequip items, view stats, sell items
  */
 
-import { gameState } from '../core/game-state.js';
-import { equipItem, unequipItem, sellEquipment, getEquipmentStats } from '../upgrades/equipment-system.js';
+import { gameState } from '../src/core/game-state.js';
+import { equipItem, unequipItem, sellEquipment, getEquipmentStats } from '../src/upgrades/equipment-system.js';
 import { updateHeroUI } from './hero-ui.js';
 
 /**
