@@ -3,19 +3,24 @@
  * Handles import, export, and reset functionality
  */
 
-import { gameState, saveGame, loadGame } from './game-state.js';
+import { gameState, saveGame, loadGame, exportSave as exportSaveFromState, importSave as importSaveFromState } from './game-state.js';
 import { applyUpgradeEffects } from '../upgrades/upgrade-manager.js';
 import { updateUI } from '../../ui/ui-render.js';
 import { renderUpgrades } from '../../ui/upgrades-ui.js';
 
 /**
- * Export save to base64 string
+ * Export save to base64 string (Unicode-safe)
  */
 export function exportSave() {
     try {
-        const saveData = JSON.stringify(gameState);
-        const encoded = btoa(saveData); // Base64 encode
-        console.log('✅ Save exported');
+        // Use the Unicode-safe export from game-state.js
+        const encoded = exportSaveFromState();
+        
+        if (!encoded) {
+            throw new Error('Export returned null');
+        }
+        
+        console.log('✅ Save exported successfully');
         return encoded;
     } catch (e) {
         console.error('❌ Export failed:', e);
@@ -24,29 +29,49 @@ export function exportSave() {
 }
 
 /**
- * Import save from base64 string
+ * Import save from base64 string (Unicode-safe)
  */
 export function importSave(encodedSave) {
     try {
-        // Decode
-        const decoded = atob(encodedSave);
-        const loadedData = JSON.parse(decoded);
+        // Decode using Unicode-safe method
+        const binaryString = atob(encodedSave);
+        
+        // Convert binary string to Uint8Array
+        const uint8Array = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        
+        // Use TextDecoder for Unicode-safe decoding
+        const decoder = new TextDecoder();
+        const jsonString = decoder.decode(uint8Array);
+        
+        // Parse JSON
+        const loadedData = JSON.parse(jsonString);
 
         // Validate basic structure
-        if (!loadedData.hero || !loadedData.resources || !loadedData.idle) {
+        if (!loadedData.hero || !loadedData.resources) {
             throw new Error('Invalid save data structure');
         }
 
         // Merge with current state (to handle new properties)
         Object.keys(gameState).forEach(key => {
             if (loadedData[key] !== undefined) {
-                if (typeof gameState[key] === 'object' && !Array.isArray(gameState[key])) {
+                if (typeof gameState[key] === 'object' && !Array.isArray(gameState[key]) && gameState[key] !== null) {
                     gameState[key] = { ...gameState[key], ...loadedData[key] };
                 } else {
                     gameState[key] = loadedData[key];
                 }
             }
         });
+
+        // Ensure inventory and equipped exist
+        if (!gameState.inventory) {
+            gameState.inventory = [];
+        }
+        if (!gameState.equipped) {
+            gameState.equipped = { weapon: null, armor: null, accessory: null };
+        }
 
         // Apply upgrades
         applyUpgradeEffects();
@@ -59,6 +84,8 @@ export function importSave(encodedSave) {
         renderUpgrades();
 
         console.log('✅ Save imported successfully');
+        console.log(`📦 Imported ${gameState.inventory?.length || 0} items`);
+        
         return { success: true };
     } catch (e) {
         console.error('❌ Import failed:', e);
