@@ -1,7 +1,7 @@
 /**
- * Combat UI v2.0
+ * Combat UI v2.1
  * Handles combat interface and interactions
- * UPDATED: Boss abilities integration
+ * UPDATED: Visual effects integration (damage numbers, screen shake, crit effects)
  */
 
 import { gameState } from '../core/game-state.js';
@@ -15,6 +15,16 @@ import {
     calculateDamageToBoss,
     getBossStatus
 } from './boss-abilities.js';
+import {
+    showCombatDamageNumber,
+    screenShake,
+    showCritEffect,
+    showBossAbilityEffect,
+    showTelegraphWarning,
+    showVictoryEffect,
+    showDefeatEffect,
+    showHitEffect
+} from './visual-effects.js';
 
 let currentMonster = null;
 let combatContainer = null;
@@ -138,11 +148,19 @@ function handleCombatAction(action) {
             calculateDamageToBoss(currentMonster, baseDamage) : 
             baseDamage;
         
+        // VISUAL EFFECTS
         if (isCrit) {
+            showCritEffect('monster');
+            screenShake('medium');
             addCombatLog(`✨ Kritischer Treffer! ${damage} Schaden!`, 'crit');
         } else {
+            showHitEffect('monster');
+            screenShake('light');
             addCombatLog(`Du triffst für ${damage} Schaden!`, 'player-action');
         }
+        
+        // Show damage number
+        showCombatDamageNumber(damage, 'monster', isCrit, false);
         
         // Show shield message if active
         if (currentMonster.isBoss && currentMonster.shielded && baseDamage !== damage) {
@@ -154,6 +172,10 @@ function handleCombatAction(action) {
         // Check if monster defeated
         if (currentMonster.hp <= 0) {
             currentMonster.hp = 0;
+            
+            // VICTORY EFFECT
+            showVictoryEffect();
+            
             addCombatLog(`✅ ${currentMonster.name} besiegt!`, 'victory');
             
             // Award XP and gold
@@ -213,14 +235,22 @@ function handleBossAction(damageMultiplier = 1.0) {
     // Check if boss is telegraphing an ability
     if (currentMonster.telegraphing) {
         // Execute telegraphed ability
+        const abilityKey = currentMonster.telegraphing;
         const result = executeBossAbility(currentMonster, gameState.hero);
         
         if (result) {
+            // SHOW ABILITY EFFECT
+            showBossAbilityEffect(abilityKey);
+            
             addCombatLog(result.message, result.isCrit ? 'crit' : 'monster-action');
             
             if (result.damage > 0) {
                 const finalDamage = Math.floor(result.damage * damageMultiplier);
                 gameState.hero.hp -= finalDamage;
+                
+                // Show damage to player
+                showCombatDamageNumber(finalDamage, 'player', result.isCrit, false);
+                showHitEffect('player');
                 
                 if (damageMultiplier < 1.0) {
                     addCombatLog(`Deine Verteidigung reduziert den Schaden!`, 'info');
@@ -228,6 +258,8 @@ function handleBossAction(damageMultiplier = 1.0) {
             }
             
             if (result.heal) {
+                // Show heal number
+                showCombatDamageNumber(result.heal, 'monster', false, true);
                 addCombatLog(`Der Boss wurde geheilt!`, 'monster-action');
             }
         }
@@ -246,6 +278,9 @@ function handleBossAction(damageMultiplier = 1.0) {
             const telegraph = telegraphBossAbility(currentMonster, abilityKey);
             
             if (telegraph) {
+                // SHOW TELEGRAPH WARNING
+                showTelegraphWarning();
+                
                 addCombatLog(telegraph.message, 'boss-telegraph');
                 updateCombatUI();
                 return; // Ability will execute next turn
@@ -268,6 +303,12 @@ function monsterAttack(damageMultiplier = 1.0) {
     const damage = Math.max(1, Math.floor((baseDamage - defense) * damageMultiplier));
 
     gameState.hero.hp -= damage;
+    
+    // VISUAL EFFECTS
+    showCombatDamageNumber(damage, 'player', false, false);
+    showHitEffect('player');
+    screenShake('light');
+    
     addCombatLog(`${currentMonster.name} trifft dich für ${damage} Schaden!`, 'monster-action');
     
     updateCombatUI();
@@ -281,6 +322,10 @@ function checkPlayerDefeat() {
     if (gameState.hero.hp <= 0) {
         gameState.hero.hp = 0;
         gameState.stats.totalDeaths++;
+        
+        // DEFEAT EFFECT
+        showDefeatEffect();
+        
         addCombatLog('💀 Du wurdest besiegt!', 'defeat');
         
         // End combat after 2 seconds
