@@ -211,8 +211,8 @@ function simulateManualRun() {
         
         // Add to history
         const reward = getRewardForDifficulty(selectedDifficulty);
-        gameState.totalGold += reward.gold;
-        gameState.totalXP += reward.xp;
+        gameState.resources.gold += reward.gold;
+        gameState.hero.xp += reward.xp;
     }
 
     // Show result
@@ -314,14 +314,21 @@ function displayLootHistory() {
 }
 
 /**
- * Update UI when equipment changes
+ * Update manual run UI - exported for ui-init.js
+ */
+export function updateManualRunUI() {
+    updateEquipmentPreview();
+}
+
+/**
+ * Update UI when equipment changes - alias
  */
 export function refreshManualRunUI() {
     updateEquipmentPreview();
 }
 
 /**
- * Update equipment preview when gear changes
+ * Update equipment preview when gear changes - alias
  */
 export function onEquipmentChanged() {
     updateEquipmentPreview();
