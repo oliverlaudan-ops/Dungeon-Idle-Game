@@ -148,12 +148,24 @@ export function loadGame() {
 }
 
 /**
- * Export save data as string
+ * Export save data as Base64 string (Unicode-safe)
  */
 export function exportSave() {
     try {
         saveGame(); // Save current state first
-        return btoa(JSON.stringify(gameState));
+        const jsonString = JSON.stringify(gameState);
+        
+        // Use TextEncoder for Unicode-safe Base64 encoding
+        const encoder = new TextEncoder();
+        const uint8Array = encoder.encode(jsonString);
+        
+        // Convert Uint8Array to Base64
+        let binaryString = '';
+        uint8Array.forEach(byte => {
+            binaryString += String.fromCharCode(byte);
+        });
+        
+        return btoa(binaryString);
     } catch (e) {
         console.error('❌ Export failed:', e);
         return null;
@@ -161,17 +173,35 @@ export function exportSave() {
 }
 
 /**
- * Import save data from string
+ * Import save data from Base64 string (Unicode-safe)
  */
 export function importSave(saveString) {
     try {
-        const decoded = JSON.parse(atob(saveString));
+        // Decode Base64 to binary string
+        const binaryString = atob(saveString);
+        
+        // Convert binary string to Uint8Array
+        const uint8Array = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        
+        // Use TextDecoder for Unicode-safe decoding
+        const decoder = new TextDecoder();
+        const jsonString = decoder.decode(uint8Array);
+        
+        // Parse and validate
+        const decoded = JSON.parse(jsonString);
+        
+        // Save to localStorage
         localStorage.setItem('dungeonIdleGame', JSON.stringify(decoded));
+        
+        // Reload page to apply
         location.reload();
         return true;
     } catch (e) {
         console.error('❌ Import failed:', e);
-        alert('❌ Invalid save data!');
+        alert('❌ Invalid save data! Make sure you copied the complete export string.');
         return false;
     }
 }
