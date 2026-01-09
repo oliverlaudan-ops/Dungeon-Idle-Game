@@ -7,12 +7,14 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles-combat.css">
+    <link rel="stylesheet" href="loot-styles.css">
+    <link rel="stylesheet" href="inventory-styles.css">
 </head>
 <body>
     <div id="game-container">
         <header>
             <h1>🏰 Dungeon Idle Game</h1>
-            <div id="version">v0.1.0-alpha</div>
+            <div id="version">v2.2.0</div>
         </header>
 
         <!-- Tab Navigation -->
@@ -20,6 +22,7 @@
             <button class="tab-btn active" data-tab="idle">Idle Runs</button>
             <button class="tab-btn" data-tab="manual">Manual Run</button>
             <button class="tab-btn" data-tab="hero">Hero</button>
+            <button class="tab-btn" data-tab="equipment">Equipment</button>
             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
             <button class="tab-btn" data-tab="achievements">Achievements</button>
             <button class="tab-btn" data-tab="settings">Settings</button>
@@ -234,6 +237,16 @@
                 </div>
             </div>
 
+            <!-- Equipment Tab (NEW!) -->
+            <div id="equipment-tab" class="tab-panel">
+                <h2>🎽 Equipment & Inventory</h2>
+                
+                <!-- Inventory Container -->
+                <div id="inventory-container">
+                    <!-- Filled by inventory-ui.js -->
+                </div>
+            </div>
+
             <!-- Upgrades Tab -->
             <div id="upgrades-tab" class="tab-panel">
                 <h2>⬆️ Permanent Upgrades</h2>
@@ -362,7 +375,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">0.1.0-alpha</span>
+                            <span class="info-value">2.2.0</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Last Save:</span>
@@ -381,6 +394,9 @@
             <p>Dungeon Idle Game © 2026 | <a href="https://github.com/oliverlaudan-ops/Dungeon-Idle-Game" target="_blank">GitHub</a></p>
         </footer>
     </div>
+
+    <!-- Notification Container for Inventory -->
+    <div id="notification-container"></div>
 
     <script type="module" src="main.js"></script>
 </body>
