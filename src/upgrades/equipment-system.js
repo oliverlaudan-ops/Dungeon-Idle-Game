@@ -1,11 +1,12 @@
 /**
- * Equipment System v2.0
+ * Equipment System v2.1
  * Handles weapons, armor, and gear with stat bonuses
  * UPDATED: Weapons have classes that modify combat behavior
  * UPDATED: Equipment affects both manual and auto-runs
+ * UPDATED: Equipment operations now save game state
  */
 
-import { gameState } from '../core/game-state.js';
+import { gameState, saveGame } from '../core/game-state.js';
 
 // Equipment rarity tiers
 const RARITY_TIERS = {
@@ -200,7 +201,7 @@ export function createEquipment(templateId, rarity = 'common') {
     const mult = RARITY_TIERS[rarity].multiplier;
 
     const equipment = {
-        id: `${templateId}-${Date.now()}`,
+        id: `${templateId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         templateId,
         name: template.name,
         type: template.type,
@@ -249,7 +250,7 @@ export function equipItem(equipmentId) {
 
     // Initialize equipped object if needed
     if (!gameState.equipped) {
-        gameState.equipped = {};
+        gameState.equipped = { weapon: null, armor: null, accessory: null };
     }
 
     // Equip new item
@@ -258,6 +259,10 @@ export function equipItem(equipmentId) {
     
     // Recalculate hero stats
     recalculateStats();
+    
+    // SAVE GAME!
+    saveGame();
+    
     console.log(`✅ Equipped: ${equipment.name}`);
     return true;
 }
@@ -271,10 +276,14 @@ export function unequipItem(equipmentId) {
 
     equipment.equipped = false;
     if (gameState.equipped?.[equipment.type]?.id === equipmentId) {
-        delete gameState.equipped[equipment.type];
+        gameState.equipped[equipment.type] = null;
     }
 
     recalculateStats();
+    
+    // SAVE GAME!
+    saveGame();
+    
     console.log(`❌ Unequipped: ${equipment.name}`);
     return true;
 }
@@ -286,14 +295,14 @@ function recalculateStats() {
     if (!gameState.equipped) return;
 
     // Reset to base stats
-    const baseATK = 10 + gameState.hero.level * 2;
-    const baseDEF = 5;
-    let baseHP = 100;
+    const baseATK = 10 + (gameState.hero.level - 1) * 2;
+    const baseDEF = 5 + (gameState.hero.level - 1) * 1;
+    let baseHP = 100 + (gameState.hero.level - 1) * 10;
 
     let totalATK = baseATK;
     let totalDEF = baseDEF;
     let totalHP = baseHP;
-    let totalCrit = gameState.hero.critChance || 0.05;
+    let totalCrit = 0.05; // Base crit
     let weaponClass = null;
     let classInfo = null;
 
@@ -340,13 +349,15 @@ function recalculateStats() {
     gameState.hero.attack = totalATK;
     gameState.hero.defense = Math.max(0, totalDEF);  // Defense can't be negative
     gameState.hero.maxHp = totalHP;
-    gameState.hero.critChance = totalCrit;
+    gameState.hero.critChance = Math.min(1.0, totalCrit);  // Cap at 100%
     
     // Heal to full when equipping
     gameState.hero.hp = totalHP;
     
     // Store current class for reference
     gameState.hero.currentClass = weaponClass || 'NONE';
+    
+    console.log(`📊 Stats recalculated: ATK=${totalATK}, DEF=${totalDEF}, HP=${totalHP}, CRIT=${(totalCrit*100).toFixed(1)}%`);
 }
 
 /**
@@ -354,7 +365,10 @@ function recalculateStats() {
  */
 export function getHeroClass() {
     const weapon = gameState.equipped?.weapon;
-    return weapon?.class || 'WARRIOR';
+    if (!weapon) {
+        return { name: 'Warrior', description: 'No weapon equipped' };
+    }
+    return WEAPON_CLASSES[weapon.class] || WEAPON_CLASSES.WARRIOR;
 }
 
 /**
@@ -416,6 +430,9 @@ export function sellEquipment(equipmentId) {
     
     // Add gold
     gameState.resources.gold += sellValue;
+
+    // SAVE GAME!
+    saveGame();
 
     console.log(`💰 Sold ${equipment.name} for ${sellValue} gold`);
     return sellValue;
