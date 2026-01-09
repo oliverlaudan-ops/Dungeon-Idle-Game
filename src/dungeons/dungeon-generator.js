@@ -1,20 +1,21 @@
 /**
- * Dungeon Generator v2.1
+ * Dungeon Generator v2.2
  * Generates procedural dungeons with:
  * - Difficulty Scaling (Easy, Normal, Hard, Expert)
  * - Longer Dungeons (5-15 rooms depending on difficulty)
  * - Boss Encounters (every 5 rooms)
  * - Monster Scaling based on floor and difficulty
- * - REBALANCED: Higher HP/ATK for normal monsters to match boss difficulty
+ * - Boss AI initialization
  */
 
 import { gameState } from '../core/game-state.js';
+import { initBossAI } from '../manual-run/boss-abilities.js';
 
-// Difficulty configuration - REBALANCED
+// Difficulty configuration
 const DIFFICULTY_CONFIG = {
     easy: {
         roomCount: { min: 5, max: 8 },
-        monsterMult: 0.75,        // INCREASED from 0.6 (too weak before)
+        monsterMult: 0.75,
         bossMult: 0.8,
         goldMult: 1.0,
         xpMult: 1.0,
@@ -22,7 +23,7 @@ const DIFFICULTY_CONFIG = {
     },
     normal: {
         roomCount: { min: 7, max: 10 },
-        monsterMult: 1.2,         // INCREASED from 1.0 (was too easy)
+        monsterMult: 1.2,
         bossMult: 1.0,
         goldMult: 1.5,
         xpMult: 1.5,
@@ -30,7 +31,7 @@ const DIFFICULTY_CONFIG = {
     },
     hard: {
         roomCount: { min: 10, max: 13 },
-        monsterMult: 1.6,         // INCREASED from 1.4 (more challenging)
+        monsterMult: 1.6,
         bossMult: 1.3,
         goldMult: 2.5,
         xpMult: 2.5,
@@ -38,7 +39,7 @@ const DIFFICULTY_CONFIG = {
     },
     expert: {
         roomCount: { min: 12, max: 15 },
-        monsterMult: 2.0,         // INCREASED from 1.8 (hardcore only)
+        monsterMult: 2.0,
         bossMult: 1.6,
         goldMult: 4.0,
         xpMult: 4.0,
@@ -203,13 +204,11 @@ function generateBossRoom(floor, roomIndex, x, y, difficulty) {
 function generateMonster(floor, room, difficulty, monsterMult = 1.0) {
     const type = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
     
-    // REBALANCED: Higher base stats
-    const baseHp = 30 + floor * 15;    // INCREASED from 20 + 10*floor
-    const baseAtk = 8 + floor * 3;     // INCREASED from 5 + 2*floor
+    const baseHp = 30 + floor * 15;
+    const baseAtk = 8 + floor * 3;
     const baseXp = 10 + floor * 5;
     const baseGold = 5 + floor * 3;
 
-    // Apply difficulty scaling
     const scaledMult = monsterMult;
 
     // Random position within room (avoid edges)
@@ -232,25 +231,23 @@ function generateMonster(floor, room, difficulty, monsterMult = 1.0) {
 }
 
 /**
- * Generate a boss monster
+ * Generate a boss monster with AI
  */
 function generateBoss(floor, room, difficulty, bossMult = 1.0) {
     const type = BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)];
     
-    // KEPT SAME: Boss difficulty was perfect!
     const baseHp = 100 + floor * 40;
     const baseAtk = 15 + floor * 5;
     const baseXp = 100 + floor * 50;
     const baseGold = 50 + floor * 30;
 
-    // Apply difficulty and boss multiplier
     const scaledMult = bossMult;
 
     // Boss spawns in center of room
     const x = room.x + Math.floor(room.width / 2);
     const y = room.y + Math.floor(room.height / 2);
 
-    return {
+    const boss = {
         name: `${type.name}`,
         icon: type.icon,
         isBoss: true,
@@ -263,6 +260,9 @@ function generateBoss(floor, room, difficulty, bossMult = 1.0) {
         x,
         y
     };
+
+    // INITIALIZE BOSS AI!
+    return initBossAI(boss);
 }
 
 /**
@@ -294,7 +294,7 @@ function generateBossTreasure(floor, room, difficulty, goldMult = 1.0, xpMult = 
         isBoss: true,
         gold: Math.floor((200 + floor * 100) * goldMult),
         xp: Math.floor((100 + floor * 50) * xpMult),
-        bonus: true // Special treasure flag
+        bonus: true
     };
 }
 
@@ -302,7 +302,6 @@ function generateBossTreasure(floor, room, difficulty, goldMult = 1.0, xpMult = 
  * Add a door between two rooms
  */
 function addDoorBetweenRooms(room1, room2, targetRoomIndex) {
-    // Door at the right edge of room1
     const doorX = room1.x + room1.width;
     const doorY = room1.y + Math.floor(room1.height / 2);
 
@@ -328,22 +327,17 @@ export function simulateDungeonRun(floor = 1, difficulty = 'normal') {
     let totalBossesDefeated = 0;
     let success = true;
 
-    // Simulate each room
     for (const room of dungeon.rooms) {
-        // Fight monsters
         if (room.monsters && room.monsters.length > 0) {
             for (const monster of room.monsters) {
-                // Simple combat simulation
                 const heroHpStart = hero.hp;
                 
                 while (hero.hp > 0 && monster.hp > 0) {
-                    // Player attacks
                     const playerDamage = Math.max(1, hero.attack - monster.defense);
                     monster.hp -= playerDamage;
 
                     if (monster.hp <= 0) break;
 
-                    // Monster attacks
                     const monsterDamage = Math.max(1, monster.attack - hero.defense);
                     hero.hp -= monsterDamage;
                 }
@@ -364,18 +358,16 @@ export function simulateDungeonRun(floor = 1, difficulty = 'normal') {
 
         if (!success) break;
 
-        // Collect treasure
         if (room.treasure) {
             totalGold += room.treasure.gold;
             totalXp += room.treasure.xp;
         }
     }
 
-    // Restore some HP after run
     if (success) {
         hero.hp = Math.min(hero.maxHp, hero.hp + Math.floor(hero.maxHp * 0.2));
     } else {
-        hero.hp = Math.floor(hero.maxHp * 0.5); // Restore 50% on failure
+        hero.hp = Math.floor(hero.maxHp * 0.5);
     }
 
     return {
