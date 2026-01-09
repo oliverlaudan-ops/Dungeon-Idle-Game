@@ -8,8 +8,8 @@ export class DungeonRenderer {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.tileSize = 40;
-        this.offsetX = 100;
-        this.offsetY = 100;
+        this.offsetX = 50;
+        this.offsetY = 80;
     }
 
     render(dungeon, hero) {
@@ -20,6 +20,7 @@ export class DungeonRenderer {
 
         this.renderRoom(room);
         this.renderGrid(room);
+        this.renderDoor(room);
         this.renderTreasure(room);
         this.renderMonsters(room);
         this.renderHero(hero);
@@ -64,6 +65,19 @@ export class DungeonRenderer {
             this.ctx.lineTo(this.offsetX + room.width * this.tileSize, this.offsetY + y * this.tileSize);
             this.ctx.stroke();
         }
+    }
+
+    renderDoor(room) {
+        // Draw exit door on the right side
+        const doorX = this.offsetX + room.width * this.tileSize - 20;
+        const doorY = this.offsetY + (room.height * this.tileSize / 2) - 20;
+
+        this.ctx.fillStyle = '#f39c12';
+        this.ctx.fillRect(doorX, doorY, 40, 40);
+        this.ctx.font = '28px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🚪', doorX + 20, doorY + 20);
     }
 
     renderHero(hero) {
@@ -146,7 +160,7 @@ export class DungeonRenderer {
     renderUI(dungeon, room, hero) {
         // Info panel
         this.ctx.fillStyle = 'rgba(26, 26, 46, 0.9)';
-        this.ctx.fillRect(0, 0, this.canvas.width, 80);
+        this.ctx.fillRect(0, 0, this.canvas.width, 70);
 
         // Title
         this.ctx.fillStyle = '#fff';
@@ -157,14 +171,14 @@ export class DungeonRenderer {
 
         // Hero stats
         this.ctx.font = '14px Arial';
-        this.ctx.fillText(`HP: ${hero.hp} / ${hero.maxHp}`, 300, 25);
-        this.ctx.fillText(`ATK: ${hero.attack} | DEF: ${hero.defense}`, 300, 50);
+        this.ctx.fillText(`HP: ${hero.hp} / ${hero.maxHp}`, 250, 25);
+        this.ctx.fillText(`ATK: ${hero.attack} | DEF: ${hero.defense}`, 250, 50);
 
         // Controls hint
         this.ctx.fillStyle = '#aaa';
         this.ctx.font = '12px Arial';
         this.ctx.textAlign = 'right';
-        this.ctx.fillText('Use WASD or Arrow Keys to move', this.canvas.width - 20, 25);
+        this.ctx.fillText('WASD / Arrow Keys to move', this.canvas.width - 20, 25);
         this.ctx.fillText('Walk into monsters to attack', this.canvas.width - 20, 45);
     }
 }

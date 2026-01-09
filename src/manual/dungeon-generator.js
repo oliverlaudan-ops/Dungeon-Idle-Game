@@ -11,10 +11,10 @@ export class DungeonGenerator {
 
     getDifficultyConfig(difficulty) {
         const configs = {
-            EASY: { rooms: [5, 8], monsters: 0.75, treasure: 1.2 },
+            EASY: { rooms: [5, 8], monsters: 0.6, treasure: 1.3 },
             NORMAL: { rooms: [7, 10], monsters: 1.0, treasure: 1.0 },
-            HARD: { rooms: [10, 13], monsters: 1.3, treasure: 0.9 },
-            EXPERT: { rooms: [12, 15], monsters: 1.6, treasure: 0.8 }
+            HARD: { rooms: [10, 13], monsters: 1.8, treasure: 0.9 },
+            EXPERT: { rooms: [12, 15], monsters: 2.8, treasure: 0.8 }
         };
         return configs[difficulty] || configs.NORMAL;
     }
@@ -53,7 +53,7 @@ export class DungeonGenerator {
 
         // Add monsters
         if (room.type === 'combat') {
-            const monsterCount = Math.floor(Math.random() * 3) + 1;
+            const monsterCount = Math.floor(Math.random() * 3) + 2; // 2-4 monsters
             for (let i = 0; i < monsterCount; i++) {
                 room.monsters.push(this.generateMonster(false));
             }
@@ -78,14 +78,14 @@ export class DungeonGenerator {
         const type = types[Math.floor(Math.random() * types.length)];
         
         const templates = {
-            goblin: { name: 'Goblin', icon: '🟢', hp: 30, attack: 5, xp: 25, gold: 10 },
-            orc: { name: 'Orc', icon: '🔴', hp: 50, attack: 8, xp: 50, gold: 25 },
-            skeleton: { name: 'Skeleton', icon: '☠️', hp: 40, attack: 7, xp: 35, gold: 15 },
-            troll: { name: 'Troll', icon: '👹', hp: 70, attack: 10, xp: 75, gold: 40 }
+            goblin: { name: 'Goblin', icon: '🟢', hp: 40, attack: 8, xp: 25, gold: 10 },
+            orc: { name: 'Orc', icon: '🔴', hp: 60, attack: 12, xp: 50, gold: 25 },
+            skeleton: { name: 'Skeleton', icon: '☠️', hp: 50, attack: 10, xp: 35, gold: 15 },
+            troll: { name: 'Troll', icon: '👹', hp: 80, attack: 15, xp: 75, gold: 40 }
         };
 
         const template = templates[type];
-        const multiplier = this.config.monsters * (isBoss ? 3 : 1);
+        const multiplier = this.config.monsters * (isBoss ? 4 : 1);
 
         return {
             ...template,
