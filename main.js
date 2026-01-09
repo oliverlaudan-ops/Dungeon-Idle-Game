@@ -10,12 +10,16 @@ import { updateManualRunUIState } from './ui/ui-init.js';
 import { processAutoRun } from './src/idle/auto-run.js';
 import { checkAchievements } from './src/achievements/achievement-manager.js';
 import { showAchievementNotification } from './ui/achievements-ui.js';
+import { initializeInventoryUI } from './ui/inventory-ui.js';
 
 // Load game on start
 loadGame();
 
 // Initialize UI
 initUI();
+
+// Initialize Inventory UI
+initializeInventoryUI();
 
 // Track play time
 let lastPlayTimeUpdate = Date.now();
@@ -62,7 +66,8 @@ function gameLoop() {
 // Start game loop
 gameLoop();
 
-console.log('🎮 Dungeon Idle Game started!');
+console.log('🎮 Dungeon Idle Game v2.2.0 started!');
 console.log('💾 Game State:', gameState);
 console.log('✅ Manual Run System: Ready');
+console.log('🎒 Equipment System: Ready');
 console.log('🎮 Use Arrow Keys or WASD to move in manual runs');
