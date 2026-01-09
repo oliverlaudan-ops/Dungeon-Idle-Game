@@ -1,178 +1,188 @@
 # 📜 Changelog
 
-## [2.1.0] - 2026-01-09
-
-### 🏕️ MAJOR UPDATE: Difficulty System & Monster Rebalancing
-
-#### New Features
-- ✨ **Difficulty Selection System** (Easy, Normal, Hard, Expert)
-  - Easy: 5-8 rooms, 0.75x monster strength
-  - Normal: 7-10 rooms, 1.2x monster strength, 1.5x rewards
-  - Hard: 10-13 rooms, 1.6x monster strength, 2.5x rewards
-  - Expert: 12-15 rooms, 2.0x monster strength, 4.0x rewards
-
-- 👑 **Boss Encounters**
-  - Bosses now spawn every 3-5 rooms (difficulty dependent)
-  - 5 unique boss types with special designs
-  - Boss difficulty PERFECT - balances well with normal monsters
-
-- 📊 **Monster Rebalancing**
-  - Base HP: 20+10*floor → 30+15*floor (1.5x increase)
-  - Base ATK: 5+2*floor → 8+3*floor (1.6x increase)
-  - Result: Monsters now deal 4-5 damage (was 1) - actual combat challenge!
-
-#### User Feedback Integrated
-
-😋 **User Testing Results:**
-- Level 5 hero vs Boss: "Perfect difficulty! Couldn't beat it, but was challenging"
-- Level 5 hero vs Normal monsters: "Too easy, instant kills" → FIXED!
-- Dungeon length: "Only 3 rooms" → FIXED! Now 5-15 rooms
-
-#### Files Added
-- `src/dungeons/dungeon-generator.js` (v2.1) - Complete rewrite
-- `ui/difficulty-ui.js` - Difficulty selection interface
-- `DIFFICULTY_SYSTEM.md` - Full technical documentation
-- `DIFFICULTY_TESTING_GUIDE.md` - Testing procedures
-- `QUICK_START.md` - Player-friendly guide
-- `CHANGELOG.md` - This file
-
-#### Files Modified
-- `DIFFICULTY_SYSTEM.md` - Updated with rebalanced values
-
-#### Technical Details
-
-**Monster Stats Example (Floor 1, Normal Difficulty):**
-```
-Old:  Goblin with 12 HP, 3 ATK (deals ~1 damage per hit)
-New:  Goblin with 36 HP, 9.6 ATK (deals ~4 damage per hit)
-
-Result: Combat is now 3-4 rounds instead of instant kill
-```
-
-**Boss Stats Example (Floor 1, Normal Difficulty):**
-```
-Dragon Lord: 400 HP, 45 ATK
-Requires 150+ ATK to reliably win (Level 12+)
-Very challenging but beatable with good preparation
-```
-
-#### Breaking Changes
-- ⚠️ Dungeon generation signature changed:
-  - `generateDungeon(floor)` → `generateDungeon(floor, difficulty='normal')`
-- Auto-run now respects difficulty setting
+Alle wichtigen Änderungen am Dungeon Idle Game, dokumentiert nach Version.
 
 ---
 
-### 🎲 Equipment System Framework (Foundation)
+## [2.2.0] - 2026-01-09
 
-#### New Features
-- 💫 **Equipment Types**
-  - Weapons (Sword, Bow, Hammer, etc.) - ATK+, Crit%
-  - Armor (Leather, Chain, Plate, Dragon Scale) - DEF+, HP+
-  - Accessories (Rings, Amulets, Necklaces) - Various bonuses
+### ✨ Neu hinzugefügt
+- **🎭 Fantasy UI Theme** - Komplette Neugestaltung mit mittelalterlichem Fantasy-Design
+  - Neue Farbpalette (Dunkelrot, Gold, Dunkelgrün)
+  - Serif-Schriftart (Georgia/Garamond) für mittelalterliches Flair
+  - Stone-Texturen und dekorative Elemente
+  - Bucheffekte und Shadow-Glow auf interaktiven Elementen
+  - Goldene Borders und mittelalterliche Dekoration
 
-- 🌟 **Rarity System**
-  - Common (1.0x stats, 60% drop chance)
-  - Uncommon (1.25x stats, 25% drop chance)
-  - Rare (1.50x stats, 10% drop chance)
-  - Epic (1.75x stats, 4% drop chance)
-  - Legendary (2.0x stats, 1% drop chance)
+- **🎁 Loot Drop System** - Equipment-Drops bei Dungeon-Abschluss
+  - Schwierigkeits-basierte Drop-Raten:
+    - Easy: 15% Chance, Common/Uncommon
+    - Normal: 25% Chance, Common/Rare
+    - Hard: 35% Chance, Uncommon/Epic
+    - Expert: 50% Chance, Rare/Legendary
+  - Gewichtete Rarity-Zuweisung
+  - Boss-spezifische Loot-Generierung
+  - Loot-Quote Display in Manual Run UI
 
-- 💫 **Equipment Functions**
-  - `createEquipment(templateId, rarity)` - Generate equipment
-  - `equipItem(id)` - Equip item to hero
-  - `unequipItem(id)` - Remove equipment
-  - `sellEquipment(id)` - Sell for gold
-  - `recalculateStats()` - Auto-update hero stats
+- **📊 Equipment Preview in Manual Run**
+  - Zeigt ausgerüstete Items (Waffe, Rüstung, Accessory)
+  - Live Hero-Stats Preview (ATK, DEF, HP, CRIT)
+  - Klassenanzeige basierend auf Waffe
+  - Visual Equipment Slots mit Icons
 
-#### Files Added
-- `src/upgrades/equipment-system.js` - Equipment framework
+- **🎨 Fantasy Manual Run UI**
+  - Mittelalterliches Difficulty-Selector mit farbigen Buttons
+  - Detaillierte Schwierigkeits-Beschreibungen
+  - Equipment-Vorschau mit Stat-Anzeige
+  - Loot-History Display nach Dungeon
+  - Fantasy-themisches Design mit Gold/Rot-Farben
 
-#### Status
-- ✋ WIP: Equipment generation and UI not yet integrated
-- ✋ WIP: Loot drops from monsters not yet implemented
-- ✋ WIP: Equipment UI not yet created
+### 🔧 Technische Änderungen
+- Neue Datei: `src/upgrades/loot-system.js` - Loot-Generierung und Drop-Logik
+- Neue Datei: `loot-styles.css` - Styling für Loot-System und Manual Run
+- `ui/manual-run-ui.js` - Komplette Überarbeitung mit Loot-Integration
+- `styles.css` - Ganzes Styling auf Fantasy-Theme umgestellt
+
+### 🎮 Gameplay-Verbesserungen
+- Equipment wird bedeutungsvoller (nicht nur Stat-Zahlen)
+- Visuelle Belohnungen beim Dungeon-Abschluss
+- Bessere Immersion durch Fantasy-Theme
+- Loot-Rarity visuell codiert (Farben)
 
 ---
 
-## [2.0.0] - 2026-01-08
+## [2.1.0] - 2026-01-08
 
-### 🎮 Initial Release
+### ✨ Neu hinzugefügt
+- **🎯 Difficulty System** - 4 Schwierigkeitsgrade
+  - Easy (5-8 Räume, 0.75x Monster, 1.0x Rewards)
+  - Normal (7-10 Räume, 1.2x Monster, 1.5x Rewards)
+  - Hard (10-13 Räume, 1.6x Monster, 2.5x Rewards)
+  - Expert (12-15 Räume, 2.0x Monster, 4.0x Rewards)
+- **👑 Equipment & Klassensystem Framework**
+  - Equipment-basierte Klassen (Waffe bestimmt Klasse)
+  - 5 Klassen: Warrior, Ranger, Berserker, Mage, Rogue
+  - Stat-Modifiers für jede Klasse
+  - Rarity-System: Common bis Legendary
+- **📊 Schwierigkeits-Skalierung** - Monster & Rewards passen sich an
+- **💼 Equipment-Vorschau** in Manual Run
+- **📖 Umfangreiche Dokumentation**
 
-- Basic dungeon generation
-- Manual and auto-run systems
-- Combat simulation
-- XP and gold rewards
-- Hero leveling
+### 🔧 Technische Änderungen
+- Neue Datei: `src/upgrades/equipment-system.js` - Equipment & Klassen Framework
+- Neue Datei: `src/dungeons/dungeon-generator.js` v2.1 - Difficulty-Scaling
+- `ui/manual-run-ui.js` - Difficulty Selector UI
+- Neue Docs: `DIFFICULTY_SYSTEM.md`, `CLASS_AND_EQUIPMENT_SYSTEM.md`, etc.
+
+### 🎮 Gameplay-Verbesserungen
+- Dungeons skalieren mit Spieler-Progression
+- Expert-Runs belohnen 4x besser
+- Equipment macht combat-mechaniken vielfältiger
+- Klassen geben verschiedene Playstyles
 
 ---
 
-## 퉰d️ Next Planned Features
+## [2.0.0] - 2026-01-07
 
-### Phase 1: Equipment Integration (1-2 days)
-- [ ] Monster loot drops (5-20% drop chance)
-- [ ] Equipment UI (inventory, equipping)
-- [ ] Stat calculation with equipment
-- [ ] Equipment shops
-- [ ] Boss special loot
+### ✨ Neu hinzugefügt
+- **🗺️ Dungeon Generator v2.0** - Procedural Dungeon-Generierung
+  - 7 verschiedene Raum-Typen
+  - Boss-Räume am Ende
+  - Monster-Spawning nach Raumtyp
+  - Gold/XP-Rewards pro Raum
+- **⚔️ Turn-Based Combat System** - Grundgerüst
+  - Hero vs Monster Combat
+  - Damage Calculation
+  - Status tracking
+- **👾 5+ Monster-Typen** mit verschiedenen Stats
+- **💬 Umfangreiche Dokumentation** (README, Design Docs)
 
-### Phase 2: Upgrades & Progression (2-3 days)
-- [ ] ATK/DEF/HP upgrade tree
-- [ ] Skill unlocks
-- [ ] Talent system
-- [ ] Prestige system (soft reset)
+### 🔧 Technische Änderungen
+- Neue Datei: `src/dungeons/dungeon-generator.js` - Dungeon-Logik
+- Neue Datei: `src/combat/combat-system.js` - Combat Simulation
+- Canvas-Integration für Dungeon-Visualisierung
+- Dungeon-History Tracking
 
-### Phase 3: Content & Polish (3-5 days)
-- [ ] More boss types
-- [ ] Special abilities
-- [ ] Events and seasons
+### 🎮 Gameplay-Verbesserungen
+- Manual Runs sind jetzt vollständig spielbar
+- Jeder Dungeon ist unikat (procedural)
+- Bosses für Epic-Momente
+
+---
+
+## [1.5.0] - 2026-01-06
+
+### ✨ Neu hinzugefügt
+- **🎰 Auto-Run System** - Vollständige Idle-Funktionalität
+  - Start/Stop-Button
+  - Interval-basierte Auto-Runs
+  - Run-History mit Success/Failure
+  - Statistik-Tracking
+- **📊 Statistics Tab** - Umfangreiche Stats
+  - Runs played, Won, Lost
+  - Total Gold/XP earned
+  - Best/Average performance
+- **💾 Auto-Save System** - Alle 30 Sekunden gespeichert
+
+### 🔧 Technische Änderungen
+- `src/idle/auto-run.js` - Auto-Run Logik
+- `src/core/game-state.js` - State Management überarbeitet
+- LocalStorage-Integration für Persistence
+
+---
+
+## [1.0.0] - 2026-01-01
+
+### ✨ Neu hinzugefügt
+- **🎮 MVP Released**
+  - 4 Tabs: Idle, Manual Run, Hero, Upgrades
+  - Resource-System (Gold, Gems, Souls, Keys)
+  - Hero-Leveling mit XP
+  - Basic Upgrade-System
+  - HTML/CSS/JS Frontend
+  - LocalStorage State Management
+
+### 🔧 Technische Änderungen
+- Basis-Repository Setup
+- Modular Architecture (ES6 Modules)
+- Tab-System in HTML
+- Basis-Styling mit Dark Theme
+
+---
+
+## 📝 Legende
+
+- **✨ Neu hinzugefügt** - Neue Features
+- **🔧 Technische Änderungen** - Code-Updates
+- **🎮 Gameplay-Verbesserungen** - Gameplay-Impact
+- **🐛 Bugfixes** - Behobene Bugs
+- **📚 Dokumentation** - Docs Updates
+- **⚡ Performance** - Performance-Verbesserungen
+- **🎨 UI/UX** - Interface-Updates
+
+---
+
+## Nächste geplante Features (Roadmap)
+
+### Version 2.3.0
+- [ ] Equipment-Inventar UI
+- [ ] Equip/Unequip funktional
+- [ ] Equipment-Shop
+- [ ] Visual Class Indicator
+- [ ] Equipment-Stats auf Auto-Runs anwenden
+
+### Version 2.4.0
+- [ ] Skill-Tree System
+- [ ] Advanced Combat Features
+- [ ] Prestige-System
 - [ ] Achievements
+
+### Version 3.0.0
+- [ ] Multiple Dungeon-Tiefen
 - [ ] Leaderboards
+- [ ] Co-op Features (geplant)
+- [ ] Mobile Optimization
 
 ---
 
-## 💪 Stats
-
-### Code Metrics
-- **Total Functions:** 50+
-- **Total Lines:** 3000+
-- **Commits:** 5
-- **Test Coverage:** Manual
-
-### Game Balance
-- **Easy Difficulty:** 3-5 mins per run, perfect for learning
-- **Normal Difficulty:** 5-10 mins per run, recommended
-- **Hard Difficulty:** 8-12 mins per run, for experienced players
-- **Expert Difficulty:** 10-15 mins per run, hardcore only
-
----
-
-## 🙋 Contributors
-
-- Oliver Läudan (@oliverlaudan-ops) - Lead Developer
-- Beta Tester (Level 5) - Feedback on monster difficulty
-
----
-
-## 🐹 Known Issues
-
-- [ ] Equipment system not yet visible in UI
-- [ ] No loot drops yet (framework only)
-- [ ] Boss special attacks not implemented
-- [ ] Difficulty selector not integrated in manual run UI
-- [ ] No equipment shop yet
-
----
-
-## 🌟 Version History
-
-```
- v2.1.0  - Difficulty System (2026-01-09)
- v2.0.0  - Initial Release (2026-01-08)
-```
-
----
-
-**Last Updated:** January 9, 2026, 10:00 CET
-**Current Version:** 2.1.0 (Difficulty System + Equipment Framework)
-**Status:** 🚀 Ready to Play!
+**Zuletzt aktualisiert:** 9. Januar 2026
