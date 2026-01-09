@@ -1,310 +1,147 @@
 /**
- * Visual Effects System v1.0
- * Provides visual feedback for combat actions
- * 
- * Features:
- * - Floating damage numbers
- * - Screen shake on hits
- * - Critical hit effects
- * - Boss ability effects
+ * Visual Effects Bridge v1.0
+ * Connects combat UI with canvas-based visual effects
  */
 
+import {
+    addDamageNumber,
+    triggerScreenShake,
+    triggerCritEffect,
+    triggerHitEffect,
+    triggerHealEffect
+} from './combat-effects.js';
+
+import { TILE_SIZE } from './canvas-renderer.js';
+
+// Canvas reference
+let canvas = null;
+
 /**
- * Create floating damage number
+ * Initialize visual effects system
  */
-export function showDamageNumber(damage, x, y, isCrit = false, isHeal = false) {
-    const damageElement = document.createElement('div');
-    damageElement.className = `damage-number ${isCrit ? 'crit' : ''} ${isHeal ? 'heal' : ''}`;
-    damageElement.textContent = isHeal ? `+${damage}` : `-${damage}`;
-    
-    // Position at specified coordinates
-    damageElement.style.left = `${x}px`;
-    damageElement.style.top = `${y}px`;
-    
-    // Add to body
-    document.body.appendChild(damageElement);
-    
-    // Animate
-    requestAnimationFrame(() => {
-        damageElement.style.opacity = '1';
-        damageElement.style.transform = 'translateY(-50px) scale(1)';
-    });
-    
-    // Remove after animation
-    setTimeout(() => {
-        damageElement.style.opacity = '0';
-        setTimeout(() => {
-            damageElement.remove();
-        }, 300);
-    }, 1000);
+export function initVisualEffects() {
+    canvas = document.getElementById('dungeon-canvas');
+    if (!canvas) {
+        console.warn('⚠️ Canvas not found for visual effects');
+        return false;
+    }
+    console.log('✅ Visual effects initialized');
+    return true;
 }
 
 /**
- * Create damage number in combat UI
+ * Show damage number on canvas
+ * @param {number} damage
+ * @param {string} target - 'player' or 'monster'
+ * @param {boolean} isCrit
+ * @param {boolean} isHeal
  */
-export function showCombatDamageNumber(damage, target = 'monster', isCrit = false, isHeal = false) {
-    const targetElement = target === 'monster' ? 
-        document.querySelector('.combat-monster-icon') :
-        document.querySelector('.combat-player-icon');
+export function showCombatDamageNumber(damage, target, isCrit = false, isHeal = false) {
+    if (!canvas) initVisualEffects();
     
-    if (!targetElement) return;
+    // Calculate position based on target
+    // Monster is typically on left side, player on right
+    const x = target === 'monster' ? canvas.width * 0.3 : canvas.width * 0.7;
+    const y = canvas.height * 0.5;
     
-    const rect = targetElement.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    
-    showDamageNumber(damage, x, y, isCrit, isHeal);
+    addDamageNumber(x, y, damage, isCrit, isHeal);
 }
 
 /**
- * Screen shake effect
+ * Trigger screen shake
+ * @param {string} intensity - 'light', 'medium', 'heavy'
  */
 export function screenShake(intensity = 'medium') {
-    const gameContainer = document.querySelector('.game-container') || document.body;
-    
     const intensityMap = {
-        light: 'shake-light',
-        medium: 'shake-medium',
-        heavy: 'shake-heavy'
+        light: 3,
+        medium: 6,
+        heavy: 10
     };
     
-    const shakeClass = intensityMap[intensity] || intensityMap.medium;
+    const shakeIntensity = intensityMap[intensity] || 6;
+    const duration = intensity === 'heavy' ? 300 : intensity === 'light' ? 150 : 200;
     
-    gameContainer.classList.add(shakeClass);
-    
-    setTimeout(() => {
-        gameContainer.classList.remove(shakeClass);
-    }, 500);
+    triggerScreenShake(shakeIntensity, duration);
 }
 
 /**
- * Critical hit flash effect
+ * Show critical hit effect
+ * @param {string} target - 'player' or 'monster'
  */
-export function showCritEffect(target = 'monster') {
-    const targetElement = target === 'monster' ? 
-        document.querySelector('.combat-monster') :
-        document.querySelector('.combat-player');
+export function showCritEffect(target) {
+    if (!canvas) initVisualEffects();
     
-    if (!targetElement) return;
+    const x = target === 'monster' ? canvas.width * 0.3 : canvas.width * 0.7;
+    const y = canvas.height * 0.5;
     
-    // Add crit effect class
-    targetElement.classList.add('crit-flash');
-    
-    // Create crit particles
-    createCritParticles(targetElement);
-    
-    // Remove effect after animation
-    setTimeout(() => {
-        targetElement.classList.remove('crit-flash');
-    }, 600);
+    triggerCritEffect(x, y, 0); // Damage will be shown separately
 }
 
 /**
- * Create crit particles around target
+ * Show hit effect (flash)
+ * @param {string} target - 'player' or 'monster'
  */
-function createCritParticles(targetElement) {
-    const rect = targetElement.getBoundingClientRect();
-    const particleCount = 8;
+export function showHitEffect(target) {
+    if (!canvas) initVisualEffects();
     
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'crit-particle';
-        particle.textContent = '✨';
-        
-        // Random position around target
-        const angle = (Math.PI * 2 * i) / particleCount;
-        const distance = 50;
-        const x = rect.left + rect.width / 2 + Math.cos(angle) * distance;
-        const y = rect.top + rect.height / 2 + Math.sin(angle) * distance;
-        
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        
-        document.body.appendChild(particle);
-        
-        // Animate outward
-        setTimeout(() => {
-            const finalX = x + Math.cos(angle) * 30;
-            const finalY = y + Math.sin(angle) * 30;
-            particle.style.left = `${finalX}px`;
-            particle.style.top = `${finalY}px`;
-            particle.style.opacity = '0';
-        }, 10);
-        
-        // Remove after animation
-        setTimeout(() => {
-            particle.remove();
-        }, 600);
-    }
+    const x = target === 'monster' ? canvas.width * 0.25 : canvas.width * 0.65;
+    const y = canvas.height * 0.4;
+    
+    triggerHitEffect(x, y, 0); // Simple hit, no damage number
 }
 
 /**
- * Boss ability effect (special visual)
+ * Show boss ability effect
+ * @param {string} abilityKey - Ability identifier
  */
-export function showBossAbilityEffect(abilityType) {
-    const bossElement = document.querySelector('.combat-monster.boss-monster');
-    if (!bossElement) return;
-    
-    const effectMap = {
-        'AOE_ATTACK': () => {
-            bossElement.classList.add('ability-aoe');
-            screenShake('heavy');
-            setTimeout(() => bossElement.classList.remove('ability-aoe'), 800);
-        },
-        'HEAL': () => {
-            bossElement.classList.add('ability-heal');
-            createHealParticles(bossElement);
-            setTimeout(() => bossElement.classList.remove('ability-heal'), 1000);
-        },
-        'RAGE_MODE': () => {
-            bossElement.classList.add('ability-rage');
-            screenShake('medium');
-            setTimeout(() => bossElement.classList.remove('ability-rage'), 1200);
-        },
-        'SHIELD': () => {
-            bossElement.classList.add('ability-shield');
-            createShieldEffect(bossElement);
-            setTimeout(() => bossElement.classList.remove('ability-shield'), 1000);
-        }
-    };
-    
-    const effect = effectMap[abilityType];
-    if (effect) effect();
-}
-
-/**
- * Create healing particles
- */
-function createHealParticles(targetElement) {
-    const rect = targetElement.getBoundingClientRect();
-    const particleCount = 6;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'heal-particle';
-        particle.textContent = '❤️‍🩹';
-        
-        const x = rect.left + Math.random() * rect.width;
-        const y = rect.bottom;
-        
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        
-        document.body.appendChild(particle);
-        
-        // Animate upward
-        setTimeout(() => {
-            particle.style.top = `${y - 100}px`;
-            particle.style.opacity = '0';
-        }, 10);
-        
-        setTimeout(() => {
-            particle.remove();
-        }, 1000);
-    }
-}
-
-/**
- * Create shield effect
- */
-function createShieldEffect(targetElement) {
-    const rect = targetElement.getBoundingClientRect();
-    
-    const shield = document.createElement('div');
-    shield.className = 'shield-effect';
-    shield.textContent = '🛡️';
-    
-    shield.style.left = `${rect.left + rect.width / 2}px`;
-    shield.style.top = `${rect.top + rect.height / 2}px`;
-    
-    document.body.appendChild(shield);
-    
-    setTimeout(() => {
-        shield.style.transform = 'translate(-50%, -50%) scale(2)';
-        shield.style.opacity = '0';
-    }, 10);
-    
-    setTimeout(() => {
-        shield.remove();
-    }, 800);
-}
-
-/**
- * Show telegraph warning effect
- */
-export function showTelegraphWarning() {
-    const combatPanel = document.querySelector('.combat-panel');
-    if (!combatPanel) return;
-    
-    combatPanel.classList.add('telegraph-warning');
-    
-    setTimeout(() => {
-        combatPanel.classList.remove('telegraph-warning');
-    }, 1000);
-}
-
-/**
- * Victory effect
- */
-export function showVictoryEffect() {
-    const combatPanel = document.querySelector('.combat-panel');
-    if (!combatPanel) return;
-    
-    // Create victory particles
-    const rect = combatPanel.getBoundingClientRect();
-    const particleCount = 20;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'victory-particle';
-        particle.textContent = ['⭐', '✨', '🎉'][Math.floor(Math.random() * 3)];
-        
-        const x = rect.left + Math.random() * rect.width;
-        const y = rect.top + rect.height / 2;
-        
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        
-        document.body.appendChild(particle);
-        
-        // Animate
-        setTimeout(() => {
-            particle.style.top = `${y - 150 - Math.random() * 100}px`;
-            particle.style.left = `${x + (Math.random() - 0.5) * 100}px`;
-            particle.style.opacity = '0';
-        }, 10);
-        
-        setTimeout(() => {
-            particle.remove();
-        }, 1500);
-    }
-}
-
-/**
- * Defeat effect
- */
-export function showDefeatEffect() {
+export function showBossAbilityEffect(abilityKey) {
+    // Heavy shake for boss abilities
     screenShake('heavy');
     
-    const playerElement = document.querySelector('.combat-player');
-    if (playerElement) {
-        playerElement.classList.add('defeated');
-    }
+    console.log(`💥 Boss ability effect: ${abilityKey}`);
 }
 
 /**
- * Hit effect (simple flash)
+ * Show telegraph warning (boss charging ability)
  */
-export function showHitEffect(target = 'monster') {
-    const targetElement = target === 'monster' ? 
-        document.querySelector('.combat-monster') :
-        document.querySelector('.combat-player');
+export function showTelegraphWarning() {
+    // Medium shake as warning
+    screenShake('light');
     
-    if (!targetElement) return;
+    console.log('⚠️ Boss telegraphing ability!');
+}
+
+/**
+ * Show victory effect
+ */
+export function showVictoryEffect() {
+    // Light celebratory shake
+    setTimeout(() => screenShake('light'), 100);
+    setTimeout(() => screenShake('light'), 300);
     
-    targetElement.classList.add('hit-flash');
+    console.log('🎉 Victory effect!');
+}
+
+/**
+ * Show defeat effect
+ */
+export function showDefeatEffect() {
+    // Heavy shake on defeat
+    screenShake('heavy');
     
-    setTimeout(() => {
-        targetElement.classList.remove('hit-flash');
-    }, 200);
+    console.log('💀 Defeat effect!');
+}
+
+/**
+ * Show heal effect
+ * @param {string} target - 'player' or 'monster'
+ * @param {number} healAmount
+ */
+export function showHealEffect(target, healAmount) {
+    if (!canvas) initVisualEffects();
+    
+    const x = target === 'monster' ? canvas.width * 0.3 : canvas.width * 0.7;
+    const y = canvas.height * 0.5;
+    
+    triggerHealEffect(x, y, healAmount);
 }
