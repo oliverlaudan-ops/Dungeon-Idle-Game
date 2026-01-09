@@ -1,188 +1,243 @@
-# 📜 Changelog
+# 📝 Changelog
 
-Alle wichtigen Änderungen am Dungeon Idle Game, dokumentiert nach Version.
+All notable changes to this project will be documented in this file.
 
 ---
 
 ## [2.2.0] - 2026-01-09
 
-### ✨ Neu hinzugefügt
-- **🎭 Fantasy UI Theme** - Komplette Neugestaltung mit mittelalterlichem Fantasy-Design
-  - Neue Farbpalette (Dunkelrot, Gold, Dunkelgrün)
-  - Serif-Schriftart (Georgia/Garamond) für mittelalterliches Flair
-  - Stone-Texturen und dekorative Elemente
-  - Bucheffekte und Shadow-Glow auf interaktiven Elementen
-  - Goldene Borders und mittelalterliche Dekoration
+### ✨ Added
 
-- **🎁 Loot Drop System** - Equipment-Drops bei Dungeon-Abschluss
-  - Schwierigkeits-basierte Drop-Raten:
-    - Easy: 15% Chance, Common/Uncommon
-    - Normal: 25% Chance, Common/Rare
-    - Hard: 35% Chance, Uncommon/Epic
-    - Expert: 50% Chance, Rare/Legendary
-  - Gewichtete Rarity-Zuweisung
-  - Boss-spezifische Loot-Generierung
-  - Loot-Quote Display in Manual Run UI
+#### Manual Run System Restoration
+- **Canvas-based dungeon renderer** (800x500px canvas)
+- **Procedural dungeon generation** with rooms, corridors, and exit doors
+- **Real-time combat system** - walk into monsters to attack
+- **Keyboard controls** - WASD and Arrow keys
+- **Exit door rendering** - now visible on canvas
+- **Combat victory/defeat handling** with proper UI feedback
 
-- **📊 Equipment Preview in Manual Run**
-  - Zeigt ausgerüstete Items (Waffe, Rüstung, Accessory)
-  - Live Hero-Stats Preview (ATK, DEF, HP, CRIT)
-  - Klassenanzeige basierend auf Waffe
-  - Visual Equipment Slots mit Icons
+#### Loot System Overhaul
+- **Massively increased drop rates:**
+  - Easy: 15% → 50% (1-2 items)
+  - Normal: 25% → 75% (1-2 items)
+  - Hard: 35% → 85% (2-3 items)
+  - Expert: 50% → **100% GUARANTEED** (2-4 items)
+- **Debug logging** for loot generation (console)
+- **Boss loot** - guaranteed drops with higher quantities
+- **Loot notifications** with rarity emojis
 
-- **🎨 Fantasy Manual Run UI**
-  - Mittelalterliches Difficulty-Selector mit farbigen Buttons
-  - Detaillierte Schwierigkeits-Beschreibungen
-  - Equipment-Vorschau mit Stat-Anzeige
-  - Loot-History Display nach Dungeon
-  - Fantasy-themisches Design mit Gold/Rot-Farben
+#### Equipment Persistence
+- **Added `inventory` array to gameState** - stores all equipment
+- **Added `equipped` object to gameState** - tracks equipped items
+- **Auto-save on equipment operations:**
+  - Save when equipping items
+  - Save when unequipping items
+  - Save when selling items
+- **Equipment survives page refresh** (F5)
+- **Debug logging** for save/load operations
 
-### 🔧 Technische Änderungen
-- Neue Datei: `src/upgrades/loot-system.js` - Loot-Generierung und Drop-Logik
-- Neue Datei: `loot-styles.css` - Styling für Loot-System und Manual Run
-- `ui/manual-run-ui.js` - Komplette Überarbeitung mit Loot-Integration
-- `styles.css` - Ganzes Styling auf Fantasy-Theme umgestellt
+#### Export/Import System Fix
+- **Unicode-safe export/import** using TextEncoder/TextDecoder
+- **Supports emojis and all Unicode characters** in save data
+- **Fixed btoa/atob** Latin1 limitation
+- **Both game-state.js and save-manager.js updated**
 
-### 🎮 Gameplay-Verbesserungen
-- Equipment wird bedeutungsvoller (nicht nur Stat-Zahlen)
-- Visuelle Belohnungen beim Dungeon-Abschluss
-- Bessere Immersion durch Fantasy-Theme
-- Loot-Rarity visuell codiert (Farben)
+### 🔧 Fixed
 
----
+#### Canvas & Rendering
+- **Fixed canvas size** - increased from 600x400 to 800x500
+- **Fixed grid rendering** - all rooms now visible (no more off-screen)
+- **Fixed exit door visibility** - properly rendered at bottom of dungeon
+- **Fixed room offsets** - adjusted to 50px X, 80px Y
 
-## [2.1.0] - 2026-01-08
+#### Combat & Balance
+- **Increased monster base stats:**
+  - Goblin: 30→40 HP, 5→8 ATK
+  - Orc: 50→60 HP, 8→12 ATK
+  - Skeleton: 40→50 HP, 7→10 ATK
+  - Troll: 70→80 HP, 10→15 ATK
+- **Adjusted difficulty multipliers:**
+  - Easy: 0.6x (unchanged)
+  - Normal: 1.0x (unchanged)
+  - Hard: 1.3x → 1.8x
+  - Expert: 1.6x → 2.8x
+- **Increased boss multiplier:** 3x → 4x
+- **More monsters per room:** 1-3 → 2-4
+- **Expert difficulty is now significantly harder**
 
-### ✨ Neu hinzugefügt
-- **🎯 Difficulty System** - 4 Schwierigkeitsgrade
-  - Easy (5-8 Räume, 0.75x Monster, 1.0x Rewards)
-  - Normal (7-10 Räume, 1.2x Monster, 1.5x Rewards)
-  - Hard (10-13 Räume, 1.6x Monster, 2.5x Rewards)
-  - Expert (12-15 Räume, 2.0x Monster, 4.0x Rewards)
-- **👑 Equipment & Klassensystem Framework**
-  - Equipment-basierte Klassen (Waffe bestimmt Klasse)
-  - 5 Klassen: Warrior, Ranger, Berserker, Mage, Rogue
-  - Stat-Modifiers für jede Klasse
-  - Rarity-System: Common bis Legendary
-- **📊 Schwierigkeits-Skalierung** - Monster & Rewards passen sich an
-- **💼 Equipment-Vorschau** in Manual Run
-- **📖 Umfangreiche Dokumentation**
+#### Equipment System
+- **Fixed equipment disappearing on page reload**
+- **Fixed stats not recalculating properly**
+- **Added proper null checks** for inventory/equipped
+- **Fixed equipped items not showing in UI after reload**
+- **Improved equipment ID generation** to prevent duplicates
 
-### 🔧 Technische Änderungen
-- Neue Datei: `src/upgrades/equipment-system.js` - Equipment & Klassen Framework
-- Neue Datei: `src/dungeons/dungeon-generator.js` v2.1 - Difficulty-Scaling
-- `ui/manual-run-ui.js` - Difficulty Selector UI
-- Neue Docs: `DIFFICULTY_SYSTEM.md`, `CLASS_AND_EQUIPMENT_SYSTEM.md`, etc.
+#### Save System
+- **Fixed export failing with Unicode characters**
+- **Fixed import not preserving emoji icons**
+- **Added inventory/equipped to save state**
+- **Improved save/load validation**
+- **Better error messages** for failed imports
 
-### 🎮 Gameplay-Verbesserungen
-- Dungeons skalieren mit Spieler-Progression
-- Expert-Runs belohnen 4x besser
-- Equipment macht combat-mechaniken vielfältiger
-- Klassen geben verschiedene Playstyles
+### 🐛 Bug Fixes
+- Fixed: Manual run grid was partially off-screen
+- Fixed: No loot received after completing dungeons
+- Fixed: Expert difficulty was too easy (completable without equipment)
+- Fixed: Equipment disappeared after F5 refresh
+- Fixed: Export save crashed with "Latin1 range" error
+- Fixed: Equipped items not persisting across sessions
 
----
+### 📊 Balance Changes
 
-## [2.0.0] - 2026-01-07
+#### Drop Rates
+```
+Easy:   15% → 50%  (+233% increase)
+Normal: 25% → 75%  (+200% increase)
+Hard:   35% → 85%  (+143% increase)
+Expert: 50% → 100% (GUARANTEED)
+```
 
-### ✨ Neu hinzugefügt
-- **🗺️ Dungeon Generator v2.0** - Procedural Dungeon-Generierung
-  - 7 verschiedene Raum-Typen
-  - Boss-Räume am Ende
-  - Monster-Spawning nach Raumtyp
-  - Gold/XP-Rewards pro Raum
-- **⚔️ Turn-Based Combat System** - Grundgerüst
-  - Hero vs Monster Combat
-  - Damage Calculation
-  - Status tracking
-- **👾 5+ Monster-Typen** mit verschiedenen Stats
-- **💬 Umfangreiche Dokumentation** (README, Design Docs)
+#### Difficulty Scaling
+```
+Hard:   1.3x → 1.8x  (+38% harder)
+Expert: 1.6x → 2.8x  (+75% harder)
+Boss:   3.0x → 4.0x  (+33% harder)
+```
 
-### 🔧 Technische Änderungen
-- Neue Datei: `src/dungeons/dungeon-generator.js` - Dungeon-Logik
-- Neue Datei: `src/combat/combat-system.js` - Combat Simulation
-- Canvas-Integration für Dungeon-Visualisierung
-- Dungeon-History Tracking
+#### Example Expert Difficulty Stats
+- Goblin: 112 HP, 22 ATK
+- Orc: 168 HP, 34 ATK
+- Skeleton: 140 HP, 28 ATK
+- Troll: 224 HP, 42 ATK
+- Boss Troll: **896 HP, 168 ATK**
 
-### 🎮 Gameplay-Verbesserungen
-- Manual Runs sind jetzt vollständig spielbar
-- Jeder Dungeon ist unikat (procedural)
-- Bosses für Epic-Momente
+### 📝 Documentation
+- **Added ROADMAP.md** - Complete development roadmap
+- **Added CHANGELOG.md** - This file
+- **Improved code comments** throughout codebase
+- **Added debug logging** for key systems
 
----
+### ⚙️ Technical Changes
 
-## [1.5.0] - 2026-01-06
+#### game-state.js
+- Added `inventory: []`
+- Added `equipped: { weapon, armor, accessory }`
+- Bumped version to `2.2.0`
+- Enhanced save/load with debug logging
+- Implemented Unicode-safe export/import
+- Added TextEncoder/TextDecoder for UTF-8 support
 
-### ✨ Neu hinzugefügt
-- **🎰 Auto-Run System** - Vollständige Idle-Funktionalität
-  - Start/Stop-Button
-  - Interval-basierte Auto-Runs
-  - Run-History mit Success/Failure
-  - Statistik-Tracking
-- **📊 Statistics Tab** - Umfangreiche Stats
-  - Runs played, Won, Lost
-  - Total Gold/XP earned
-  - Best/Average performance
-- **💾 Auto-Save System** - Alle 30 Sekunden gespeichert
+#### equipment-system.js
+- Imported `saveGame` from game-state
+- Added `saveGame()` calls to:
+  - `equipItem()`
+  - `unequipItem()`
+  - `sellEquipment()`
+- Improved `recalculateStats()` to account for hero level
+- Added crit chance cap at 100%
+- Better equipment ID generation
+- Enhanced debug logging
 
-### 🔧 Technische Änderungen
-- `src/idle/auto-run.js` - Auto-Run Logik
-- `src/core/game-state.js` - State Management überarbeitet
-- LocalStorage-Integration für Persistence
+#### loot-system.js
+- Increased all drop rates significantly
+- Added comprehensive debug logging
+- Enhanced `generateLootDrops()` with console output
+- Improved `addLootToInventory()` logging
+- Boss loot now drops 2-3+ items
 
----
+#### save-manager.js
+- Updated `exportSave()` to use Unicode-safe method
+- Updated `importSave()` with TextDecoder
+- Added inventory/equipped validation
+- Better error handling
 
-## [1.0.0] - 2026-01-01
+#### manual-run-renderer.js
+- Increased canvas size to 800x500
+- Adjusted room rendering offsets
+- Fixed exit door rendering
+- Improved grid visibility
 
-### ✨ Neu hinzugefügt
-- **🎮 MVP Released**
-  - 4 Tabs: Idle, Manual Run, Hero, Upgrades
-  - Resource-System (Gold, Gems, Souls, Keys)
-  - Hero-Leveling mit XP
-  - Basic Upgrade-System
-  - HTML/CSS/JS Frontend
-  - LocalStorage State Management
+#### monster-stats.js
+- Increased base HP/ATK for all monsters
+- Adjusted difficulty multipliers
+- Increased boss multiplier to 4x
+- More monsters spawn per room
 
-### 🔧 Technische Änderungen
-- Basis-Repository Setup
-- Modular Architecture (ES6 Modules)
-- Tab-System in HTML
-- Basis-Styling mit Dark Theme
-
----
-
-## 📝 Legende
-
-- **✨ Neu hinzugefügt** - Neue Features
-- **🔧 Technische Änderungen** - Code-Updates
-- **🎮 Gameplay-Verbesserungen** - Gameplay-Impact
-- **🐛 Bugfixes** - Behobene Bugs
-- **📚 Dokumentation** - Docs Updates
-- **⚡ Performance** - Performance-Verbesserungen
-- **🎨 UI/UX** - Interface-Updates
-
----
-
-## Nächste geplante Features (Roadmap)
-
-### Version 2.3.0
-- [ ] Equipment-Inventar UI
-- [ ] Equip/Unequip funktional
-- [ ] Equipment-Shop
-- [ ] Visual Class Indicator
-- [ ] Equipment-Stats auf Auto-Runs anwenden
-
-### Version 2.4.0
-- [ ] Skill-Tree System
-- [ ] Advanced Combat Features
-- [ ] Prestige-System
-- [ ] Achievements
-
-### Version 3.0.0
-- [ ] Multiple Dungeon-Tiefen
-- [ ] Leaderboards
-- [ ] Co-op Features (geplant)
-- [ ] Mobile Optimization
+### 🛡️ Safety & Stability
+- All changes are backward compatible
+- Existing saves will load correctly
+- New properties have fallback defaults
+- No breaking changes to existing features
+- Extensive null checks added throughout
 
 ---
 
-**Zuletzt aktualisiert:** 9. Januar 2026
+## [2.1.0] - Previous Version
+
+### Features (Before Today)
+- Basic manual run system
+- Equipment system
+- Loot drops
+- Save/load functionality
+- Upgrade system
+- Achievement system
+- Auto-run system
+
+---
+
+## Version History
+
+- **2.2.0** (2026-01-09) - Combat Polish, Loot Overhaul, Equipment Persistence
+- **2.1.0** - Base game features
+- **2.0.0** - Equipment system added
+- **1.0.0** - Initial release
+
+---
+
+## Next Up (Phase 1)
+
+See ROADMAP.md for complete development plan.
+
+### Sprint 1: Combat Polish (Next)
+- [ ] Boss special abilities
+- [ ] Damage numbers
+- [ ] Screen shake
+- [ ] Critical hit effects
+
+### Sprint 2: Skill Tree
+- [ ] 3 skill trees (Combat/Defense/Utility)
+- [ ] 4-5 skills per tree
+- [ ] Respec functionality
+
+### Sprint 3: Daily Quests
+- [ ] Quest system
+- [ ] Daily challenges
+- [ ] Reward claiming
+
+---
+
+## Notes
+
+### Development Workflow
+1. Each sprint gets its own changelog section when complete
+2. Document ALL changes (additions, fixes, balance)
+3. Include code file names that were modified
+4. Note any breaking changes or migration steps
+5. Update version number in game-state.js
+
+### Commit Message Format
+```
+type: short description
+
+Longer explanation if needed.
+
+Affects: file1.js, file2.js
+Closes: #issue-number (if applicable)
+```
+
+**Types:** feat, fix, docs, style, refactor, test, chore
+
+---
+
+**Last Updated:** January 9, 2026  
+**Next Review:** After Sprint 1 completion
