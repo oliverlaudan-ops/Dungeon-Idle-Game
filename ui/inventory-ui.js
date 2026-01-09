@@ -6,7 +6,6 @@
 
 import { gameState } from '../src/core/game-state.js';
 import { equipItem, unequipItem, sellEquipment, getEquipmentStats } from '../src/upgrades/equipment-system.js';
-import { updateHeroUI } from './hero-ui.js';
 
 /**
  * Initialize Inventory UI
@@ -169,11 +168,8 @@ function handleEquipItem(itemId) {
         // Show notification
         showNotification('✅ Item ausgerüstet!', 'success');
         
-        // Update UIs
+        // Update Inventory UI
         updateInventoryUI();
-        if (typeof updateHeroUI === 'function') {
-            updateHeroUI();
-        }
     } else {
         showNotification('❌ Fehler beim Ausrüsten', 'error');
     }
@@ -188,9 +184,6 @@ function handleUnequipItem(itemId) {
     if (success) {
         showNotification('❌ Item abgenommen', 'info');
         updateInventoryUI();
-        if (typeof updateHeroUI === 'function') {
-            updateHeroUI();
-        }
     }
 }
 
@@ -210,9 +203,6 @@ function handleSellItem(itemId) {
         if (goldEarned > 0) {
             showNotification(`💰 Verkauft für ${goldEarned} Gold!`, 'success');
             updateInventoryUI();
-            if (typeof updateHeroUI === 'function') {
-                updateHeroUI();
-            }
         }
     }
 }
