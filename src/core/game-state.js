@@ -9,7 +9,7 @@ export const gameState = {
         name: 'Adventurer',
         level: 1,
         xp: 0,
-        xpToNextLevel: 100,
+        maxXp: 100,
         hp: 100,
         maxHp: 100,
         attack: 10,
@@ -24,6 +24,14 @@ export const gameState = {
         gems: 0,
         souls: 0,
         dungeonKeys: 3
+    },
+
+    // Equipment & Inventory
+    inventory: [],
+    equipped: {
+        weapon: null,
+        armor: null,
+        accessory: null
     },
 
     // Idle system
@@ -65,7 +73,7 @@ export const gameState = {
     },
 
     // Meta
-    version: '0.1.0',
+    version: '2.2.0',
     lastSave: Date.now(),
     totalPlayTime: 0
 };
@@ -76,8 +84,13 @@ export const gameState = {
 export function saveGame() {
     try {
         gameState.lastSave = Date.now();
-        localStorage.setItem('dungeonIdleGame', JSON.stringify(gameState));
+        const saveData = JSON.stringify(gameState);
+        localStorage.setItem('dungeonIdleGame', saveData);
+        
         console.log('💾 Game saved');
+        console.log(`📦 Inventory: ${gameState.inventory?.length || 0} items`);
+        console.log(`⚔️ Equipped: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
+        
         return true;
     } catch (e) {
         console.error('❌ Save failed:', e);
@@ -93,16 +106,25 @@ export function loadGame() {
         const saved = localStorage.getItem('dungeonIdleGame');
         if (saved) {
             const loaded = JSON.parse(saved);
+            
             // Merge loaded state with default state to handle new properties
             Object.keys(gameState).forEach(key => {
                 if (loaded[key] !== undefined) {
-                    if (typeof gameState[key] === 'object' && !Array.isArray(gameState[key])) {
+                    if (typeof gameState[key] === 'object' && !Array.isArray(gameState[key]) && gameState[key] !== null) {
                         gameState[key] = { ...gameState[key], ...loaded[key] };
                     } else {
                         gameState[key] = loaded[key];
                     }
                 }
             });
+            
+            // Ensure inventory and equipped exist
+            if (!gameState.inventory) {
+                gameState.inventory = [];
+            }
+            if (!gameState.equipped) {
+                gameState.equipped = { weapon: null, armor: null, accessory: null };
+            }
             
             // Always reset manual run state on load (runs don't persist across page reloads)
             gameState.manualRun.active = false;
@@ -111,13 +133,45 @@ export function loadGame() {
             gameState.manualRun.dungeon = null;
             
             console.log('💾 Game loaded');
+            console.log(`📦 Loaded inventory: ${gameState.inventory.length} items`);
+            console.log(`⚔️ Loaded equipment: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
             console.log('♻️ Manual run state reset');
+            
             return true;
         }
         console.log('🆕 No save found, starting new game');
         return false;
     } catch (e) {
         console.error('❌ Load failed:', e);
+        return false;
+    }
+}
+
+/**
+ * Export save data as string
+ */
+export function exportSave() {
+    try {
+        saveGame(); // Save current state first
+        return btoa(JSON.stringify(gameState));
+    } catch (e) {
+        console.error('❌ Export failed:', e);
+        return null;
+    }
+}
+
+/**
+ * Import save data from string
+ */
+export function importSave(saveString) {
+    try {
+        const decoded = JSON.parse(atob(saveString));
+        localStorage.setItem('dungeonIdleGame', JSON.stringify(decoded));
+        location.reload();
+        return true;
+    } catch (e) {
+        console.error('❌ Import failed:', e);
+        alert('❌ Invalid save data!');
         return false;
     }
 }
