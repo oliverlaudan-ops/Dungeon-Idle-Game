@@ -75,7 +75,7 @@ function createUpgradeCard(upgrade) {
     effectDiv.className = 'upgrade-effect';
     if (currentLevel > 0) {
         const effect = upgrade.effect(currentLevel);
-        effectDiv.innerHTML = `<small>Aktuell: ${formatEffect(effect)}</small>`;
+        effectDiv.innerHTML = `<small>Current: ${formatEffect(effect)}</small>`;
     }
 
     // Cost & Button
@@ -93,7 +93,7 @@ function createUpgradeCard(upgrade) {
         footer.innerHTML = `
             <span class="upgrade-cost">${costText.join(' ')}</span>
             <button class="btn btn-upgrade ${canAfford ? '' : 'disabled'}" ${canAfford ? '' : 'disabled'}>
-                Kaufen
+                Buy
             </button>
         `;
 
@@ -117,7 +117,7 @@ function handleUpgradePurchase(upgradeId) {
     
     if (result.success) {
         // Success feedback
-        console.log('✅ Upgrade gekauft!');
+        console.log('✅ Upgrade purchased!');
         
         // Re-render upgrades
         renderUpgrades();
@@ -126,7 +126,7 @@ function handleUpgradePurchase(upgradeId) {
         updateUI();
     } else {
         // Error feedback
-        console.log('❌ Fehler:', result.error);
+        console.log('❌ Error:', result.error);
         alert(getErrorMessage(result.error));
     }
 }
@@ -139,10 +139,10 @@ function formatEffect(effect) {
     if (effect.attack) parts.push(`+${effect.attack} ATK`);
     if (effect.defense) parts.push(`+${effect.defense} DEF`);
     if (effect.maxHp) parts.push(`+${effect.maxHp} HP`);
-    if (effect.critChance) parts.push(`+${(effect.critChance * 100).toFixed(1)}% Krit`);
-    if (effect.critMultiplier) parts.push(`+${effect.critMultiplier.toFixed(1)}x Krit-Dmg`);
-    if (effect.autoRunInterval) parts.push(`${effect.autoRunInterval}s Intervall`);
-    if (effect.successBonus) parts.push(`+${(effect.successBonus * 100).toFixed(0)}% Erfolg`);
+    if (effect.critChance) parts.push(`+${(effect.critChance * 100).toFixed(1)}% Crit`);
+    if (effect.critMultiplier) parts.push(`+${effect.critMultiplier.toFixed(1)}x Crit Dmg`);
+    if (effect.autoRunInterval) parts.push(`${effect.autoRunInterval}s Interval`);
+    if (effect.successBonus) parts.push(`+${(effect.successBonus * 100).toFixed(0)}% Success`);
     if (effect.goldMultiplier) parts.push(`+${(effect.goldMultiplier * 100).toFixed(0)}% Gold`);
     if (effect.xpMultiplier) parts.push(`+${(effect.xpMultiplier * 100).toFixed(0)}% XP`);
     if (effect.gemChanceBonus) parts.push(`+${(effect.gemChanceBonus * 100).toFixed(0)}% Gem`);
@@ -156,10 +156,10 @@ function formatEffect(effect) {
  */
 function getErrorMessage(error) {
     switch (error) {
-        case 'Not enough gold': return 'Nicht genug Gold!';
-        case 'Not enough gems': return 'Nicht genug Gems!';
-        case 'Not enough souls': return 'Nicht genug Souls!';
-        case 'Max level reached': return 'Maximales Level erreicht!';
-        default: return 'Fehler beim Kauf!';
+        case 'Not enough gold': return 'Not enough Gold!';
+        case 'Not enough gems': return 'Not enough Gems!';
+        case 'Not enough souls': return 'Not enough Souls!';
+        case 'Max level reached': return 'Max level reached!';
+        default: return 'Purchase error!';
     }
 }
