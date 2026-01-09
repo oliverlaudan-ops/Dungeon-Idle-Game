@@ -1,40 +1,40 @@
 /**
- * Loot System v1.0
+ * Loot System v1.1
  * Generates equipment drops from defeated monsters and dungeons
  */
 
 import { gameState } from '../core/game-state.js';
 import { createEquipment } from './equipment-system.js';
 
-// Drop rates by difficulty
+// Drop rates by difficulty - INCREASED!
 const DROP_RATES = {
     EASY: {
-        chance: 0.15,           // 15% chance to get loot
+        chance: 0.50,           // 50% chance to get loot
         minRarity: 'common',
         maxRarity: 'uncommon',
         minQuantity: 1,
-        maxQuantity: 1
+        maxQuantity: 2
     },
     NORMAL: {
-        chance: 0.25,           // 25% chance
+        chance: 0.75,           // 75% chance
         minRarity: 'common',
         maxRarity: 'rare',
         minQuantity: 1,
         maxQuantity: 2
     },
     HARD: {
-        chance: 0.35,           // 35% chance
+        chance: 0.85,           // 85% chance
         minRarity: 'uncommon',
         maxRarity: 'epic',
-        minQuantity: 1,
-        maxQuantity: 2
+        minQuantity: 2,
+        maxQuantity: 3
     },
     EXPERT: {
-        chance: 0.50,           // 50% chance (every other run!)
+        chance: 1.0,            // 100% GUARANTEED
         minRarity: 'rare',
         maxRarity: 'legendary',
-        minQuantity: 1,
-        maxQuantity: 3
+        minQuantity: 2,
+        maxQuantity: 4
     }
 };
 
@@ -125,16 +125,26 @@ function getRandomLootTemplate() {
 export function generateLootDrops(difficulty, runSuccess = true) {
     const drops = [];
     
+    console.log(`🎲 Generating loot for ${difficulty} difficulty...`);
+    
     // Only drop loot if run was successful
-    if (!runSuccess) return drops;
+    if (!runSuccess) {
+        console.log('❌ Run failed - no loot');
+        return drops;
+    }
     
     // Check if loot should drop
-    if (!shouldDropLoot(difficulty)) return drops;
+    if (!shouldDropLoot(difficulty)) {
+        console.log('💔 No loot dropped (unlucky roll)');
+        return drops;
+    }
     
     // Determine how many items
     const rates = DROP_RATES[difficulty];
     const quantity = Math.floor(Math.random() * 
         (rates.maxQuantity - rates.minQuantity + 1)) + rates.minQuantity;
+    
+    console.log(`🎁 Generating ${quantity} items...`);
     
     // Generate each item
     for (let i = 0; i < quantity; i++) {
@@ -144,9 +154,13 @@ export function generateLootDrops(difficulty, runSuccess = true) {
         
         if (equipment) {
             drops.push(equipment);
+            console.log(`✨ Generated: ${equipment.name} (${rarity})`);
+        } else {
+            console.warn(`⚠️ Failed to create equipment: ${lootTemplate.id}`);
         }
     }
     
+    console.log(`✅ Total loot generated: ${drops.length} items`);
     return drops;
 }
 
@@ -158,7 +172,13 @@ export function addLootToInventory(loot) {
         gameState.inventory = [];
     }
     
+    console.log(`📦 Adding ${loot.length} items to inventory`);
+    console.log(`📦 Inventory before: ${gameState.inventory.length} items`);
+    
     gameState.inventory.push(...loot);
+    
+    console.log(`📦 Inventory after: ${gameState.inventory.length} items`);
+    
     return loot;
 }
 
@@ -167,7 +187,7 @@ export function addLootToInventory(loot) {
  */
 export function getLootNotificationMessage(drops) {
     if (drops.length === 0) {
-        return 'Kein Loot erhalten...';
+        return 'No loot received...';
     }
     
     const rarityEmojis = {
@@ -182,7 +202,7 @@ export function getLootNotificationMessage(drops) {
         `${rarityEmojis[item.rarity]} ${item.name}`
     ).join(', ');
     
-    return `Loot erhalten: ${lootList}`;
+    return `Loot received: ${lootList}`;
 }
 
 /**
@@ -228,8 +248,8 @@ export function generateBossLoot(difficulty) {
     
     // Bosses always drop loot
     const rates = DROP_RATES[difficulty];
-    const baseQuantity = difficulty === 'EXPERT' ? 2 : 1;
-    const quantity = baseQuantity + (Math.random() < 0.4 ? 1 : 0);
+    const baseQuantity = difficulty === 'EXPERT' ? 3 : 2;
+    const quantity = baseQuantity + (Math.random() < 0.5 ? 1 : 0);
     
     for (let i = 0; i < quantity; i++) {
         const lootTemplate = getRandomLootTemplate();
