@@ -3,9 +3,9 @@
  * Updated with Fantasy Theme and Loot Drop System
  */
 
-import { gameState } from '../core/game-state.js';
-import { shouldDropLoot, generateLootDrops, addLootToInventory, getLootNotificationMessage, getDropRateForDifficulty } from '../upgrades/loot-system.js';
-import { getHeroClass, getClassInfo } from '../upgrades/equipment-system.js';
+import { gameState } from '../src/core/game-state.js';
+import { shouldDropLoot, generateLootDrops, addLootToInventory, getLootNotificationMessage, getDropRateForDifficulty } from '../src/upgrades/loot-system.js';
+import { getHeroClass, getClassInfo } from '../src/upgrades/equipment-system.js';
 
 let selectedDifficulty = 'NORMAL';
 let runInProgress = false;
