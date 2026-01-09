@@ -133,13 +133,18 @@
             <div id="manual-tab" class="tab-panel">
                 <h2>🗡️ Manual Dungeon Run</h2>
                 
+                <!-- Manual Run Panel (filled by JS) -->
+                <div id="manual-run-panel">
+                    <!-- Manual run UI rendered by manual-run-ui.js -->
+                </div>
+                
                 <!-- Combat UI positioned ABOVE canvas -->
-                <div id="combat-ui">
-                    <!-- Combat UI rendered by JS -->
+                <div id="combat-ui" style="display: none;">
+                    <!-- Combat UI rendered by JS during active run -->
                 </div>
                 
                 <!-- Canvas below combat UI -->
-                <div id="dungeon-canvas-container">
+                <div id="dungeon-canvas-container" style="display: none;">
                     <canvas id="dungeon-canvas" width="600" height="400"></canvas>
                 </div>
             </div>
@@ -237,7 +242,7 @@
                 </div>
             </div>
 
-            <!-- Equipment Tab (NEW!) -->
+            <!-- Equipment Tab -->
             <div id="equipment-tab" class="tab-panel">
                 <h2>🎽 Equipment & Inventory</h2>
                 

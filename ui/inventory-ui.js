@@ -32,8 +32,8 @@ export function updateInventoryUI() {
     if (inventory.length === 0) {
         inventoryContainer.innerHTML = `
             <div class="empty-inventory">
-                <p>📦 Dein Inventar ist leer</p>
-                <p class="hint">Spiele Dungeons um Equipment zu bekommen!</p>
+                <p>📦 Your Inventory is Empty</p>
+                <p class="hint">Complete dungeons to get equipment!</p>
             </div>
         `;
         return;
@@ -46,25 +46,25 @@ export function updateInventoryUI() {
 
     let html = `
         <div class="inventory-header">
-            <h3>🎒 Inventar</h3>
+            <h3>🎒 Inventory</h3>
             <div class="inventory-stats">
                 <span>📦 ${inventory.length} Items</span>
-                <span>⚔️ ${weapons.length} Waffen</span>
-                <span>🛡️ ${armor.length} Rüstungen</span>
-                <span>💍 ${accessories.length} Accessoires</span>
+                <span>⚔️ ${weapons.length} Weapons</span>
+                <span>🛡️ ${armor.length} Armor</span>
+                <span>💍 ${accessories.length} Accessories</span>
             </div>
         </div>
     `;
 
     // Render sections
     if (weapons.length > 0) {
-        html += renderInventorySection('⚔️ Waffen', weapons);
+        html += renderInventorySection('⚔️ Weapons', weapons);
     }
     if (armor.length > 0) {
-        html += renderInventorySection('🛡️ Rüstungen', armor);
+        html += renderInventorySection('🛡️ Armor', armor);
     }
     if (accessories.length > 0) {
-        html += renderInventorySection('💍 Accessoires', accessories);
+        html += renderInventorySection('💍 Accessories', accessories);
     }
 
     inventoryContainer.innerHTML = html;
@@ -120,10 +120,10 @@ function renderInventoryItem(item) {
             </div>
             <div class="item-actions">
                 ${isEquipped 
-                    ? `<button class="btn-unequip" data-item-id="${item.id}">❌ Abnehmen</button>` 
-                    : `<button class="btn-equip" data-item-id="${item.id}">✅ Ausrüsten</button>`
+                    ? `<button class="btn-unequip" data-item-id="${item.id}">❌ Unequip</button>` 
+                    : `<button class="btn-equip" data-item-id="${item.id}">✅ Equip</button>`
                 }
-                <button class="btn-sell" data-item-id="${item.id}">💰 Verkaufen</button>
+                <button class="btn-sell" data-item-id="${item.id}">💰 Sell</button>
             </div>
         </div>
     `;
@@ -166,12 +166,12 @@ function handleEquipItem(itemId) {
     
     if (success) {
         // Show notification
-        showNotification('✅ Item ausgerüstet!', 'success');
+        showNotification('✅ Item equipped!', 'success');
         
         // Update Inventory UI
         updateInventoryUI();
     } else {
-        showNotification('❌ Fehler beim Ausrüsten', 'error');
+        showNotification('❌ Failed to equip', 'error');
     }
 }
 
@@ -182,7 +182,7 @@ function handleUnequipItem(itemId) {
     const success = unequipItem(itemId);
     
     if (success) {
-        showNotification('❌ Item abgenommen', 'info');
+        showNotification('❌ Item unequipped', 'info');
         updateInventoryUI();
     }
 }
@@ -195,13 +195,13 @@ function handleSellItem(itemId) {
     if (!item) return;
 
     // Confirm sell
-    const confirmSell = confirm(`Verkaufen: ${item.name}?\nDu erhältst Gold basierend auf der Seltenheit.`);
+    const confirmSell = confirm(`Sell: ${item.name}?\nYou will receive gold based on rarity.`);
     
     if (confirmSell) {
         const goldEarned = sellEquipment(itemId);
         
         if (goldEarned > 0) {
-            showNotification(`💰 Verkauft für ${goldEarned} Gold!`, 'success');
+            showNotification(`💰 Sold for ${goldEarned} Gold!`, 'success');
             updateInventoryUI();
         }
     }
