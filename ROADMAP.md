@@ -1,8 +1,9 @@
 # 🗺️ Dungeon Idle Game - Development Roadmap
 
-**Last Updated:** January 9, 2026  
+**Last Updated:** January 9, 2026 (16:58 CET)  
 **Current Phase:** Phase 1 - Foundation & Quick Wins  
-**Next Sprint:** Sprint 1 - Combat Polish
+**Current Sprint:** Sprint 2 - Skill Tree System  
+**Completed Sprints:** 1/9
 
 ---
 
@@ -21,13 +22,17 @@
 - [x] Auto-Run System
 - [x] Upgrades System
 - [x] Achievement System
+- [x] **Boss Special Abilities (4 types)**
+- [x] **Damage Numbers (floating text)**
+- [x] **Screen Shake effects**
+- [x] **Critical Hit Visual Effects**
 
 ### 🎯 Current Game State
 - Manual Dungeon Runs working perfectly
 - Equipment persists across sessions
 - Loot drops with balanced rates (Expert = 100% guaranteed)
-- Combat is functional but basic (stat-based only)
-- End-game content is limited
+- Combat has visual feedback and boss mechanics ✨
+- Ready for skill tree implementation
 
 ---
 
@@ -37,29 +42,37 @@
 
 ## **Phase 1: Foundation & Quick Wins** ⚡
 **Goal:** Make the game feel "complete" and polished  
-**Timeline:** Week 1-2
+**Timeline:** Week 1-2  
+**Progress:** 1/3 sprints complete
 
 ### **Sprint 1: Combat Polish** ⚔️
-**Status:** 🔴 Not Started  
+**Status:** ✅ **COMPLETE**  
 **Priority:** HIGH  
-**Estimated Time:** 2-3 hours
+**Completed:** January 9, 2026
 
-**Tasks:**
-- [ ] Implement Boss Special Abilities
-  - [ ] AOE Attack (damages in radius)
-  - [ ] Heal ability (boss restores HP)
-  - [ ] Rage mode (increased damage at low HP)
-  - [ ] Shield ability (temporary damage reduction)
-- [ ] Add Damage Numbers (floating text on hit)
-- [ ] Implement Screen Shake on hits
-- [ ] Add Critical Hit Visual Effects
-- [ ] Boss telegraph system (warning before special attack)
+**Completed Tasks:**
+- [x] Implement Boss Special Abilities
+  - [x] AOE Attack (damages in radius)
+  - [x] Heal ability (boss restores HP)
+  - [x] Rage mode (increased damage at low HP)
+  - [x] Shield ability (temporary damage reduction)
+- [x] Add Damage Numbers (floating text on hit)
+- [x] Implement Screen Shake on hits
+- [x] Add Critical Hit Visual Effects
+- [x] Boss telegraph system (warning before special attack)
 
-**Success Criteria:**
-- Bosses have 3-4 unique abilities
-- Combat feels more dynamic and engaging
-- Visual feedback for all damage/crits
-- Players can react to boss patterns
+**Implementation Details:**
+- `boss-abilities.js` - Complete boss AI system with 4 abilities
+- `combat-effects.js` - Floating damage numbers, screen shake, hit flashes
+- `canvas-renderer.js` - Integration with visual effects system
+- All effects are animated and fade smoothly
+- Crit effects have enhanced visuals (orange, larger, stronger shake)
+
+**Success Criteria:** ✅ ALL MET
+- ✅ Bosses have 4 unique abilities
+- ✅ Combat feels more dynamic and engaging
+- ✅ Visual feedback for all damage/crits
+- ✅ Players can react to boss patterns
 
 ---
 
@@ -395,8 +408,26 @@
 4. Follow the current sprint tasks
 5. Update both files after completing work
 
-**Current Sprint:** Sprint 1 - Combat Polish  
-**Next Task:** Implement Boss Special Abilities
+**Current Sprint:** Sprint 2 - Skill Tree System  
+**Next Task:** Design Skill Tree Structure (3 trees)
+
+---
+
+## 🏆 Completed Sprints
+
+### ✅ Sprint 1: Combat Polish (Jan 9, 2026)
+**What was added:**
+- Boss abilities system with 4 unique abilities
+- Telegraph system for boss attacks
+- Floating damage numbers with animations
+- Screen shake on hits (different intensity for crits)
+- Critical hit visual effects
+- Hit flash animations
+
+**Impact:**
+- Combat feels dynamic and engaging
+- Visual feedback makes hits feel impactful
+- Boss fights are strategic, not just stat checks
 
 ---
 
