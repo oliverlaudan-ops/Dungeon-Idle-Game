@@ -63,7 +63,6 @@ export class ManualRunController {
 
         // Update
         this.handleMovement();
-        this.checkCollisions();
 
         // Render
         this.renderer.render(this.dungeon, gameState.hero);
@@ -196,6 +195,9 @@ export class ManualRunController {
             gameState.hero.xp += xpBonus;
             gameState.resources.gold += goldBonus;
 
+            // Update inventory UI
+            this.refreshInventoryUI();
+
             alert(`🎉 Victory!\n\n+${xpBonus} XP\n+${goldBonus} Gold\n${loot.length > 0 ? `\n🎁 ${loot.length} items looted!` : ''}`);
         } else {
             console.log('❌ Hero defeated!');
@@ -206,6 +208,17 @@ export class ManualRunController {
 
         // Return to selection screen
         this.showSelectionScreen();
+    }
+
+    refreshInventoryUI() {
+        // Dynamically import and call inventory UI update
+        import('../../ui/inventory-ui.js').then(module => {
+            if (module.updateInventoryUI) {
+                module.updateInventoryUI();
+            }
+        }).catch(err => {
+            console.error('Failed to update inventory UI:', err);
+        });
     }
 
     showSelectionScreen() {
@@ -221,7 +234,16 @@ export class ManualRunController {
         ctx.fillText('Manual Run Completed', this.canvas.width / 2, this.canvas.height / 2 - 20);
         ctx.font = '16px Arial';
         ctx.fillStyle = '#aaa';
-        ctx.fillText('Switch to another tab or start a new run', this.canvas.width / 2, this.canvas.height / 2 + 20);
+        ctx.fillText('Go to Equipment tab to see your loot or start a new run', this.canvas.width / 2, this.canvas.height / 2 + 20);
+
+        // Show canvas container, hide if needed
+        setTimeout(() => {
+            const canvasContainer = document.getElementById('dungeon-canvas-container');
+            const manualPanel = document.getElementById('manual-run-panel');
+            
+            if (canvasContainer) canvasContainer.style.display = 'none';
+            if (manualPanel) manualPanel.style.display = 'block';
+        }, 3000);
     }
 
     getRewardMultiplier() {

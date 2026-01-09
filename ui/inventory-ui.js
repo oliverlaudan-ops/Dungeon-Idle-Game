@@ -29,6 +29,8 @@ export function updateInventoryUI() {
 
     const inventory = gameState.inventory || [];
     
+    console.log(`💾 Updating inventory UI: ${inventory.length} items`);
+    
     if (inventory.length === 0) {
         inventoryContainer.innerHTML = `
             <div class="empty-inventory">
