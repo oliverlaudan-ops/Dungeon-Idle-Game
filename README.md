@@ -10,90 +10,150 @@ Ein innovatives Spiel, das Roguelike-Dungeon-Crawling mit Idle-Game-Mechaniken v
 - **Meta-Progression**: Nutze gesammelte Ressourcen für permanente Upgrades
 - **Procedural Generation**: Jeder Dungeon ist einzigartig
 
+---
+
+## 🚀 Aktueller Entwicklungsstand
+
+### Version & Status
+
+- **Aktuelle Version:** `2.1.0`
+- **Status:** Spielbar, mit Difficulty-System & vorbereitetem Equipment-Framework
+- **Live Demo:** https://idle.future-pulse.tech
+
+> Details zum Fortschritt findest du in [`STATUS.md`](./STATUS.md)
+
+### Wichtige Systeme (Stand 2.1.0)
+
+- ✅ Dungeon-Generator v2.1 (längere Dungeons, Boss-Räume, Difficulty-Scaling)
+- ✅ 4 Schwierigkeitsgrade (Easy, Normal, Hard, Expert)
+- ✅ Monster-Rebalancing (keine 1-Hit-„Witzmonster“ mehr)
+- ✅ Boss-System mit mehreren Boss-Typen
+- ✅ Manual Runs inkl. Difficulty-Auswahl
+- ✅ Auto-Run-System (Idle)
+- ✅ Grundlegendes Equipment-System (Framework)
+- ✅ Umfangreiche Dokumentation
+
+Weitere Details zu den Features findest du in [`CHANGELOG.md`](./CHANGELOG.md).
+
+---
+
 ## 🎯 Gameplay-Features
 
 ### Automatische Runs (Idle)
-- Dein Held erkundet Dungeons auch wenn du offline bist
-- Sammle Gold, XP, Souls und Gems passiv
-- Erfolgsrate basiert auf deinen Hero-Stats
-- Runs alle paar Sekunden/Minuten
+- Held erkundet Dungeons automatisch im Hintergrund
+- Gold, XP, Souls und weitere Ressourcen werden passiv gesammelt
+- Erfolgsrate hängt von Hero-Stats (und später Equipment) ab
+- Läuft in Intervallen und kann an/aus geschaltet werden
 
 ### Manuelle Runs (Roguelike)
-- Turn-based Combat-System
-- Procedural generierte Dungeon-Layouts
-- Verschiedene Gegnertypen mit unterschiedlichen Fähigkeiten
-- Bessere Loot-Chancen als Auto-Runs
-- Boss-Kämpfe und spezielle Räume
+- Turn-based Combat auf einem Dungeon-Canvas
+- Procedural generierte Dungeons mit mehreren Räumen
+- Unterschiedliche Gegnertypen und Boss-Räume
+- Höhere Loot- und XP-Ausbeute als Auto-Runs
+- Ab Version 2.1.0: Schwierigkeitsauswahl + längere Dungeons
 
-### Meta-Progression
-- Permanente Hero-Upgrades (HP, Attack, Defense)
-- Skill-Tree für neue Fähigkeiten
-- Idle-Effizienz-Verbesserungen
-- Freischaltbare Dungeon-Tiefen
+> Siehe [`DIFFICULTY_SYSTEM.md`](./DIFFICULTY_SYSTEM.md) für alle Details zum Difficulty-System.
 
-## 🚀 Entwicklungs-Status
+### Difficulty-System (NEU in 2.1.0)
 
-### Phase 1: MVP ✅ **ABGESCHLOSSEN**
-- [x] Repository Setup
-- [x] Basis-UI mit Tabs (Idle, Manual Run, Hero, Upgrades)
-- [x] Auto-Run-System mit Start/Stop
-- [x] 4 Ressourcen (Gold, Gems, Souls, Keys)
-- [x] Hero-Level-System mit XP
-- [x] Run-History mit visuellen Feedback
-- [x] Statistiken-Tracking
-- [x] Auto-Save System
+- **Easy:** 5–8 Räume, 0,75× Monsterstärke, 1,0× Rewards
+- **Normal:** 7–10 Räume, 1,2× Monsterstärke, 1,5× Rewards
+- **Hard:** 10–13 Räume, 1,6× Monsterstärke, 2,5× Rewards
+- **Expert:** 12–15 Räume, 2,0× Monsterstärke, 4,0× Rewards
+- Boss-Räume erscheinen abhängig von der Schwierigkeit alle 3–5 Räume
 
-### Phase 2: Hero & Upgrades (In Planung)
-- [ ] Hero-Tab mit vollständiger Stats-Anzeige
-- [ ] Attribute-System und Level-Up-Boni
-- [ ] 10-15 permanente Upgrades
-- [ ] Upgrade-Kategorien (Attack, Defense, Idle-Speed)
-- [ ] Tooltips und Beschreibungen
+Detaillierte Formeln, Beispiele und Balancing-Notizen findest du in:
+- [`DIFFICULTY_SYSTEM.md`](./DIFFICULTY_SYSTEM.md)
+- [`DIFFICULTY_TESTING_GUIDE.md`](./DIFFICULTY_TESTING_GUIDE.md)
+- Spieler-orientiert: [`QUICK_START.md`](./QUICK_START.md)
 
-### Phase 3: Combat & Dungeons
-- [ ] Turn-based Combat-System
-- [ ] 5+ Gegnertypen
-- [ ] Procedural Dungeon-Generator
-- [ ] Loot-System mit Items
-- [ ] Verschiedene Raum-Typen
+### Equipment- & Klassensystem (Framework vorhanden)
 
-### Phase 4: Polish & Erweiterung
-- [ ] Boss-Kämpfe
-- [ ] Skill-System
-- [ ] Equipment-System
-- [ ] Achievements
-- [ ] Multiple Dungeon-Tiefen
-- [ ] Prestige-System
+- Waffen, Rüstungen und Accessoires mit Attribut-Boni
+- Rarity-Tiers: Common → Legendary
+- **Waffen bestimmen die „Klasse“ des Helden** (Equipment-based Classes):
+  - Sword → Warrior (balanced)
+  - Bow → Ranger (Crit-fokussiert)
+  - Hammer → Berserker (hoher Schaden, geringere Defense)
+  - Staff → Mage (Utility/Survivability)
+  - Dagger → Rogue (hoher Crit, riskant)
+- Stats (ATK/DEF/HP/Crit) werden beim Ausrüsten neu berechnet
+- Framework vorbereitet, UI & Loot-Drops folgen
+
+Details zum Design:
+- [`equipment-system.js`](./src/upgrades/equipment-system.js)
+- [`CLASS_AND_EQUIPMENT_SYSTEM.md`](./CLASS_AND_EQUIPMENT_SYSTEM.md)
+- [`DESIGN_DECISIONS.md`](./DESIGN_DECISIONS.md)
+- Kurze Q&A: [`YOUR_QUESTIONS_ANSWERED.md`](./YOUR_QUESTIONS_ANSWERED.md)
+
+---
+
+## 📚 Dokumentation
+
+Die wichtigsten Design- und Technik-Dokumente im Überblick:
+
+- 📌 **Projektstatus & Roadmap:** [`STATUS.md`](./STATUS.md)
+- 📝 **Changelog:** [`CHANGELOG.md`](./CHANGELOG.md)
+- 🚀 **Quick Start (für Spieler):** [`QUICK_START.md`](./QUICK_START.md)
+- 🎯 **Difficulty-System (Design & Formeln):** [`DIFFICULTY_SYSTEM.md`](./DIFFICULTY_SYSTEM.md)
+- 🧪 **Difficulty Testing Guide:** [`DIFFICULTY_TESTING_GUIDE.md`](./DIFFICULTY_TESTING_GUIDE.md)
+- ⚔️ **Class & Equipment Design:** [`CLASS_AND_EQUIPMENT_SYSTEM.md`](./CLASS_AND_EQUIPMENT_SYSTEM.md)
+- 🧠 **Designentscheidungen:** [`DESIGN_DECISIONS.md`](./DESIGN_DECISIONS.md)
+- ❓ **Q&A zu deinen Fragen:** [`YOUR_QUESTIONS_ANSWERED.md`](./YOUR_QUESTIONS_ANSWERED.md)
+
+Damit dient die README als Einstiegspunkt, während die verlinkten Dateien jeweils tiefer ins Detail gehen.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Vanilla JavaScript (ES6+)
-- **Rendering**: HTML5 Canvas für Dungeon-Visualisierung
-- **Styling**: Pure CSS mit Custom Properties
-- **State Management**: LocalStorage Persistence
-- **Architecture**: Modulares ES6 Module Design
+- **Frontend:** Vanilla JavaScript (ES6+)
+- **Rendering:** HTML5 Canvas für Dungeon-Visualisierung
+- **Styling:** CSS mit Custom Properties
+- **State Management:** `gameState` + LocalStorage Persistence
+- **Architektur:** Modulares ES6-Module-Design
 
-## 📁 Projekt-Struktur
+Details zur aktuellen Struktur siehe [`STATUS.md`](./STATUS.md).
 
-```
+---
+
+## 📁 Projekt-Struktur (vereinfacht)
+
+```bash
 Dungeon-Idle-Game/
-├── index.html              # Haupt-HTML mit Tab-System
-├── styles.css             # Komplettes Styling
-├── main.js                # Entry Point
+├── index.html                # Haupt-HTML mit Tabs (Idle, Manual Run, Hero, Upgrades)
+├── styles.css                # Styling
+├── main.js                   # Entry Point
 ├── src/
 │   ├── core/
-│   │   ├── game-loop.js       # Haupt-Game-Loop
-│   │   └── game-state.js      # State Management & Save/Load
-│   └── idle/
-│       └── auto-run.js        # Auto-Run-System
-└── ui/
-    ├── ui-init.js         # UI Initialisierung
-    └── ui-render.js       # Rendering & Updates
+│   │   ├── game-state.js     # State Management & Save/Load
+│   │   └── ...
+│   ├── dungeons/
+│   │   └── dungeon-generator.js  # Dungeon & Difficulty-Logik
+│   └── upgrades/
+│       └── equipment-system.js   # Equipment & Klassen-Framework
+├── ui/
+│   ├── ui-init.js
+│   ├── ui-render.js
+│   ├── manual-run-ui.js          # Manual Run UI + Difficulty Selection
+│   └── ...
+├── QUICK_START.md
+├── DIFFICULTY_SYSTEM.md
+├── DIFFICULTY_TESTING_GUIDE.md
+├── CLASS_AND_EQUIPMENT_SYSTEM.md
+├── DESIGN_DECISIONS.md
+├── YOUR_QUESTIONS_ANSWERED.md
+├── STATUS.md
+└── CHANGELOG.md
 ```
+
+---
 
 ## 🎮 Spielen
 
-**Live Demo**: [dungeon.future-pulse.tech](https://dungeon.future-pulse.tech/)
+### Live Demo
+
+- **Idle Game Demo:** https://idle.future-pulse.tech
 
 ### Lokal ausführen
 
@@ -102,61 +162,52 @@ Dungeon-Idle-Game/
 git clone https://github.com/oliverlaudan-ops/Dungeon-Idle-Game.git
 cd Dungeon-Idle-Game
 
-# Mit lokalem Server starten
+# Mit lokalem Server starten (ein Beispiel)
 python -m http.server 8000
 # oder
 npx http-server
 
 # Im Browser öffnen
-open http://localhost:8000
+http://localhost:8000
 ```
-
-## 🎯 Game Design Prinzipien
-
-1. **Dual Gameplay**: Idle für Casual, Roguelike für Engagement
-2. **Fair Progression**: Keine Pay-to-Win, alles erspielbar
-3. **Strategic Depth**: Sinnvolle Entscheidungen bei Upgrades und Combat
-4. **Respekt für Zeit**: Offline-Progress und keine künstlichen Wartezeiten
-5. **Wiederspielbarkeit**: Procedural Generation und Meta-Progression
-
-## 👏 Aktueller Stand
-
-**Version**: 0.1.0-alpha  
-**Letzte Aktualisierung**: Januar 2026
-
-### Spielbare Features
-- ✅ Auto-Run-System aktivieren/deaktivieren
-- ✅ Ressourcen sammeln (Gold, Gems, Souls)
-- ✅ Hero levelt automatisch durch XP
-- ✅ Run-History mit Erfolgen/Fehlschlägen
-- ✅ Statistiken-Tracking
-- ✅ Auto-Save (alle 30 Sekunden)
-
-### Nächste Schritte
-1. Hero-Tab mit Stats-Visualisierung
-2. Upgrade-System implementieren
-3. Manual Run Grundgerüst
-
-## 👥 Contributing
-
-Das Projekt ist in aktiver Entwicklung. Beiträge, Ideen und Feedback sind willkommen!
-
-1. Forke das Repository
-2. Erstelle einen Feature-Branch
-3. Committe deine Änderungen
-4. Pushe zum Branch
-5. Öffne einen Pull Request
-
-## 📝 Lizenz
-
-MIT License - siehe LICENSE Datei
-
-## 💬 Kontakt
-
-Oliver Laudan - [@oliverlaudan-ops](https://github.com/oliverlaudan-ops)
-
-Projekt Link: [https://github.com/oliverlaudan-ops/Dungeon-Idle-Game](https://github.com/oliverlaudan-ops/Dungeon-Idle-Game)
 
 ---
 
-⚔️ Happy Dungeon Crawling! 🏰
+## 🎯 Game Design Prinzipien
+
+1. **Dual Gameplay**: Idle für entspanntes Progressen, Manual Runs für aktive Sessions
+2. **Fair Progression**: Keine Pay-to-Win-Mechaniken geplant, alles erspielbar
+3. **Strategic Depth**: Entscheidungen bei Dungeons, Difficulty, Upgrades und Equipment
+4. **Respect for Time**: Offline-Progress, sinnvolle Run-Dauer, kein künstliches Warten
+5. **Replayability**: Procedural Dungeons, Meta-Progression, verschiedene Builds
+
+---
+
+## 👏 Contributing
+
+Das Projekt ist in aktiver Entwicklung. Beiträge, Ideen und Feedback sind willkommen!
+
+1. Repository forken
+2. Feature-Branch erstellen
+3. Änderungen committen
+4. Branch pushen
+5. Pull Request eröffnen
+
+Bitte lies vorher kurz [`STATUS.md`](./STATUS.md) und [`CHANGELOG.md`](./CHANGELOG.md), um den aktuellen Stand zu verstehen.
+
+---
+
+## 📝 Lizenz
+
+MIT License – siehe [`LICENSE`](./LICENSE)
+
+---
+
+## 💬 Kontakt
+
+- **Autor:** Oliver Laudan – [@oliverlaudan-ops](https://github.com/oliverlaudan-ops)
+- **Repository:** https://github.com/oliverlaudan-ops/Dungeon-Idle-Game
+
+---
+
+⚔️ Happy Dungeon Crawling & Idle Farming! 🏰
