@@ -1,6 +1,6 @@
 # 🗺️ Dungeon Idle Game - Development Roadmap
 
-**Last Updated:** January 9, 2026 (16:58 CET)  
+**Last Updated:** January 12, 2026 (08:20 CET)  
 **Current Phase:** Phase 1 - Foundation & Quick Wins  
 **Current Sprint:** Sprint 2 - Skill Tree System  
 **Completed Sprints:** 1/9
@@ -22,16 +22,17 @@
 - [x] Auto-Run System
 - [x] Upgrades System
 - [x] Achievement System
-- [x] **Boss Special Abilities (4 types)**
-- [x] **Damage Numbers (floating text)**
-- [x] **Screen Shake effects**
-- [x] **Critical Hit Visual Effects**
+- [x] **Boss Special Abilities (4 types)** ✨
+- [x] **Damage Numbers (floating text)** ✨
+- [x] **Screen Shake effects** ✨
+- [x] **Critical Hit Visual Effects** ✨
 
 ### 🎯 Current Game State
-- Manual Dungeon Runs working perfectly
+- Manual Dungeon Runs working perfectly with visual effects
 - Equipment persists across sessions
 - Loot drops with balanced rates (Expert = 100% guaranteed)
-- Combat has visual feedback and boss mechanics ✨
+- Combat has full visual feedback and boss mechanics ✨
+- Boss AI with 4 unique abilities and telegraph system
 - Ready for skill tree implementation
 
 ---
@@ -48,31 +49,35 @@
 ### **Sprint 1: Combat Polish** ⚔️
 **Status:** ✅ **COMPLETE**  
 **Priority:** HIGH  
-**Completed:** January 9, 2026
+**Completed:** January 12, 2026
 
 **Completed Tasks:**
 - [x] Implement Boss Special Abilities
-  - [x] AOE Attack (damages in radius)
-  - [x] Heal ability (boss restores HP)
-  - [x] Rage mode (increased damage at low HP)
-  - [x] Shield ability (temporary damage reduction)
+  - [x] AOE Attack (150% damage)
+  - [x] Heal ability (boss restores 20% HP)
+  - [x] Rage mode (increased damage at low HP, up to 200%)
+  - [x] Shield ability (50% damage reduction for 2 turns)
 - [x] Add Damage Numbers (floating text on hit)
 - [x] Implement Screen Shake on hits
 - [x] Add Critical Hit Visual Effects
 - [x] Boss telegraph system (warning before special attack)
 
 **Implementation Details:**
-- `boss-abilities.js` - Complete boss AI system with 4 abilities
-- `combat-effects.js` - Floating damage numbers, screen shake, hit flashes
-- `canvas-renderer.js` - Integration with visual effects system
+- `src/manual/boss-abilities.js` - Complete boss AI system with 4 abilities
+- `src/manual/combat-effects.js` - Floating damage numbers, screen shake, hit flashes
+- `src/manual/dungeon-renderer.js` - Integration with visual effects system
+- `src/manual/combat-system.js` - Boss ability logic in combat
+- `src/manual/manual-run-controller.js` - Full integration with delta time animation
 - All effects are animated and fade smoothly
 - Crit effects have enhanced visuals (orange, larger, stronger shake)
+- Boss AI prioritizes abilities based on HP (heal at <40%, rage at <50%)
 
 **Success Criteria:** ✅ ALL MET
-- ✅ Bosses have 4 unique abilities
+- ✅ Bosses have 4 unique abilities with different effects
 - ✅ Combat feels more dynamic and engaging
-- ✅ Visual feedback for all damage/crits
-- ✅ Players can react to boss patterns
+- ✅ Visual feedback for all damage/crits/heals
+- ✅ Players can react to boss telegraph warnings
+- ✅ Shield visual indicator shows when boss is protected
 
 ---
 
@@ -415,19 +420,30 @@
 
 ## 🏆 Completed Sprints
 
-### ✅ Sprint 1: Combat Polish (Jan 9, 2026)
+### ✅ Sprint 1: Combat Polish (Jan 12, 2026)
 **What was added:**
-- Boss abilities system with 4 unique abilities
-- Telegraph system for boss attacks
-- Floating damage numbers with animations
-- Screen shake on hits (different intensity for crits)
-- Critical hit visual effects
-- Hit flash animations
+- Boss abilities system with 4 unique abilities (AOE, Heal, Rage, Shield)
+- Telegraph system for boss attacks (warnings before special moves)
+- Floating damage numbers with smooth animations
+- Screen shake on hits (3px normal, 8px for crits)
+- Critical hit visual effects (orange text, outline, larger scale)
+- Hit flash animations (white flash on damage)
+- Boss shield visual indicator (blue ring around boss)
+- Smart boss AI (prioritizes heal at <40% HP, rage at <50% HP)
+
+**Files Created/Modified:**
+- `src/manual/boss-abilities.js` - New file
+- `src/manual/combat-effects.js` - New file
+- `src/manual/combat-system.js` - Updated
+- `src/manual/dungeon-renderer.js` - Updated
+- `src/manual/manual-run-controller.js` - Updated
 
 **Impact:**
-- Combat feels dynamic and engaging
-- Visual feedback makes hits feel impactful
+- Combat feels dynamic and engaging with real-time feedback
+- Visual feedback makes hits feel impactful and satisfying
 - Boss fights are strategic, not just stat checks
+- Players can react to telegraphed abilities
+- Screen shake and damage numbers add "juice" to combat
 
 ---
 
