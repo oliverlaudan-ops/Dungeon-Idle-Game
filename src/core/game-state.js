@@ -23,7 +23,7 @@ export const gameState = {
         gold: 0,
         gems: 0,
         souls: 0,
-        dungeonKeys: 3
+        dungeonKeys: 0 // Now starts at 0 - keys are precious!
     },
 
     // Equipment & Inventory
@@ -39,6 +39,14 @@ export const gameState = {
     skillEffects: {}, // Calculated effects from skills
     bloodlustStacks: 0, // Temporary combat buff
     bloodlustTimer: null, // Timer reference
+
+    // Prestige System (Sprint 3)
+    prestigeLevel: 0, // Number of ascensions
+    prestigeUpgrades: {}, // { upgradeId: level }
+    prestigeStats: {
+        totalAscensions: 0,
+        keysSpent: 0
+    },
 
     // Idle system
     idle: {
@@ -79,7 +87,7 @@ export const gameState = {
     },
 
     // Meta
-    version: '2.4.1',
+    version: '2.5.0',
     lastSave: Date.now(),
     totalPlayTime: 0
 };
@@ -97,6 +105,8 @@ export function saveGame() {
         console.log(`📦 Inventory: ${gameState.inventory?.length || 0} items`);
         console.log(`⚔️ Equipped: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
         console.log(`🌳 Skills: ${Object.keys(gameState.skills || {}).length} learned`);
+        console.log(`🔑 Keys: ${gameState.resources.dungeonKeys}`);
+        console.log(`⭐ Prestige Level: ${gameState.prestigeLevel || 0}`);
         
         return true;
     } catch (e) {
@@ -141,6 +151,17 @@ export function loadGame() {
                 gameState.skillEffects = {};
             }
             
+            // Ensure prestige data exists (Sprint 3)
+            if (gameState.prestigeLevel === undefined) {
+                gameState.prestigeLevel = 0;
+            }
+            if (!gameState.prestigeUpgrades) {
+                gameState.prestigeUpgrades = {};
+            }
+            if (!gameState.prestigeStats) {
+                gameState.prestigeStats = { totalAscensions: 0, keysSpent: 0 };
+            }
+            
             // Reset temporary combat state
             gameState.bloodlustStacks = 0;
             gameState.bloodlustTimer = null;
@@ -155,6 +176,8 @@ export function loadGame() {
             console.log(`📦 Loaded inventory: ${gameState.inventory.length} items`);
             console.log(`⚔️ Loaded equipment: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
             console.log(`🌳 Loaded skills: ${Object.keys(gameState.skills).length} learned`);
+            console.log(`🔑 Keys: ${gameState.resources.dungeonKeys}`);
+            console.log(`⭐ Prestige Level: ${gameState.prestigeLevel}`);
             console.log('♻️ Manual run state reset');
             
             return true;
