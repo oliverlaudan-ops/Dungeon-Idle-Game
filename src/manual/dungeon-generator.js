@@ -4,8 +4,9 @@
  */
 
 export class DungeonGenerator {
-    constructor(difficulty = 'NORMAL') {
+    constructor(difficulty = 'NORMAL', floorLevel = 1) {
         this.difficulty = difficulty;
+        this.floorLevel = floorLevel;
         this.config = this.getDifficultyConfig(difficulty);
     }
 
@@ -19,6 +20,23 @@ export class DungeonGenerator {
         return configs[difficulty] || configs.NORMAL;
     }
 
+    /**
+     * Calculate floor scaling multiplier
+     * Scales monster difficulty exponentially with floor level
+     */
+    getFloorScaling() {
+        // Floor 1: 1.0x, Floor 5: 1.75x, Floor 10: 3.5x, Floor 20: 12x
+        const hpScaling = Math.pow(1.15, this.floorLevel - 1);
+        const attackScaling = Math.pow(1.12, this.floorLevel - 1);
+        
+        return {
+            hp: hpScaling,
+            attack: attackScaling,
+            xp: 1 + (this.floorLevel - 1) * 0.2, // Linear XP scaling
+            gold: 1 + (this.floorLevel - 1) * 0.25 // Linear gold scaling
+        };
+    }
+
     generate() {
         const [minRooms, maxRooms] = this.config.rooms;
         const roomCount = Math.floor(Math.random() * (maxRooms - minRooms + 1)) + minRooms;
@@ -27,7 +45,8 @@ export class DungeonGenerator {
             rooms: [],
             currentRoom: 0,
             totalRooms: roomCount,
-            difficulty: this.difficulty
+            difficulty: this.difficulty,
+            floorLevel: this.floorLevel
         };
 
         // Generate rooms
@@ -85,15 +104,26 @@ export class DungeonGenerator {
         };
 
         const template = templates[type];
-        const multiplier = this.config.monsters * (isBoss ? 4 : 1);
+        const floorScaling = this.getFloorScaling();
+        
+        // Boss multiplier increased from 4x to 5x for more challenge
+        const bossMultiplier = isBoss ? 5.0 : 1.0;
+        const difficultyMultiplier = this.config.monsters;
+        
+        // Apply all multipliers
+        const finalHp = Math.floor(template.hp * difficultyMultiplier * bossMultiplier * floorScaling.hp);
+        const finalAttack = Math.floor(template.attack * difficultyMultiplier * bossMultiplier * floorScaling.attack);
+        const finalXp = Math.floor(template.xp * bossMultiplier * floorScaling.xp);
+        const finalGold = Math.floor(template.gold * bossMultiplier * floorScaling.gold);
 
         return {
             ...template,
-            hp: Math.floor(template.hp * multiplier),
-            maxHp: Math.floor(template.hp * multiplier),
-            attack: Math.floor(template.attack * multiplier),
-            xp: Math.floor(template.xp * multiplier),
-            gold: Math.floor(template.gold * multiplier),
+            name: isBoss ? `${template.name} Boss` : template.name,
+            hp: finalHp,
+            maxHp: finalHp,
+            attack: finalAttack,
+            xp: finalXp,
+            gold: finalGold,
             x: Math.floor(Math.random() * 13) + 1,
             y: Math.floor(Math.random() * 6) + 1,
             isBoss,
