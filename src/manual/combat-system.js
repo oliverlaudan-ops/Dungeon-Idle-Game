@@ -4,6 +4,14 @@
  */
 
 import { gameState } from '../core/game-state.js';
+import { 
+    shouldUseBossAbility, 
+    selectBossAbility, 
+    telegraphBossAbility,
+    executeBossAbility,
+    processBossTurn,
+    calculateDamageToBoss
+} from './boss-abilities.js';
 
 export class CombatSystem {
     constructor() {
@@ -31,12 +39,18 @@ export class CombatSystem {
             damage = Math.floor(damage * hero.critMultiplier);
         }
 
+        // Apply boss shield if active
+        if (monster.isBoss && monster.shielded) {
+            damage = calculateDamageToBoss(monster, damage);
+        }
+
         monster.hp -= damage;
 
         const result = {
             damage,
             isCrit,
-            killed: monster.hp <= 0
+            killed: monster.hp <= 0,
+            shieldBlocked: monster.isBoss && monster.shielded
         };
 
         if (result.killed) {
@@ -51,6 +65,60 @@ export class CombatSystem {
 
     monsterAttack(monster) {
         const hero = gameState.hero;
+        
+        // Check if boss should use special ability
+        if (monster.isBoss && monster.telegraphing) {
+            // Execute telegraphed ability
+            const abilityResult = executeBossAbility(monster, hero);
+            if (abilityResult) {
+                if (abilityResult.damage > 0) {
+                    const actualDamage = Math.max(1, abilityResult.damage - hero.defense);
+                    hero.hp -= actualDamage;
+                    
+                    return {
+                        damage: actualDamage,
+                        killed: hero.hp <= 0,
+                        isCrit: abilityResult.isCrit,
+                        isAbility: true,
+                        abilityMessage: abilityResult.message
+                    };
+                } else if (abilityResult.heal) {
+                    // Boss healed
+                    return {
+                        damage: 0,
+                        killed: false,
+                        heal: abilityResult.heal,
+                        isAbility: true,
+                        abilityMessage: abilityResult.message
+                    };
+                } else if (abilityResult.shield) {
+                    // Boss activated shield
+                    return {
+                        damage: 0,
+                        killed: false,
+                        shield: true,
+                        isAbility: true,
+                        abilityMessage: abilityResult.message
+                    };
+                }
+            }
+        } else if (monster.isBoss && shouldUseBossAbility(monster)) {
+            // Telegraph new ability
+            const abilityKey = selectBossAbility(monster);
+            if (abilityKey) {
+                const telegraph = telegraphBossAbility(monster, abilityKey);
+                if (telegraph) {
+                    return {
+                        damage: 0,
+                        killed: false,
+                        telegraph: true,
+                        telegraphMessage: telegraph.message
+                    };
+                }
+            }
+        }
+        
+        // Normal attack
         const baseDamage = monster.attack;
         const damage = Math.max(1, baseDamage - hero.defense);
 
@@ -60,6 +128,13 @@ export class CombatSystem {
             damage,
             killed: hero.hp <= 0
         };
+    }
+    
+    processBossTurn(monster) {
+        if (monster.isBoss) {
+            return processBossTurn(monster);
+        }
+        return null;
     }
 
     checkLevelUp() {
