@@ -23,11 +23,22 @@ export class DungeonGenerator {
     /**
      * Calculate floor scaling multiplier
      * Scales monster difficulty exponentially with floor level
+     * 
+     * UPDATED v2.4.1: Increased scaling to compensate for skill tree power
+     * 
+     * Comparison (HP):
+     * Floor 1:  1.0x (same)
+     * Floor 5:  2.1x (was 1.75x)
+     * Floor 10: 6.2x (was 3.5x)
+     * Floor 15: 15.4x (was 8.1x)
+     * Floor 20: 38.3x (was 18.7x)
      */
     getFloorScaling() {
-        // Floor 1: 1.0x, Floor 5: 1.75x, Floor 10: 3.5x, Floor 20: 12x
-        const hpScaling = Math.pow(1.15, this.floorLevel - 1);
-        const attackScaling = Math.pow(1.12, this.floorLevel - 1);
+        // Increased from 1.15 to 1.20 for stronger HP scaling
+        const hpScaling = Math.pow(1.20, this.floorLevel - 1);
+        
+        // Increased from 1.12 to 1.18 for stronger attack scaling
+        const attackScaling = Math.pow(1.18, this.floorLevel - 1);
         
         return {
             hp: hpScaling,
@@ -106,8 +117,8 @@ export class DungeonGenerator {
         const template = templates[type];
         const floorScaling = this.getFloorScaling();
         
-        // Boss multiplier increased from 4x to 5x for more challenge
-        const bossMultiplier = isBoss ? 5.0 : 1.0;
+        // Boss multiplier increased from 5x to 6x for more challenge
+        const bossMultiplier = isBoss ? 6.0 : 1.0;
         const difficultyMultiplier = this.config.monsters;
         
         // Apply all multipliers
