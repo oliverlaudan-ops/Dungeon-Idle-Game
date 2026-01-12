@@ -34,6 +34,12 @@ export const gameState = {
         accessory: null
     },
 
+    // Skills (Sprint 2)
+    skills: {}, // { skillId: rank }
+    skillEffects: {}, // Calculated effects from skills
+    bloodlustStacks: 0, // Temporary combat buff
+    bloodlustTimer: null, // Timer reference
+
     // Idle system
     idle: {
         autoRunEnabled: false,
@@ -73,7 +79,7 @@ export const gameState = {
     },
 
     // Meta
-    version: '2.2.0',
+    version: '2.4.0',
     lastSave: Date.now(),
     totalPlayTime: 0
 };
@@ -90,6 +96,7 @@ export function saveGame() {
         console.log('💾 Game saved');
         console.log(`📦 Inventory: ${gameState.inventory?.length || 0} items`);
         console.log(`⚔️ Equipped: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
+        console.log(`🌳 Skills: ${Object.keys(gameState.skills || {}).length} learned`);
         
         return true;
     } catch (e) {
@@ -126,6 +133,18 @@ export function loadGame() {
                 gameState.equipped = { weapon: null, armor: null, accessory: null };
             }
             
+            // Ensure skills exist (Sprint 2)
+            if (!gameState.skills) {
+                gameState.skills = {};
+            }
+            if (!gameState.skillEffects) {
+                gameState.skillEffects = {};
+            }
+            
+            // Reset temporary combat state
+            gameState.bloodlustStacks = 0;
+            gameState.bloodlustTimer = null;
+            
             // Always reset manual run state on load (runs don't persist across page reloads)
             gameState.manualRun.active = false;
             gameState.manualRun.currentFloor = 0;
@@ -135,6 +154,7 @@ export function loadGame() {
             console.log('💾 Game loaded');
             console.log(`📦 Loaded inventory: ${gameState.inventory.length} items`);
             console.log(`⚔️ Loaded equipment: Weapon=${gameState.equipped?.weapon?.name || 'None'}, Armor=${gameState.equipped?.armor?.name || 'None'}`);
+            console.log(`🌳 Loaded skills: ${Object.keys(gameState.skills).length} learned`);
             console.log('♻️ Manual run state reset');
             
             return true;
