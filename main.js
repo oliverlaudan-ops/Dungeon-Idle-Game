@@ -82,9 +82,10 @@ function gameLoop() {
 // Start game loop
 gameLoop();
 
-console.log('🎮 Dungeon Idle Game v2.4.0 started!');
+console.log('🎮 Dungeon Idle Game v2.4.1 started!');
 console.log('💾 Game State:', gameState);
 console.log('✅ Manual Run System: Ready');
 console.log('🎒 Equipment System: Ready');
 console.log('🌳 Skill Tree System: Ready');
+console.log('⚖️ Monster Difficulty: Rebalanced for endgame');
 console.log('🎮 Use Arrow Keys or WASD to move in manual runs');
