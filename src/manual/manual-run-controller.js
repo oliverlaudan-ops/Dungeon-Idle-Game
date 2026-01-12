@@ -8,6 +8,14 @@ import { DungeonGenerator } from './dungeon-generator.js';
 import { DungeonRenderer } from './dungeon-renderer.js';
 import { CombatSystem } from './combat-system.js';
 import { generateLootDrops, addLootToInventory } from '../upgrades/loot-system.js';
+import { 
+    updateEffects, 
+    clearAllEffects, 
+    triggerCritEffect, 
+    triggerHitEffect,
+    triggerHealEffect 
+} from './combat-effects.js';
+import { initBossAI } from './boss-abilities.js';
 
 export class ManualRunController {
     constructor(canvas) {
@@ -19,6 +27,7 @@ export class ManualRunController {
         this.isRunning = false;
         this.keys = {};
         this.animationId = null;
+        this.lastFrameTime = 0;
 
         this.setupControls();
     }
@@ -43,32 +52,52 @@ export class ManualRunController {
 
         this.difficulty = difficulty;
         this.isRunning = true;
+        this.lastFrameTime = performance.now();
 
         // Generate dungeon
         const generator = new DungeonGenerator(difficulty);
         this.dungeon = generator.generate();
+        
+        // Initialize boss AI for all boss monsters
+        this.dungeon.rooms.forEach(room => {
+            room.monsters.forEach(monster => {
+                if (monster.isBoss) {
+                    initBossAI(monster);
+                }
+            });
+        });
 
-        // Reset hero position
+        // Reset hero position and HP
         gameState.hero.x = 1;
         gameState.hero.y = 1;
+        gameState.hero.hp = gameState.hero.maxHp;
+        
+        // Clear any previous effects
+        clearAllEffects();
 
         // Start game loop
-        this.gameLoop();
+        this.lastFrameTime = performance.now();
+        this.gameLoop(this.lastFrameTime);
 
         console.log(`🎮 Manual Run started (${difficulty})`);
     }
 
-    gameLoop() {
+    gameLoop(timestamp) {
         if (!this.isRunning) return;
+
+        // Calculate delta time
+        const deltaTime = timestamp - this.lastFrameTime;
+        this.lastFrameTime = timestamp;
 
         // Update
         this.handleMovement();
+        updateEffects(deltaTime);
 
         // Render
         this.renderer.render(this.dungeon, gameState.hero);
 
         // Continue loop
-        this.animationId = requestAnimationFrame(() => this.gameLoop());
+        this.animationId = requestAnimationFrame((ts) => this.gameLoop(ts));
     }
 
     handleMovement() {
@@ -130,6 +159,20 @@ export class ManualRunController {
         const heroResult = this.combat.heroAttack(monster);
         if (!heroResult) return; // Cooldown
 
+        // Get monster screen position for effects
+        const monsterPos = this.renderer.getEntityScreenPosition(monster.x, monster.y);
+        
+        // Trigger visual effects
+        if (heroResult.isCrit) {
+            triggerCritEffect(monsterPos.x, monsterPos.y, heroResult.damage);
+        } else {
+            triggerHitEffect(monsterPos.x, monsterPos.y, heroResult.damage);
+        }
+        
+        if (heroResult.shieldBlocked) {
+            console.log(`👥 Shield blocked some damage!`);
+        }
+
         console.log(`⚔️ Hero attacks ${monster.name} for ${heroResult.damage} damage${heroResult.isCrit ? ' (CRIT!)' : ''}`);
 
         if (heroResult.killed) {
@@ -141,7 +184,40 @@ export class ManualRunController {
         setTimeout(() => {
             if (monster.alive) {
                 const monsterResult = this.combat.monsterAttack(monster);
-                console.log(`👹 ${monster.name} attacks for ${monsterResult.damage} damage`);
+                
+                // Get hero screen position for effects
+                const heroPos = this.renderer.getEntityScreenPosition(gameState.hero.x, gameState.hero.y);
+                
+                // Handle different result types
+                if (monsterResult.telegraph) {
+                    // Boss is telegraphing an ability
+                    console.log(`⚠️ ${monsterResult.telegraphMessage}`);
+                } else if (monsterResult.isAbility) {
+                    // Boss used an ability
+                    console.log(monsterResult.abilityMessage);
+                    
+                    if (monsterResult.heal) {
+                        triggerHealEffect(monsterPos.x, monsterPos.y, monsterResult.heal);
+                    } else if (monsterResult.damage > 0) {
+                        if (monsterResult.isCrit) {
+                            triggerCritEffect(heroPos.x, heroPos.y, monsterResult.damage);
+                        } else {
+                            triggerHitEffect(heroPos.x, heroPos.y, monsterResult.damage);
+                        }
+                    }
+                } else if (monsterResult.damage > 0) {
+                    // Normal attack
+                    triggerHitEffect(heroPos.x, heroPos.y, monsterResult.damage);
+                    console.log(`👹 ${monster.name} attacks for ${monsterResult.damage} damage`);
+                }
+                
+                // Process boss turn (cooldowns, shield, etc.)
+                if (monster.isBoss) {
+                    const turnResult = this.combat.processBossTurn(monster);
+                    if (turnResult && turnResult.message) {
+                        console.log(turnResult.message);
+                    }
+                }
 
                 if (monsterResult.killed) {
                     this.endRun(false); // Hero died
@@ -181,6 +257,7 @@ export class ManualRunController {
     endRun(success) {
         this.isRunning = false;
         cancelAnimationFrame(this.animationId);
+        clearAllEffects();
 
         if (success) {
             console.log('✅ Dungeon Complete!');
@@ -261,5 +338,6 @@ export class ManualRunController {
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
         }
+        clearAllEffects();
     }
 }
