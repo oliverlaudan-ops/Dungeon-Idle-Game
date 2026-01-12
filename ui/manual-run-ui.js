@@ -5,7 +5,6 @@
 
 import { gameState } from '../src/core/game-state.js';
 import { ManualRunController } from '../src/manual/manual-run-controller.js';
-import { getHeroClass } from '../src/upgrades/equipment-system.js';
 
 let selectedDifficulty = 'NORMAL';
 let runController = null;
@@ -50,7 +49,6 @@ export function initManualRunUI() {
                         <span class="slot-icon">🗡️</span>
                         <div class="slot-info">
                             <div class="slot-name" id="weapon-name">No Weapon</div>
-                            <div class="slot-class" id="weapon-class">Class: Warrior</div>
                         </div>
                     </div>
                     <div class="equipment-slot">
@@ -129,16 +127,8 @@ function updateEquipmentPreview() {
 
     // Update weapon
     const weaponNameEl = document.getElementById('weapon-name');
-    const weaponClassEl = document.getElementById('weapon-class');
-    if (weaponNameEl && weaponClassEl) {
-        if (weapon) {
-            weaponNameEl.textContent = weapon.name;
-            const classInfo = getHeroClass();
-            weaponClassEl.textContent = `Class: ${classInfo?.name || 'Warrior'}`;
-        } else {
-            weaponNameEl.textContent = 'No Weapon';
-            weaponClassEl.textContent = 'Class: Warrior';
-        }
+    if (weaponNameEl) {
+        weaponNameEl.textContent = weapon ? weapon.name : 'No Weapon';
     }
 
     // Update armor
