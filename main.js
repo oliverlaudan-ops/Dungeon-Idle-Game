@@ -13,12 +13,16 @@ import { showAchievementNotification } from './ui/achievements-ui.js';
 import { initializeInventoryUI } from './ui/inventory-ui.js';
 import { initSkillTreeUI, refreshSkillTreeUI } from './src/ui/skill-tree-ui.js';
 import { applySkillBonuses } from './src/skills/skill-effects.js';
+import { getPrestigeBonuses } from './src/prestige/prestige-system.js';
 
 // Load game on start
 loadGame();
 
 // Apply skill bonuses from loaded save
 applySkillBonuses();
+
+// Apply prestige bonuses to hero stats (Sprint 3)
+applyPrestigeBonuses();
 
 // Initialize UI
 initUI();
@@ -33,6 +37,35 @@ initSkillTreeUI();
 let lastPlayTimeUpdate = Date.now();
 let lastAchievementCheck = Date.now();
 let previousLevel = gameState.hero.level;
+
+/**
+ * Apply prestige bonuses to hero stats
+ */
+function applyPrestigeBonuses() {
+    const bonuses = getPrestigeBonuses();
+    
+    if (Object.keys(bonuses).length === 0) {
+        console.log('🔑 No prestige bonuses yet');
+        return;
+    }
+    
+    // Apply stat bonuses
+    if (bonuses.maxHpBonus) {
+        gameState.hero.maxHp += bonuses.maxHpBonus;
+        gameState.hero.hp = gameState.hero.maxHp; // Full heal on load
+    }
+    if (bonuses.attackBonus) {
+        gameState.hero.attack += bonuses.attackBonus;
+    }
+    if (bonuses.defenseBonus) {
+        gameState.hero.defense += bonuses.defenseBonus;
+    }
+    if (bonuses.critChanceBonus) {
+        gameState.hero.critChance += bonuses.critChanceBonus;
+    }
+    
+    console.log('✨ Prestige bonuses applied:', bonuses);
+}
 
 // Main game loop
 function gameLoop() {
@@ -82,10 +115,11 @@ function gameLoop() {
 // Start game loop
 gameLoop();
 
-console.log('🎮 Dungeon Idle Game v2.4.1 started!');
+console.log('🎮 Dungeon Idle Game v2.5.0 started!');
 console.log('💾 Game State:', gameState);
 console.log('✅ Manual Run System: Ready');
 console.log('🎒 Equipment System: Ready');
 console.log('🌳 Skill Tree System: Ready');
+console.log('⭐ Prestige System: Ready (Keys as currency)');
 console.log('⚖️ Monster Difficulty: Rebalanced for endgame');
 console.log('🎮 Use Arrow Keys or WASD to move in manual runs');

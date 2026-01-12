@@ -8,6 +8,7 @@ import { updateUI } from './ui-render.js';
 import { renderUpgrades } from './upgrades-ui.js';
 import { renderAchievements } from './achievements-ui.js';
 import { initManualRunUI, updateManualRunUI } from './manual-run-ui.js';
+import { initPrestigeUI, renderPrestigeUI } from '../src/ui/prestige-ui.js';
 import { applyUpgradeEffects } from '../src/upgrades/upgrade-manager.js';
 import { exportSave, importSave, resetGame, formatTimestamp, formatPlayTime } from '../src/core/save-manager.js';
 
@@ -31,6 +32,10 @@ export function initUI() {
 
     // Render achievements
     renderAchievements();
+
+    // Initialize prestige UI (Sprint 3)
+    initPrestigeUI();
+    renderPrestigeUI();
 
     // Initialize manual run UI
     initManualRunUI();
@@ -74,6 +79,11 @@ function setupTabs() {
             // Refresh achievements when switching to achievements tab
             if (targetTab === 'achievements') {
                 renderAchievements();
+            }
+
+            // Refresh prestige when switching to prestige tab (Sprint 3)
+            if (targetTab === 'prestige') {
+                renderPrestigeUI();
             }
 
             // Initialize manual run when switching to manual tab
