@@ -10,12 +10,13 @@
     <link rel="stylesheet" href="loot-styles.css">
     <link rel="stylesheet" href="inventory-styles.css">
     <link rel="stylesheet" href="skill-tree-styles.css">
+    <link rel="stylesheet" href="prestige-styles.css">
 </head>
 <body>
     <div id="game-container">
         <header>
             <h1>🏰 Dungeon Idle Game</h1>
-            <div id="version">v2.4.1</div>
+            <div id="version">v2.5.0</div>
         </header>
 
         <!-- Tab Navigation -->
@@ -24,6 +25,7 @@
             <button class="tab-btn" data-tab="manual">Manual Run</button>
             <button class="tab-btn" data-tab="hero">Hero</button>
             <button class="tab-btn" data-tab="skills">🌳 Skills</button>
+            <button class="tab-btn" data-tab="prestige">⭐ Prestige</button>
             <button class="tab-btn" data-tab="equipment">Equipment</button>
             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
             <button class="tab-btn" data-tab="achievements">Achievements</button>
@@ -61,11 +63,11 @@
                                 <span class="resource-value" id="souls-value">0</span>
                             </div>
                         </div>
-                        <div class="resource-item">
-                            <span class="resource-icon">🗝️</span>
+                        <div class="resource-item highlight-keys">
+                            <span class="resource-icon">🔑</span>
                             <div class="resource-info">
                                 <span class="resource-name">Keys</span>
-                                <span class="resource-value" id="keys-value">3</span>
+                                <span class="resource-value" id="keys-value">0</span>
                             </div>
                         </div>
                     </div>
@@ -239,7 +241,7 @@
                 </div>
             </div>
 
-            <!-- Skills Tab (NEW) -->
+            <!-- Skills Tab -->
             <div id="skills-tab" class="tab-panel">
                 <h2>🌳 Skill Trees</h2>
                 
@@ -282,6 +284,51 @@
                 </div>
             </div>
 
+            <!-- PRESTIGE TAB (NEW) -->
+            <div id="prestige-tab" class="tab-panel">
+                <h2>⭐ Prestige System</h2>
+                
+                <!-- Prestige Header -->
+                <div id="prestige-header" class="prestige-header">
+                    <!-- Filled by prestige-ui.js -->
+                </div>
+
+                <!-- Ascension Panel -->
+                <div id="ascension-panel" class="ascension-section">
+                    <!-- Filled by prestige-ui.js -->
+                </div>
+
+                <!-- Prestige Upgrades -->
+                <div class="prestige-upgrades-section">
+                    <h3 class="category-title">❤️ Stat Upgrades</h3>
+                    <div class="prestige-upgrades-grid" id="stats-upgrades">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="prestige-upgrades-section">
+                    <h3 class="category-title">💰 Resource Upgrades</h3>
+                    <div class="prestige-upgrades-grid" id="resources-upgrades">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="prestige-upgrades-section">
+                    <h3 class="category-title">✨ Convenience Upgrades</h3>
+                    <div class="prestige-upgrades-grid" id="convenience-upgrades">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Active Bonuses -->
+                <div class="active-bonuses-section">
+                    <h3>✨ Active Prestige Bonuses</h3>
+                    <div id="active-bonuses">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Equipment Tab -->
             <div id="equipment-tab" class="tab-panel">
                 <h2>🎽 Equipment & Inventory</h2>
@@ -313,8 +360,8 @@
                         <span class="upgrade-resource-value" id="upgrade-souls">0</span>
                     </div>
                     <div class="upgrade-resource-item">
-                        <span class="upgrade-resource-icon">🗝️</span>
-                        <span class="upgrade-resource-value" id="upgrade-keys">3</span>
+                        <span class="upgrade-resource-icon">🔑</span>
+                        <span class="upgrade-resource-value" id="upgrade-keys">0</span>
                     </div>
                 </div>
 
@@ -420,7 +467,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">2.4.1</span>
+                            <span class="info-value">2.5.0</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Last Save:</span>
