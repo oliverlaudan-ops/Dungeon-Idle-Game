@@ -79,7 +79,7 @@ export const gameState = {
     },
 
     // Meta
-    version: '2.4.0',
+    version: '2.4.1',
     lastSave: Date.now(),
     totalPlayTime: 0
 };
