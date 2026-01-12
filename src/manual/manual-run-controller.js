@@ -24,6 +24,7 @@ export class ManualRunController {
         this.combat = new CombatSystem();
         this.dungeon = null;
         this.difficulty = 'NORMAL';
+        this.floorLevel = 1;
         this.isRunning = false;
         this.keys = {};
         this.animationId = null;
@@ -54,8 +55,12 @@ export class ManualRunController {
         this.isRunning = true;
         this.lastFrameTime = performance.now();
 
-        // Generate dungeon
-        const generator = new DungeonGenerator(difficulty);
+        // Determine floor level based on progression
+        // Use deepestFloor + 1 (since we're attempting the next floor)
+        this.floorLevel = (gameState.stats.deepestFloor || 0) + 1;
+
+        // Generate dungeon with floor scaling
+        const generator = new DungeonGenerator(difficulty, this.floorLevel);
         this.dungeon = generator.generate();
         
         // Initialize boss AI for all boss monsters
@@ -79,7 +84,7 @@ export class ManualRunController {
         this.lastFrameTime = performance.now();
         this.gameLoop(this.lastFrameTime);
 
-        console.log(`🎮 Manual Run started (${difficulty})`);
+        console.log(`🎮 Manual Run started (${difficulty}, Floor ${this.floorLevel})`);
     }
 
     gameLoop(timestamp) {
@@ -228,7 +233,7 @@ export class ManualRunController {
 
     collectTreasure(room) {
         room.treasure.collected = true;
-        const goldReward = Math.floor(50 * this.getRewardMultiplier());
+        const goldReward = Math.floor(50 * this.getRewardMultiplier() * (1 + (this.floorLevel - 1) * 0.1));
         gameState.resources.gold += goldReward;
         console.log(`💰 Treasure collected! +${goldReward} Gold`);
     }
@@ -262,23 +267,31 @@ export class ManualRunController {
         if (success) {
             console.log('✅ Dungeon Complete!');
             
+            // Update deepest floor reached
+            if (this.floorLevel > (gameState.stats.deepestFloor || 0)) {
+                gameState.stats.deepestFloor = this.floorLevel;
+                console.log(`🏆 New record! Reached Floor ${this.floorLevel}`);
+            }
+            
             // Generate loot
             const loot = generateLootDrops(this.difficulty, true);
             addLootToInventory(loot);
 
-            // Bonus rewards
-            const xpBonus = Math.floor(100 * this.getRewardMultiplier());
-            const goldBonus = Math.floor(200 * this.getRewardMultiplier());
+            // Bonus rewards scale with floor
+            const xpBonus = Math.floor(100 * this.getRewardMultiplier() * (1 + (this.floorLevel - 1) * 0.15));
+            const goldBonus = Math.floor(200 * this.getRewardMultiplier() * (1 + (this.floorLevel - 1) * 0.2));
             gameState.hero.xp += xpBonus;
             gameState.resources.gold += goldBonus;
+            gameState.stats.totalRunsCompleted++;
 
             // Update inventory UI
             this.refreshInventoryUI();
 
-            alert(`🎉 Victory!\n\n+${xpBonus} XP\n+${goldBonus} Gold\n${loot.length > 0 ? `\n🎁 ${loot.length} items looted!` : ''}`);
+            alert(`🎉 Victory! (Floor ${this.floorLevel})\n\n+${xpBonus} XP\n+${goldBonus} Gold${loot.length > 0 ? `\n\n🎁 ${loot.length} items looted!` : ''}`);
         } else {
             console.log('❌ Hero defeated!');
-            alert('☠️ Defeat\n\nYou were defeated in the dungeon...');
+            gameState.stats.totalDeaths++;
+            alert(`☠️ Defeat (Floor ${this.floorLevel})\n\nYou were defeated in the dungeon...`);
         }
 
         saveGame();
