@@ -1,9 +1,7 @@
 /**
- * Equipment System v2.1
+ * Equipment System v2.2
  * Handles weapons, armor, and gear with stat bonuses
- * UPDATED: Weapons have classes that modify combat behavior
- * UPDATED: Equipment affects both manual and auto-runs
- * UPDATED: Equipment operations now save game state
+ * Simplified: Removed class system (marked for future proper implementation)
  */
 
 import { gameState, saveGame } from '../core/game-state.js';
@@ -17,53 +15,12 @@ const RARITY_TIERS = {
     legendary: { color: '#f39c12', multiplier: 2.0, dropChance: 0.01 }
 };
 
-// Weapon classes - define combat style
-const WEAPON_CLASSES = {
-    WARRIOR: {
-        name: 'Warrior',
-        description: 'Balanced damage and defense',
-        damageMultiplier: 1.0,
-        defenseBenefit: 2,
-        critBonus: 0.0
-    },
-    RANGER: {
-        name: 'Ranger',
-        description: 'High critical strikes with reduced damage',
-        damageMultiplier: 0.8,
-        defenseBenefit: 0,
-        critBonus: 0.15
-    },
-    BERSERKER: {
-        name: 'Berserker',
-        description: 'Extreme damage but reduced defense',
-        damageMultiplier: 1.5,
-        defenseBenefit: -1,
-        critBonus: 0.0
-    },
-    MAGE: {
-        name: 'Mage',
-        description: 'Utility damage with extra survivability',
-        damageMultiplier: 0.9,
-        defenseBenefit: 0,
-        critBonus: 0.10,
-        hpBonus: 10
-    },
-    ROGUE: {
-        name: 'Rogue',
-        description: 'High crit chance but fragile',
-        damageMultiplier: 1.2,
-        defenseBenefit: -1,
-        critBonus: 0.25
-    }
-};
-
-// Weapon templates with class assignment
+// Weapon templates (simplified - no classes)
 const WEAPONS = {
     'iron-sword': {
         name: 'Iron Sword',
         type: 'weapon',
         icon: '⚔️',
-        class: 'WARRIOR',
         baseATK: 5,
         baseCrit: 0.0,
         description: 'Basic iron sword for beginners'
@@ -72,7 +29,6 @@ const WEAPONS = {
         name: 'Steel Sword',
         type: 'weapon',
         icon: '⚔️',
-        class: 'WARRIOR',
         baseATK: 10,
         baseCrit: 0.05,
         description: 'Sturdy steel blade'
@@ -81,7 +37,6 @@ const WEAPONS = {
         name: 'Elven Bow',
         type: 'weapon',
         icon: '🏹',
-        class: 'RANGER',
         baseATK: 8,
         baseCrit: 0.15,
         description: 'High crit chance ranged weapon'
@@ -90,7 +45,6 @@ const WEAPONS = {
         name: 'Warhammer',
         type: 'weapon',
         icon: '🔨',
-        class: 'BERSERKER',
         baseATK: 15,
         baseCrit: 0.0,
         description: 'Heavy hitting two-hander'
@@ -99,7 +53,6 @@ const WEAPONS = {
         name: 'Enchanted Blade',
         type: 'weapon',
         icon: '✨⚔️',
-        class: 'MAGE',
         baseATK: 12,
         baseCrit: 0.10,
         description: 'Magically enhanced sword'
@@ -108,7 +61,6 @@ const WEAPONS = {
         name: "Assassin's Dagger",
         type: 'weapon',
         icon: '🔪',
-        class: 'ROGUE',
         baseATK: 10,
         baseCrit: 0.25,
         description: 'Silent and deadly'
@@ -218,8 +170,6 @@ export function createEquipment(templateId, rarity = 'common') {
     if (template.type === 'weapon') {
         equipment.atk = Math.floor(template.baseATK * mult);
         equipment.crit = template.baseCrit;
-        equipment.class = template.class;  // NEW: Weapon class
-        equipment.classInfo = WEAPON_CLASSES[template.class];  // NEW: Class details
     } else if (template.type === 'armor') {
         equipment.def = Math.floor(template.baseDEF * mult);
         equipment.hp = Math.floor(template.baseHP * mult);
@@ -289,7 +239,7 @@ export function unequipItem(equipmentId) {
 }
 
 /**
- * Recalculate hero stats based on equipped items
+ * Recalculate hero stats based on equipped items (simplified - no classes)
  */
 function recalculateStats() {
     if (!gameState.equipped) return;
@@ -303,16 +253,12 @@ function recalculateStats() {
     let totalDEF = baseDEF;
     let totalHP = baseHP;
     let totalCrit = 0.05; // Base crit
-    let weaponClass = null;
-    let classInfo = null;
 
-    // Apply equipment bonuses
+    // Apply equipment bonuses (direct stats only)
     if (gameState.equipped.weapon) {
         const weapon = gameState.equipped.weapon;
         totalATK += weapon.atk || 0;
         totalCrit += weapon.crit || 0;
-        weaponClass = weapon.class;
-        classInfo = WEAPON_CLASSES[weaponClass];
     }
     
     if (gameState.equipped.armor) {
@@ -328,54 +274,23 @@ function recalculateStats() {
         totalHP += acc.bonusHP || 0;
     }
 
-    // Apply class modifiers (NEW!)
-    if (classInfo) {
-        // Apply damage multiplier
-        totalATK = Math.floor(totalATK * classInfo.damageMultiplier);
-        
-        // Apply defense benefit
-        totalDEF += classInfo.defenseBenefit;
-        
-        // Apply crit bonus
-        totalCrit += classInfo.critBonus;
-        
-        // Apply any extra HP bonus
-        if (classInfo.hpBonus) {
-            totalHP += classInfo.hpBonus;
-        }
-    }
-
     // Update hero stats
     gameState.hero.attack = totalATK;
-    gameState.hero.defense = Math.max(0, totalDEF);  // Defense can't be negative
+    gameState.hero.defense = Math.max(0, totalDEF);
     gameState.hero.maxHp = totalHP;
     gameState.hero.critChance = Math.min(1.0, totalCrit);  // Cap at 100%
     
     // Heal to full when equipping
     gameState.hero.hp = totalHP;
     
-    // Store current class for reference
-    gameState.hero.currentClass = weaponClass || 'NONE';
-    
     console.log(`📊 Stats recalculated: ATK=${totalATK}, DEF=${totalDEF}, HP=${totalHP}, CRIT=${(totalCrit*100).toFixed(1)}%`);
 }
 
 /**
- * Get current hero class
+ * Get current hero class (deprecated - returns default)
  */
 export function getHeroClass() {
-    const weapon = gameState.equipped?.weapon;
-    if (!weapon) {
-        return { name: 'Warrior', description: 'No weapon equipped' };
-    }
-    return WEAPON_CLASSES[weapon.class] || WEAPON_CLASSES.WARRIOR;
-}
-
-/**
- * Get class information
- */
-export function getClassInfo(className) {
-    return WEAPON_CLASSES[className] || null;
+    return { name: 'Adventurer', description: 'Versatile dungeon explorer' };
 }
 
 /**
@@ -446,7 +361,6 @@ export function getEquipmentStats(equipment) {
 
     if (equipment.type === 'weapon') {
         stats.push(`⚔️ ATK: +${equipment.atk}`);
-        stats.push(`🎯 Class: ${equipment.classInfo?.name || 'Unknown'}`);
         if (equipment.crit > 0) {
             stats.push(`💥 Crit: +${(equipment.crit * 100).toFixed(0)}%`);
         }
