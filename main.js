@@ -11,9 +11,14 @@ import { processAutoRun } from './src/idle/auto-run.js';
 import { checkAchievements } from './src/achievements/achievement-manager.js';
 import { showAchievementNotification } from './ui/achievements-ui.js';
 import { initializeInventoryUI } from './ui/inventory-ui.js';
+import { initSkillTreeUI, refreshSkillTreeUI } from './src/ui/skill-tree-ui.js';
+import { applySkillBonuses } from './src/skills/skill-effects.js';
 
 // Load game on start
 loadGame();
+
+// Apply skill bonuses from loaded save
+applySkillBonuses();
 
 // Initialize UI
 initUI();
@@ -21,9 +26,13 @@ initUI();
 // Initialize Inventory UI
 initializeInventoryUI();
 
+// Initialize Skill Tree UI
+initSkillTreeUI();
+
 // Track play time
 let lastPlayTimeUpdate = Date.now();
 let lastAchievementCheck = Date.now();
+let previousLevel = gameState.hero.level;
 
 // Main game loop
 function gameLoop() {
@@ -51,6 +60,13 @@ function gameLoop() {
         lastAchievementCheck = now;
     }
 
+    // Check for level up to refresh skill tree
+    if (gameState.hero.level > previousLevel) {
+        console.log(`🌳 Level up detected! Refreshing skill tree UI...`);
+        refreshSkillTreeUI();
+        previousLevel = gameState.hero.level;
+    }
+
     // Update manual run UI if active
     if (gameState.manualRun.active) {
         updateManualRunUIState();
@@ -66,8 +82,9 @@ function gameLoop() {
 // Start game loop
 gameLoop();
 
-console.log('🎮 Dungeon Idle Game v2.2.0 started!');
+console.log('🎮 Dungeon Idle Game v2.4.0 started!');
 console.log('💾 Game State:', gameState);
 console.log('✅ Manual Run System: Ready');
 console.log('🎒 Equipment System: Ready');
+console.log('🌳 Skill Tree System: Ready');
 console.log('🎮 Use Arrow Keys or WASD to move in manual runs');
