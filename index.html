@@ -9,12 +9,13 @@
     <link rel="stylesheet" href="styles-combat.css">
     <link rel="stylesheet" href="loot-styles.css">
     <link rel="stylesheet" href="inventory-styles.css">
+    <link rel="stylesheet" href="skill-tree-styles.css">
 </head>
 <body>
     <div id="game-container">
         <header>
             <h1>🏰 Dungeon Idle Game</h1>
-            <div id="version">v2.2.0</div>
+            <div id="version">v2.4.0</div>
         </header>
 
         <!-- Tab Navigation -->
@@ -22,6 +23,7 @@
             <button class="tab-btn active" data-tab="idle">Idle Runs</button>
             <button class="tab-btn" data-tab="manual">Manual Run</button>
             <button class="tab-btn" data-tab="hero">Hero</button>
+            <button class="tab-btn" data-tab="skills">🌳 Skills</button>
             <button class="tab-btn" data-tab="equipment">Equipment</button>
             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
             <button class="tab-btn" data-tab="achievements">Achievements</button>
@@ -146,12 +148,12 @@
 
             <!-- Hero Tab -->
             <div id="hero-tab" class="tab-panel">
-                <h2>🦸 Your Hero</h2>
+                <h2>🦾 Your Hero</h2>
                 
                 <!-- Hero Overview -->
                 <div class="hero-panel">
                     <div class="hero-header">
-                        <div class="hero-avatar">🦸</div>
+                        <div class="hero-avatar">🦾</div>
                         <div class="hero-title">
                             <h3 id="hero-name">Adventurer</h3>
                             <p class="hero-level">Level <span id="hero-level">1</span></p>
@@ -227,12 +229,55 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Gain per Level:</span>
-                            <span class="info-value">+10 HP, +2 ATK, +1 DEF</span>
+                            <span class="info-value">+10 HP, +2 ATK, +1 DEF, +1 Skill Point</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Next Level:</span>
                             <span class="info-value" id="xp-needed">100 XP</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Tab (NEW) -->
+            <div id="skills-tab" class="tab-panel">
+                <h2>🌳 Skill Trees</h2>
+                
+                <!-- Skill Points Display -->
+                <div class="skill-header">
+                    <div class="skill-points-display">
+                        <span class="points-label">Available Skill Points:</span>
+                        <span class="points-value" id="available-points">0</span>
+                    </div>
+                    <button id="respec-btn" class="btn btn-warning">Reset Skills</button>
+                </div>
+
+                <!-- Skill Tree Tabs -->
+                <div class="skill-tree-tabs">
+                    <button class="skill-tree-tab active" data-tree="COMBAT">
+                        <span class="tree-icon">⚔️</span>
+                        <span class="tree-name">Combat</span>
+                    </button>
+                    <button class="skill-tree-tab" data-tree="DEFENSE">
+                        <span class="tree-icon">🛡️</span>
+                        <span class="tree-name">Defense</span>
+                    </button>
+                    <button class="skill-tree-tab" data-tree="UTILITY">
+                        <span class="tree-icon">⭐</span>
+                        <span class="tree-name">Utility</span>
+                    </button>
+                </div>
+
+                <!-- Skill Tree Container -->
+                <div id="skill-tree-container">
+                    <!-- Filled by skill-tree-ui.js -->
+                </div>
+
+                <!-- Active Skills Summary -->
+                <div class="active-skills-panel">
+                    <h3>✨ Active Skill Effects</h3>
+                    <div id="active-skills-list" class="active-skills-list">
+                        <p class="text-muted">No skills learned yet...</p>
                     </div>
                 </div>
             </div>
@@ -375,7 +420,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">2.2.0</span>
+                            <span class="info-value">2.4.0</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Last Save:</span>
