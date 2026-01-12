@@ -3,6 +3,9 @@
  * Renders the dungeon on canvas with hero, monsters, and treasure
  */
 
+import { getScreenShakeOffset, renderEffects } from './combat-effects.js';
+import { getBossStatus } from './boss-abilities.js';
+
 export class DungeonRenderer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -18,13 +21,25 @@ export class DungeonRenderer {
         const room = dungeon.rooms[dungeon.currentRoom];
         if (!room) return;
 
+        // Apply screen shake
+        const shake = getScreenShakeOffset();
+        this.ctx.save();
+        this.ctx.translate(shake.x, shake.y);
+
         this.renderRoom(room);
         this.renderGrid(room);
         this.renderDoor(room);
         this.renderTreasure(room);
         this.renderMonsters(room);
         this.renderHero(hero);
+        
+        this.ctx.restore();
+        
+        // Render UI (not affected by shake)
         this.renderUI(dungeon, room, hero);
+        
+        // Render effects on top (damage numbers, flashes)
+        renderEffects(this.ctx);
     }
 
     clear() {
@@ -94,7 +109,7 @@ export class DungeonRenderer {
         this.ctx.font = '20px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('🦸', x, y);
+        this.ctx.fillText('🦾', x, y);
 
         // HP bar
         this.renderHealthBar(x, y - 25, hero.hp, hero.maxHp, 30);
@@ -106,6 +121,15 @@ export class DungeonRenderer {
 
             const x = this.offsetX + monster.x * this.tileSize + this.tileSize / 2;
             const y = this.offsetY + monster.y * this.tileSize + this.tileSize / 2;
+
+            // Shield effect for bosses
+            if (monster.isBoss && monster.shielded) {
+                this.ctx.strokeStyle = '#3498db';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 25, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
 
             // Circle background
             this.ctx.fillStyle = monster.isBoss ? '#8e44ad' : '#e74c3c';
@@ -121,6 +145,17 @@ export class DungeonRenderer {
 
             // HP bar
             this.renderHealthBar(x, y - (monster.isBoss ? 35 : 30), monster.hp, monster.maxHp, 40);
+            
+            // Boss status (telegraph, shield)
+            if (monster.isBoss) {
+                const status = getBossStatus(monster);
+                if (status) {
+                    this.ctx.font = '10px Arial';
+                    this.ctx.fillStyle = '#f39c12';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText(status, x, y + 45);
+                }
+            }
         });
     }
 
@@ -180,5 +215,15 @@ export class DungeonRenderer {
         this.ctx.textAlign = 'right';
         this.ctx.fillText('WASD / Arrow Keys to move', this.canvas.width - 20, 25);
         this.ctx.fillText('Walk into monsters to attack', this.canvas.width - 20, 45);
+    }
+    
+    /**
+     * Get screen position for entity (for visual effects)
+     */
+    getEntityScreenPosition(x, y) {
+        return {
+            x: this.offsetX + x * this.tileSize + this.tileSize / 2,
+            y: this.offsetY + y * this.tileSize + this.tileSize / 2
+        };
     }
 }
