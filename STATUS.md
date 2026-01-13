@@ -1,6 +1,6 @@
 # 🚀 Dungeon Idle Game - Project Status
 
-**Last Updated:** January 13, 2026, 07:25 CET
+**Last Updated:** January 13, 2026, 09:28 CET
 **Current Version:** 2.5.0
 **Status:** 🚀 STABLE & FEATURE-RICH
 
@@ -71,7 +71,7 @@
 - [x] Convenience: Start Level, Start Keys, Death Protection, Skill Points
 - [x] Key drops from bosses (30% base + bonuses)
 - [x] Guaranteed key drops at floor milestones (5, 10, 15+)
-- [x] Prestige UI with stats and upgrade cards
+- [x] Prestige UI with stats tracking
 - [x] Prestige level tracking
 - [x] Meta-progression loop
 
@@ -100,7 +100,7 @@
 ## 🎯 Feature Comparison
 
 | Feature | Status | Version |
-|---------|--------|---------|
+|---------|--------|---------|-------
 | **Core Gameplay** | ✅ Complete | 2.0.0 |
 | **Equipment & Loot** | ✅ Complete | 2.1.0 |
 | **Difficulty System** | ✅ Complete | 2.1.0 |
@@ -310,38 +310,41 @@
 ### File Structure
 ```
 Dungeon-Idle-Game/
-├── index.html                 # Main game
-├── main.js                    # Entry point (v2.5.0)
+├── index.html                     # Main game
+├── main.js                        # Entry point (v2.5.0)
+├── skill-tree-styles.css          # Skill styling
+├── prestige-styles.css            # Prestige styling
+├── inventory-styles.css           # Inventory styling
+├── loot-styles.css                # Loot styling
 ├── src/
-│  ├── core/
-│  │  ├── game-state.js        # State management
-│  │  ├── combat.js            # Combat system
-│  │  └── canvas-renderer.js
-│  ├── dungeons/
-│  │  └── dungeon-generator.js # Procedural generation
-│  ├── upgrades/
-│  │  ├── equipment-system.js  # Equipment & loot
-│  │  ├── skill-tree.js        # Skill system (NEW)
-│  │  ├── skill-effects.js     # Skill combat effects (NEW)
-│  │  └── prestige-system.js   # Prestige/Ascension (NEW)
-│  └── manual/
-│     ├── manual-run-controller.js
-│     ├── dungeon-renderer.js
-│     ├── combat-system.js
-│     ├── boss-abilities.js    # Boss AI (NEW)
-│     └── combat-effects.js    # Visual effects (NEW)
-├── ui/
-│  ├── ui-render.js
-│  ├── manual-run-ui.js
-│  ├── difficulty-ui.js
-│  ├── inventory-ui.js
-│  ├── skill-tree-ui.js        # Skill UI (NEW)
-│  ├── prestige-ui.js          # Prestige UI (NEW)
-│  └── upgrades-ui.js
-├── css/
-│  ├── styles.css
-│  ├── skill-tree-styles.css   # Skill styling (NEW)
-│  └── prestige-styles.css     # Prestige styling (NEW)
+│   ├── core/
+│   │   ├── game-state.js          # State management
+│   │   ├── auto-run.js            # Auto-run system
+│   │   └── combat.js              # Combat system
+│   ├── dungeons/
+│   │   └── dungeon-generator.js   # Procedural generation
+│   ├── equipment/
+│   │   ├── equipment-system.js    # Equipment & loot
+│   │   └── loot-system.js         # Loot drops
+│   ├── skills/
+│   │   ├── skill-tree.js          # Skill system
+│   │   └── skill-effects.js       # Skill combat effects
+│   ├── prestige/
+│   │   └── prestige-system.js     # Prestige/Ascension
+│   ├── manual/
+│   │   ├── manual-run-controller.js
+│   │   ├── dungeon-renderer.js
+│   │   ├── combat-system.js
+│   │   ├── boss-abilities.js      # Boss AI
+│   │   └── combat-effects.js      # Visual effects
+│   └── ui/
+│       ├── ui-render.js
+│       ├── manual-run-ui.js
+│       ├── difficulty-ui.js
+│       ├── inventory-ui.js
+│       ├── skill-tree-ui.js       # Skill UI
+│       ├── prestige-ui.js         # Prestige UI
+│       └── upgrades-ui.js
 └── docs/ (9 documentation files)
 ```
 
