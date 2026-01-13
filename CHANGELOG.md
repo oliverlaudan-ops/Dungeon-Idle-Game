@@ -4,6 +4,432 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.5.0] - 2026-01-12
+
+### ✨ Added - Sprint 3: Prestige System
+
+#### Ascension/Prestige Mechanics
+- **Prestige System** - Meta-progression loop with permanent bonuses
+  - Unlock at Level 20+
+  - Costs 10 keys to ascend
+  - Soft reset: Keep keys, prestige upgrades, achievements
+  - Reset: Hero level, equipment, gold, skills, inventory
+- **Prestige Level Tracking** - Total ascensions counter
+- **Prestige Statistics** - Tracks ascensions and keys spent
+
+#### Key Currency System
+- **Keys as prestige currency**
+  - Start with 0 keys (must earn through gameplay)
+  - Boss drops: 30% base chance + prestige bonuses
+  - Guaranteed drops at floor milestones (5, 10, 15+)
+  - Keys persist through ascension
+- **Key drop integration** with auto-run reward system
+- **Fortune prestige upgrade** increases key drop chance
+
+#### Prestige Upgrades (12 Total)
+**Stats Category (4 upgrades):**
+- **Vitality** - +5% max HP per level (max 5 levels)
+- **Power** - +3% attack per level (max 5 levels)
+- **Resilience** - +3% defense per level (max 5 levels)
+- **Precision** - +1% crit chance per level (max 5 levels)
+
+**Resources Category (4 upgrades):**
+- **Wealth** - +20% gold find per level (max 5 levels)
+- **Experience** - +15% XP gain per level (max 5 levels)
+- **Fortune** - +10% key drop chance per level (max 5 levels)
+- **Treasure Hunter** - +5% better loot rarity per level (max 5 levels)
+
+**Convenience Category (4 upgrades):**
+- **Head Start** - Start at higher level (2/4/6/8/10)
+- **Key Reserve** - Start with more keys (1/2/3/5/10)
+- **Death Ward** - Survive one fatal hit per run (max 1 level)
+- **Skill Master** - Start with bonus skill points (1/2/3/5/10)
+
+#### Prestige UI
+- **New Prestige Tab** in navigation
+- **Prestige Stats Header** - Shows ascensions, keys, keys spent
+- **Ascension Panel** - Warning message and ascension button
+- **Upgrade Categories** - Three sections (Stats, Resources, Convenience)
+- **Upgrade Cards** - Shows level, cost, next bonus, purchase button
+- **Active Bonuses Display** - Summary of all active prestige effects
+- **Prestige-specific CSS** - Dedicated styling (prestige-styles.css)
+
+### 🔧 Technical Details
+
+#### New Files Created
+```
+src/upgrades/prestige-system.js (8.2 KB)
+- PRESTIGE_UPGRADES - All 12 upgrade definitions
+- canAscend() - Check if player meets requirements
+- performAscension() - Execute soft reset
+- canPurchaseUpgrade() - Validate upgrade purchase
+- purchasePrestigeUpgrade() - Buy and apply upgrade
+- getPrestigeBonus() - Calculate total bonus for stat
+- applyPrestigeBonuses() - Apply all bonuses to hero
+- getActiveUpgrades() - Get list of purchased upgrades
+```
+
+```
+ui/prestige-ui.js (6.8 KB)
+- initPrestigeUI() - Setup prestige tab
+- renderPrestigeTab() - Render entire prestige UI
+- renderPrestigeStats() - Render stats header
+- renderAscensionPanel() - Render ascension button/warning
+- renderUpgradeCategories() - Render all upgrade cards
+- renderUpgradeCard() - Render single upgrade
+- handlePrestigeUpgradePurchase() - Purchase button handler
+- handleAscensionClick() - Ascension button handler
+```
+
+```
+prestige-styles.css (6.0 KB)
+- Prestige-specific styling
+- Stats header design
+- Ascension panel warnings
+- Upgrade category grid layout
+- Upgrade card styling (locked/unlocked states)
+- Purchase button states
+- Active bonuses summary panel
+```
+
+#### Modified Files
+```
+src/core/game-state.js
+- Added prestigeLevel: 0
+- Added prestigeUpgrades: {}
+- Added prestigeStats: { ascensions, keysSpent }
+- Updated version to 2.5.0
+- Keys now start at 0 (was 5)
+```
+
+```
+src/core/auto-run.js
+- Import prestige-system functions
+- Added key drops to reward calculation
+- 30% base chance for boss key drops
+- Guaranteed keys at floor milestones
+- Apply prestige Fortune bonus to key chance
+```
+
+```
+src/manual/combat-system.js
+- Import applyPrestigeBonuses
+- Apply prestige bonuses to hero stats before combat
+```
+
+```
+index.html
+- Added Prestige tab button
+- Added prestige-tab panel
+- Linked prestige-styles.css
+- Updated version to 2.5.0
+```
+
+```
+main.js
+- Import prestige UI functions
+- Initialize prestige UI on load
+- Apply prestige bonuses on game start
+- Render prestige tab when active
+- Update version logs to 2.5.0
+```
+
+### 🎮 Gameplay Impact
+
+#### Meta-Progression
+- **Before:** No reason to restart after reaching endgame
+- **After:** Strategic ascension provides permanent power growth
+
+#### Key Currency
+- **Before:** Keys were freely given (5 at start)
+- **After:** Keys must be earned, creating value and scarcity
+
+#### Build Diversity
+- **Before:** Single playthrough, linear progression
+- **After:** Multiple builds through prestige specialization
+
+#### Long-Term Engagement
+- **Before:** Game ends when you beat highest difficulty
+- **After:** Endless progression loop with prestige levels
+
+### 📊 Balance Notes
+
+#### Ascension Requirements
+- Level 20+ ensures players experience core game first
+- 10 keys cost creates meaningful decision (not too easy/hard)
+- ~3-5 runs needed before first ascension
+
+#### Upgrade Costs
+- Exponential scaling: keys * (level + 1)
+- Level 1: 1 key, Level 2: 2 keys, Level 3: 3 keys, etc.
+- Total to max one upgrade (5 levels): 15 keys
+- Total to max all 12 upgrades: 180 keys (long-term goal)
+
+#### Key Drop Rates
+- 30% base from bosses (balanced for ~3 keys per 10 runs)
+- Fortune upgrade adds +10% per level (max +50%)
+- Milestone guarantees prevent bad RNG streaks
+- Floor 5: +1 key, Floor 10: +2 keys, Floor 15+: +3 keys
+
+### 🐛 Bug Fixes
+- Fixed: Prestige bonuses not applying after page reload
+- Fixed: Keys not saving properly in game state
+- Fixed: Ascension button clickable when requirements not met
+- Fixed: Prestige upgrades not persisting through sessions
+
+### 🛡️ Safety & Compatibility
+- Backward compatible with existing saves
+- Players without prestige data start at 0 (no prestige)
+- All prestige features are optional/additive
+- No breaking changes to core gameplay
+- Existing game state migrates seamlessly
+
+---
+
+## [2.4.1] - 2026-01-12
+
+### 🔧 Balance & Polish
+
+#### Monster Difficulty Scaling
+- **Increased HP scaling:** 1.15^floor → 1.20^floor
+- **Increased Attack scaling:** 1.12^floor → 1.18^floor  
+- **Increased Boss multiplier:** 5x → 6x (HP and Attack)
+- **Floor-based scaling** now uses deepestFloor from stats
+- **Example Floor 10:** 6.2x HP (was 3.5x)
+- **Example Floor 15:** 15.4x HP (was 8.1x)
+- **Example Floor 20:** 38.3x HP (was 18.7x)
+
+#### Class System Removal
+- **Removed weapon class system** - never fully implemented
+- **Removed WEAPON_CLASSES** constant from equipment
+- **Simplified equipment** to pure stat-based system
+- **Removed class display** from manual run UI
+- Hero is now simply "Adventurer" (no class selection)
+- **Rationale:** Skill tree provides build diversity instead
+
+### 📊 Balance Impact
+- Endgame significantly more challenging
+- Compensates for skill tree power increases
+- Forces strategic skill and equipment choices
+- Expert difficulty now truly difficult at high floors
+
+### 🐛 Bug Fixes
+- Fixed: Floor scaling not applying to dungeon generation
+- Fixed: Class references causing confusion in UI
+
+---
+
+## [2.4.0] - 2026-01-12
+
+### ✨ Added - Sprint 2: Skill Tree System
+
+#### Skill Tree Framework
+- **3 Skill Trees:** Combat, Defense, Utility
+- **15 Unique Skills** (5 per tree)
+- **5 Ranks per skill** (75 total progression points)
+- **Skill Point System** - Earn 1 point per level up
+- **Respec Functionality** - Reset skills for gold cost
+
+#### Combat Tree (5 Skills)
+- **Lifesteal** - Heal for 5% of damage dealt per rank (max 25%)
+- **Double Strike** - 15% chance to attack twice, +3% per rank (max 30%)
+- **Execute** - +10% damage to enemies below 30% HP, +2% per rank (max 20%)
+- **Berserker Rage** - +5% damage per 10% missing HP, +1% per rank (max 10%)
+- **Bloodlust** - +2% damage per kill (stacks up to 10x), +0.5% per rank
+
+#### Defense Tree (5 Skills)
+- **Dodge Chance** - 10% chance to avoid attacks, +2% per rank (max 20%)
+- **Block** - Reduce damage by 15%, +3% per rank (max 30%)
+- **Thorns** - Reflect 10% of damage taken, +2% per rank (max 20%)
+- **Second Wind** - Heal 20% max HP on kill, +4% per rank (max 40%)
+- **Iron Skin** - +10% max HP per rank (max 50%)
+
+#### Utility Tree (5 Skills)
+- **Gold Find** - +15% gold from all sources, +3% per rank (max 30%)
+- **Magic Find** - +10% better loot rarity, +2% per rank (max 20%)
+- **XP Boost** - +15% XP gain, +3% per rank (max 30%)
+- **Swift Movement** - +10% faster dungeon movement, +2% per rank (max 20%)
+- **Lucky Strike** - +5% crit chance per rank (max 25%)
+
+#### Skill Tree UI
+- **New Skills Tab** in navigation
+- **Skill Tree Selector** - Switch between 3 trees
+- **Skill Cards** - Visual skill representation with:
+  - Current rank and max rank
+  - Description and effects
+  - Cost (1 skill point)
+  - Lock state indicators
+- **Available Points Display** - Shows unspent skill points
+- **Respec Button** - Reset all skills (cost scales with spent points)
+- **Active Skills Summary** - Shows all bonuses at a glance
+- **Skill-specific CSS** - Dedicated styling (skill-tree-styles.css)
+
+#### Skill Integration
+- **Combat Skills** - Applied during manual/auto combat
+- **Defense Skills** - Dodge, block, thorns work in combat
+- **Utility Skills** - Affect gold, XP, loot, movement speed
+- **Bloodlust Stacks** - Tracked per combat encounter
+- **Skill Persistence** - All skills save/load correctly
+
+### 🔧 Technical Details
+
+#### New Files Created
+```
+src/upgrades/skill-tree.js (9.5 KB)
+- SKILL_TREES - All 15 skill definitions
+- MAX_SKILL_RANK = 5
+- unlockSkill() - Spend point to learn/upgrade skill
+- canUnlockSkill() - Validate skill unlock
+- getSkillRank() - Get current skill level
+- getTotalSkillPoints() - Calculate total spent points
+- getRespecCost() - Calculate respec gold cost
+- respecSkills() - Reset all skills and refund points
+```
+
+```
+src/upgrades/skill-effects.js (7.8 KB)
+- applySkillBonuses() - Apply all passive skill effects to hero
+- getSkillBonus() - Calculate specific skill bonus
+- handleLifesteal() - Lifesteal healing calculation
+- handleDoubleStrike() - Check for double attack proc
+- handleExecute() - Execute damage bonus calculation
+- handleBerserkerRage() - Damage based on missing HP
+- handleBloodlust() - Manage bloodlust stacks
+- handleDodge() - Dodge chance calculation
+- handleBlock() - Block damage reduction
+- handleThorns() - Thorns damage reflection
+- handleSecondWind() - Heal on kill
+- applyCombatSkills() - Apply all combat skills to damage
+- applyDefenseSkills() - Apply all defense skills to incoming damage
+- applyUtilitySkills() - Apply gold/XP/loot bonuses
+```
+
+```
+ui/skill-tree-ui.js (8.9 KB)
+- initSkillTreeUI() - Setup skill tree tab
+- renderSkillTree() - Render entire skill UI
+- renderSkillTreeSelector() - Render tree tabs
+- renderSkillHeader() - Render points and respec button
+- renderSkillCards() - Render all skills in active tree
+- renderSkillCard() - Render single skill card
+- renderActiveSkillsSummary() - Render active bonus list
+- handleSkillUnlock() - Unlock button click handler
+- handleTreeSwitch() - Tree tab click handler
+- handleRespec() - Respec button click handler
+- refreshSkillTree() - Update skill UI display
+```
+
+```
+skill-tree-styles.css (8.1 KB)
+- Skill tree tab selector styling
+- Skill header with points display
+- Skill card grid layout
+- Skill card states (locked/unlockable/maxed)
+- Rank indicators and progress
+- Unlock button styling
+- Respec button design
+- Active skills summary panel
+- Hover effects and animations
+```
+
+#### Modified Files
+```
+src/core/game-state.js
+- Added skills: {} to store skill ranks
+- Added skillEffects: {} for active bonuses
+- Added bloodlustStacks: 0 for combat tracking
+- Updated version to 2.4.0
+```
+
+```
+src/manual/combat-system.js
+- Import skill-effects functions
+- Apply skill bonuses to hero stats
+- Handle lifesteal healing
+- Handle double strike proc
+- Apply execute/berserker/bloodlust damage
+- Handle dodge/block/thorns/second wind
+- Award skill points on level up
+- Reset bloodlust stacks on combat end
+```
+
+```
+src/core/auto-run.js
+- Import skill-effects functions
+- Apply skill bonuses to auto-run combat
+- Apply gold/XP multipliers from skills
+```
+
+```
+index.html
+- Added Skills tab button
+- Added skills-tab panel
+- Linked skill-tree-styles.css
+- Updated version to 2.4.0
+```
+
+```
+main.js
+- Import skill tree UI functions
+- Initialize skill tree UI on load
+- Refresh skill tree on level up
+- Apply skill bonuses on game start
+- Update version logs to 2.4.0
+```
+
+### 🎮 Gameplay Impact
+
+#### Build Diversity
+- **Before:** All players had identical progression
+- **After:** Multiple viable builds (DPS, Tank, Balanced, Farmer)
+
+#### Strategic Depth
+- **Before:** Level up = automatic stat increase
+- **After:** Meaningful choices on every level up
+
+#### Replayability
+- **Before:** One playthrough felt identical to another
+- **After:** Different skill builds create unique experiences
+
+#### Player Agency
+- **Before:** Passive progression, no player input
+- **After:** Active decision-making in character development
+
+### 📊 Balance Notes
+
+#### Skill Costs
+- All skills cost 1 point per rank (simple, consistent)
+- Total points needed for full tree: 25 points (5 skills × 5 ranks)
+- Average player at level 20: ~20 skill points available
+- Forces specialization (can't max everything)
+
+#### Respec Cost
+- Formula: Total spent points × 100 gold
+- 10 points spent: 1,000 gold
+- 20 points spent: 2,000 gold
+- Allows experimentation without being free
+
+#### Skill Power Levels
+- Combat tree: High damage output (DPS builds)
+- Defense tree: Survivability (Tank builds)
+- Utility tree: Faster progression (Farmer builds)
+- No single "best" tree - all viable
+
+### 🐛 Bug Fixes
+- Fixed: Skills not saving after page reload
+- Fixed: Bloodlust stacks not resetting between runs
+- Fixed: Skill bonuses not applying to auto-runs
+- Fixed: Respec button clickable when no skills learned
+
+### 🛡️ Safety & Compatibility
+- Backward compatible with existing saves
+- Players without skills start with empty skill tree
+- All skills are optional/additive
+- No breaking changes to core gameplay
+- Existing combat system enhanced, not replaced
+
+---
+
 ## [2.3.0] - 2026-01-12
 
 ### ✨ Added - Sprint 1: Combat Polish
@@ -342,7 +768,7 @@ Boss:   3.0x → 4.0x  (+33% harder)
 
 ## [2.1.0] - Previous Version
 
-### Features (Before Today)
+### Features (Before 2026-01-09)
 - Basic manual run system
 - Equipment system
 - Loot drops
@@ -355,6 +781,9 @@ Boss:   3.0x → 4.0x  (+33% harder)
 
 ## Version History
 
+- **2.5.0** (2026-01-12) - 🌟 Sprint 3: Prestige System (Meta-Progression)
+- **2.4.1** (2026-01-12) - ⚖️ Balance Patch (Monster Scaling + Class System Removal)
+- **2.4.0** (2026-01-12) - 🌳 Sprint 2: Skill Tree System (15 Skills, 3 Trees)
 - **2.3.0** (2026-01-12) - ✨ Sprint 1: Combat Polish (Boss Abilities + Visual Effects)
 - **2.2.0** (2026-01-09) - Combat Balance, Loot Overhaul, Equipment Persistence
 - **2.1.0** - Base game features
@@ -363,22 +792,19 @@ Boss:   3.0x → 4.0x  (+33% harder)
 
 ---
 
-## Next Up (Phase 1)
+## Phase 1 Complete! 🎉
+
+**All Phase 1 sprints (Foundation & Quick Wins) are complete:**
+- ✅ Sprint 1: Combat Polish
+- ✅ Sprint 2: Skill Tree System
+- ✅ Sprint 3: Prestige System
+
+**Moving to Phase 2 - Depth & Progression:**
+- 🔴 Sprint 4: Equipment Sets (Next)
+- 🔴 Sprint 6: Dungeon Modifiers
+- 🔴 Sprint 7: Infinite Tower
 
 See ROADMAP.md for complete development plan.
-
-### Sprint 2: Skill Tree System (Next)
-- [ ] 3 skill trees (Combat/Defense/Utility)
-- [ ] 4-5 skills per tree
-- [ ] Respec functionality
-- [ ] Skill point allocation UI
-- [ ] Save/load skill builds
-
-### Sprint 3: Daily Quests
-- [ ] Quest system
-- [ ] Daily challenges
-- [ ] Reward claiming
-- [ ] Quest progress tracking
 
 ---
 
@@ -405,5 +831,6 @@ Closes: #issue-number (if applicable)
 
 ---
 
-**Last Updated:** January 12, 2026  
-**Next Review:** After Sprint 2 completion
+**Last Updated:** January 13, 2026, 07:48 CET  
+**Current Version:** 2.5.0  
+**Next Sprint:** Sprint 4 - Equipment Sets
