@@ -58,7 +58,7 @@ All notable changes to this project will be documented in this file.
 
 #### New Files Created
 ```
-src/upgrades/prestige-system.js (8.2 KB)
+src/prestige/prestige-system.js (11.9 KB)
 - PRESTIGE_UPGRADES - All 12 upgrade definitions
 - canAscend() - Check if player meets requirements
 - performAscension() - Execute soft reset
@@ -70,7 +70,7 @@ src/upgrades/prestige-system.js (8.2 KB)
 ```
 
 ```
-ui/prestige-ui.js (6.8 KB)
+src/ui/prestige-ui.js (9.9 KB)
 - initPrestigeUI() - Setup prestige tab
 - renderPrestigeTab() - Render entire prestige UI
 - renderPrestigeStats() - Render stats header
@@ -275,7 +275,7 @@ main.js
 
 #### New Files Created
 ```
-src/upgrades/skill-tree.js (9.5 KB)
+src/skills/skill-tree.js (10.3 KB)
 - SKILL_TREES - All 15 skill definitions
 - MAX_SKILL_RANK = 5
 - unlockSkill() - Spend point to learn/upgrade skill
@@ -287,7 +287,7 @@ src/upgrades/skill-tree.js (9.5 KB)
 ```
 
 ```
-src/upgrades/skill-effects.js (7.8 KB)
+src/skills/skill-effects.js (8.2 KB)
 - applySkillBonuses() - Apply all passive skill effects to hero
 - getSkillBonus() - Calculate specific skill bonus
 - handleLifesteal() - Lifesteal healing calculation
@@ -305,7 +305,7 @@ src/upgrades/skill-effects.js (7.8 KB)
 ```
 
 ```
-ui/skill-tree-ui.js (8.9 KB)
+src/ui/skill-tree-ui.js (12.5 KB)
 - initSkillTreeUI() - Setup skill tree tab
 - renderSkillTree() - Render entire skill UI
 - renderSkillTreeSelector() - Render tree tabs
@@ -831,6 +831,6 @@ Closes: #issue-number (if applicable)
 
 ---
 
-**Last Updated:** January 13, 2026, 07:48 CET  
+**Last Updated:** January 13, 2026, 09:02 CET  
 **Current Version:** 2.5.0  
 **Next Sprint:** Sprint 4 - Equipment Sets
