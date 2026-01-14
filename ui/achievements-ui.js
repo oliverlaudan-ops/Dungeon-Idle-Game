@@ -57,14 +57,27 @@ function renderAchievementsByCategory() {
         { key: ACHIEVEMENT_CATEGORIES.PROGRESS, name: 'Progress', icon: '📈' },
         { key: ACHIEVEMENT_CATEGORIES.COMBAT, name: 'Combat', icon: '⚔️' },
         { key: ACHIEVEMENT_CATEGORIES.WEALTH, name: 'Wealth', icon: '💰' },
-        { key: ACHIEVEMENT_CATEGORIES.MASTERY, name: 'Mastery', icon: '✨' }
+        { key: ACHIEVEMENT_CATEGORIES.MASTERY, name: 'Mastery', icon: '✨' },
+        { key: ACHIEVEMENT_CATEGORIES.PRESTIGE, name: 'Prestige', icon: '🔑' },
+        { key: ACHIEVEMENT_CATEGORIES.SKILLS, name: 'Skills', icon: '🌳' },
+        { key: ACHIEVEMENT_CATEGORIES.EQUIPMENT, name: 'Equipment', icon: '🎁' },
+        { key: ACHIEVEMENT_CATEGORIES.MANUAL_RUN, name: 'Manual Runs', icon: '🎮' }
     ];
 
     categories.forEach(cat => {
         const containerEl = document.getElementById(`achievements-${cat.key}`);
-        if (!containerEl) return;
+        if (!containerEl) {
+            console.warn(`Achievement container not found: achievements-${cat.key}`);
+            return;
+        }
 
         const achievements = getAchievementsByCategory(cat.key);
+        
+        if (achievements.length === 0) {
+            containerEl.innerHTML = '<p class="text-muted">No achievements in this category yet.</p>';
+            return;
+        }
+        
         containerEl.innerHTML = achievements.map(achievement => 
             createAchievementCard(achievement)
         ).join('');
