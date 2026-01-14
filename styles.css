@@ -141,25 +141,28 @@ header h1::after {
 /* ===== TAB NAVIGATION ===== */
 .tab-nav {
     display: flex;
+    flex-wrap: wrap; /* Allow tabs to wrap to next line */
     background: linear-gradient(90deg, var(--bg-tertiary), var(--bg-secondary));
     border-bottom: 3px solid var(--accent-secondary);
 }
 
 .tab-btn {
-    flex: 1;
-    padding: 15px;
+    flex: 1 1 auto; /* Allow flexible sizing */
+    min-width: 90px; /* Minimum width for readability */
+    padding: 12px 8px; /* Reduced padding */
     background: transparent;
     border: none;
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: 0.85rem; /* Slightly smaller font */
     cursor: pointer;
     transition: all 0.3s ease;
     border-bottom: 4px solid transparent;
     font-family: 'Georgia', serif;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1px; /* Reduced letter spacing */
     text-transform: uppercase;
     position: relative;
+    white-space: nowrap; /* Prevent text wrapping inside button */
 }
 
 .tab-btn:hover {
@@ -1318,9 +1321,23 @@ main {
     box-shadow: 0 0 20px rgba(139, 46, 26, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+.btn-warning {
+    background: var(--warning);
+    border-color: var(--warning);
+    color: var(--bg-primary);
+}
+
+.btn-warning:hover {
+    background: #c99561;
+    border-color: #c99561;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .btn-primary:active,
 .btn-success:active,
-.btn-danger:active {
+.btn-danger:active,
+.btn-warning:active {
     transform: translateY(0);
 }
 
@@ -1528,6 +1545,15 @@ footer a:hover {
 }
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .tab-btn {
+        min-width: 85px;
+        font-size: 0.8rem;
+        padding: 10px 6px;
+        letter-spacing: 0.5px;
+    }
+}
+
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -1538,8 +1564,9 @@ footer a:hover {
     }
 
     .tab-btn {
-        font-size: 0.8rem;
-        padding: 12px 6px;
+        font-size: 0.75rem;
+        padding: 10px 5px;
+        min-width: 70px;
     }
 
     main {
