@@ -10,13 +10,14 @@
     <link rel="stylesheet" href="loot-styles.css">
     <link rel="stylesheet" href="inventory-styles.css">
     <link rel="stylesheet" href="skill-tree-styles.css">
+    <link rel="stylesheet" href="equipment-sets-styles.css">
     <link rel="stylesheet" href="prestige-styles.css">
 </head>
 <body>
     <div id="game-container">
         <header>
             <h1>🏰 Dungeon Idle Game</h1>
-            <div id="version">v2.5.0</div>
+            <div id="version">v2.6.0</div>
         </header>
 
         <!-- Tab Navigation -->
@@ -25,6 +26,7 @@
             <button class="tab-btn" data-tab="manual">Manual Run</button>
             <button class="tab-btn" data-tab="hero">Hero</button>
             <button class="tab-btn" data-tab="skills">🌳 Skills</button>
+            <button class="tab-btn" data-tab="sets">🎁 Sets</button>
             <button class="tab-btn" data-tab="prestige">⭐ Prestige</button>
             <button class="tab-btn" data-tab="equipment">Equipment</button>
             <button class="tab-btn" data-tab="upgrades">Upgrades</button>
@@ -284,7 +286,14 @@
                 </div>
             </div>
 
-            <!-- PRESTIGE TAB (NEW) -->
+            <!-- EQUIPMENT SETS TAB (NEW - Sprint 4) -->
+            <div id="sets-tab" class="tab-panel">
+                <div id="sets-container">
+                    <!-- Filled by sets-ui.js -->
+                </div>
+            </div>
+
+            <!-- PRESTIGE TAB -->
             <div id="prestige-tab" class="tab-panel">
                 <h2>⭐ Prestige System</h2>
                 
@@ -467,7 +476,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Version:</span>
-                            <span class="info-value">2.5.0</span>
+                            <span class="info-value">2.6.0</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Last Save:</span>
