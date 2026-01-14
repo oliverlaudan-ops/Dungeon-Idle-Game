@@ -368,6 +368,19 @@ export const ACHIEVEMENTS = {
         reward: { gold: 5000, gems: 50, souls: 20 },
         hidden: false
     },
+    utility_path: {
+        id: 'utility_path',
+        name: 'Path of Prosperity',
+        description: 'Max out all Utility skills',
+        icon: '🔑',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            return ['treasure_hunter', 'quick_learner', 'fleet_footed'].every(id => (skills[id] || 0) >= 3);
+        },
+        reward: { gold: 5000, gems: 50, souls: 20 },
+        hidden: false
+    },
     skill_master: {
         id: 'skill_master',
         name: 'Skill Master',
@@ -376,7 +389,12 @@ export const ACHIEVEMENTS = {
         category: ACHIEVEMENT_CATEGORIES.SKILLS,
         condition: (state) => {
             const skills = state.skills || {};
-            const allSkills = ['power_strike', 'battle_hardened', 'berserker_rage', 'iron_skin', 'shield_mastery', 'last_stand', 'critical_strike', 'swift_reflexes', 'assassinate'];
+            const allSkills = [
+                'power_strike', 'battle_hardened', 'berserker_rage', 
+                'iron_skin', 'shield_mastery', 'last_stand', 
+                'critical_strike', 'swift_reflexes', 'assassinate',
+                'treasure_hunter', 'quick_learner', 'fleet_footed'
+            ];
             return allSkills.every(id => (skills[id] || 0) >= 3);
         },
         reward: { gold: 25000, gems: 200, souls: 100 },
