@@ -1,16 +1,17 @@
 /**
  * Equipment Sets UI v1.0
- * Sprint 4: Display and track equipment set collections
+ * Display set collections, bonuses, and progress
+ * Sprint 4 - Equipment Sets
  */
 
 import { gameState } from '../src/core/game-state.js';
-import { EQUIPMENT_SETS, getActiveSetBonuses, getAllSetsProgress } from '../src/upgrades/equipment-sets.js';
+import { getSetCollectionProgress, getActiveSetBonuses, EQUIPMENT_SETS } from '../src/upgrades/equipment-sets.js';
 
 /**
  * Initialize Sets UI
  */
 export function initializeSetsUI() {
-    console.log('🎁 Initializing Equipment Sets UI');
+    console.log('🎁 Initializing Sets UI...');
     updateSetsUI();
 }
 
@@ -24,8 +25,8 @@ export function updateSetsUI() {
         return;
     }
 
-    const activeSets = getActiveSetBonuses();
-    const allSetsProgress = getAllSetsProgress();
+    const activeSetBonuses = getActiveSetBonuses();
+    const collectionProgress = getSetCollectionProgress();
 
     let html = `
         <div class="sets-header">
@@ -34,24 +35,19 @@ export function updateSetsUI() {
         </div>
     `;
 
-    // Active set bonuses section
-    html += renderActiveSetBonuses(activeSets);
+    // Active Set Bonuses Section
+    html += renderActiveSetBonuses(activeSetBonuses);
 
-    // All sets overview
-    html += `
-        <div class="sets-collection">
-            <h3>📚 Set Collection</h3>
-            <div class="sets-grid">
-    `;
-
-    for (const setProgress of allSetsProgress) {
-        html += renderSetCard(setProgress, activeSets);
-    }
-
-    html += `
-            </div>
-        </div>
-    `;
+    // Set Collection Section
+    html += `<div class="sets-collection">`;
+    html += `<h3>📦 Set Collection</h3>`;
+    
+    Object.keys(collectionProgress).forEach(setId => {
+        const set = collectionProgress[setId];
+        html += renderSetCard(set, activeSetBonuses.sets[setId]);
+    });
+    
+    html += `</div>`;
 
     setsContainer.innerHTML = html;
 }
@@ -59,51 +55,148 @@ export function updateSetsUI() {
 /**
  * Render active set bonuses section
  */
-function renderActiveSetBonuses(activeSets) {
-    const hasActiveSets = Object.keys(activeSets).length > 0;
-
-    if (!hasActiveSets) {
+function renderActiveSetBonuses(activeSetBonuses) {
+    const activeSets = Object.keys(activeSetBonuses.sets);
+    
+    if (activeSets.length === 0) {
         return `
-            <div class="active-sets-section">
+            <div class="active-sets-section empty">
                 <h3>✨ Active Set Bonuses</h3>
-                <div class="no-active-sets">
+                <div class="no-sets">
                     <p>🚫 No active set bonuses</p>
-                    <p class="hint">Equip 2 or more pieces from the same set to activate bonuses!</p>
+                    <p class="hint">Equip 2 or 3 pieces from the same set to activate bonuses!</p>
                 </div>
             </div>
         `;
     }
 
     let html = `
-        <div class="active-sets-section active">
+        <div class="active-sets-section">
             <h3>✨ Active Set Bonuses</h3>
-            <div class="active-sets-list">
+            <div class="active-sets-grid">
     `;
 
-    for (const [setId, setData] of Object.entries(activeSets)) {
-        const setInfo = EQUIPMENT_SETS[setId];
+    activeSets.forEach(setId => {
+        const setInfo = activeSetBonuses.sets[setId];
+        const set = EQUIPMENT_SETS[setId];
+        
         html += `
-            <div class="active-set-bonus" style="border-left: 4px solid ${setInfo.color}">
-                <div class="set-bonus-header">
-                    <span class="set-icon">${setInfo.icon}</span>
-                    <span class="set-name">${setData.name}</span>
-                    <span class="set-pieces">(${setData.pieceCount}/3 pieces)</span>
+            <div class="active-set-card" style="border-color: ${setInfo.color}">
+                <div class="set-header">
+                    <span class="set-icon" style="font-size: 2em;">${setInfo.icon}</span>
+                    <div class="set-info">
+                        <div class="set-name" style="color: ${setInfo.color}">${setInfo.name}</div>
+                        <div class="set-pieces">${setInfo.piecesEquipped}/3 pieces equipped</div>
+                    </div>
                 </div>
-                <div class="set-bonus-effects">
+                <div class="set-active-bonuses">
         `;
 
-        for (const bonus of setData.bonuses) {
+        setInfo.activeBonuses.forEach(bonus => {
             html += `
-                <div class="bonus-effect level-${bonus.level}">
-                    <span class="bonus-level">${bonus.level}-Piece:</span>
-                    <span class="bonus-name">${bonus.name}</span>
-                    <span class="bonus-description">${bonus.description}</span>
+                <div class="bonus-item active">
+                    <div class="bonus-name">✅ ${bonus.name}</div>
+                    <div class="bonus-description">${bonus.description}</div>
                 </div>
             `;
-        }
+        });
 
         html += `
                 </div>
+            </div>
+        `;
+    });
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    return html;
+}
+
+/**
+ * Render a single set card
+ */
+function renderSetCard(set, activeInfo) {
+    const isActive = activeInfo !== undefined;
+    const progressPercent = (set.ownedCount / set.totalPieces) * 100;
+    const cardClass = isActive ? 'set-card active' : 'set-card';
+
+    let html = `
+        <div class="${cardClass}" style="border-left: 4px solid ${set.color}">
+            <div class="set-card-header">
+                <div class="set-icon-large">${set.icon}</div>
+                <div class="set-header-info">
+                    <h4 class="set-title" style="color: ${set.color}">${set.name}</h4>
+                    <p class="set-description">${set.description}</p>
+                    <div class="set-theme-badge" style="background-color: ${set.color}20; color: ${set.color}">
+                        ${set.theme.toUpperCase()}
+                    </div>
+                </div>
+            </div>
+
+            <div class="set-progress">
+                <div class="progress-label">
+                    <span>Collection Progress</span>
+                    <span class="progress-count">${set.ownedCount}/${set.totalPieces}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progressPercent}%; background-color: ${set.color}"></div>
+                </div>
+            </div>
+
+            <div class="set-pieces-list">
+                <h5>Set Pieces:</h5>
+    `;
+
+    set.pieces.forEach(piece => {
+        const ownedClass = piece.owned ? 'owned' : 'missing';
+        const icon = piece.owned ? '✅' : '❌';
+        
+        html += `
+            <div class="set-piece ${ownedClass}">
+                <span class="piece-icon">${icon}</span>
+                <span class="piece-slot">${piece.slot.charAt(0).toUpperCase() + piece.slot.slice(1)}</span>
+            </div>
+        `;
+    });
+
+    html += `
+            </div>
+
+            <div class="set-bonuses-info">
+                <h5>Set Bonuses:</h5>
+    `;
+
+    // 2-piece bonus
+    if (set.bonuses['2piece']) {
+        const bonus = set.bonuses['2piece'];
+        const activeClass = (isActive && activeInfo.piecesEquipped >= 2) ? 'bonus-active' : '';
+        
+        html += `
+            <div class="bonus-item ${activeClass}">
+                <div class="bonus-header">
+                    <span class="bonus-pieces">(2) ${bonus.name}</span>
+                    ${activeClass ? '<span class="bonus-active-tag">✨ ACTIVE</span>' : ''}
+                </div>
+                <div class="bonus-desc">${bonus.description}</div>
+            </div>
+        `;
+    }
+
+    // 3-piece bonus
+    if (set.bonuses['3piece']) {
+        const bonus = set.bonuses['3piece'];
+        const activeClass = (isActive && activeInfo.piecesEquipped >= 3) ? 'bonus-active' : '';
+        
+        html += `
+            <div class="bonus-item ${activeClass}">
+                <div class="bonus-header">
+                    <span class="bonus-pieces">(3) ${bonus.name}</span>
+                    ${activeClass ? '<span class="bonus-active-tag">✨ ACTIVE</span>' : ''}
+                </div>
+                <div class="bonus-desc">${bonus.description}</div>
             </div>
         `;
     }
@@ -117,108 +210,38 @@ function renderActiveSetBonuses(activeSets) {
 }
 
 /**
- * Render a set card
+ * Refresh Sets UI (called after equipping/unequipping)
  */
-function renderSetCard(setProgress, activeSets) {
-    const isActive = activeSets[setProgress.setId] !== undefined;
-    const activeClass = isActive ? 'set-active' : '';
-    const setInfo = EQUIPMENT_SETS[setProgress.setId];
-
-    return `
-        <div class="set-card ${activeClass}" style="border-color: ${setProgress.color}">
-            <div class="set-card-header" style="background: linear-gradient(135deg, ${setProgress.color}22, transparent)">
-                <span class="set-icon-large">${setProgress.icon}</span>
-                <div class="set-card-title">
-                    <h4 style="color: ${setProgress.color}">${setProgress.name}</h4>
-                    <p class="set-theme">${setProgress.theme}</p>
-                </div>
-            </div>
-            
-            <div class="set-card-body">
-                <div class="set-description">
-                    ${setProgress.description}
-                </div>
-                
-                <div class="set-progress">
-                    <div class="progress-label">
-                        <span>📦 Collection Progress</span>
-                        <span class="progress-count">${setProgress.ownedCount}/3</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(setProgress.ownedCount / 3) * 100}%; background: ${setProgress.color}"></div>
-                    </div>
-                </div>
-                
-                <div class="set-pieces-list">
-                    ${renderSetPieces(setProgress)}
-                </div>
-                
-                <div class="set-bonuses-list">
-                    <h5>Set Bonuses:</h5>
-                    ${renderSetBonusesList(setProgress.bonuses, setProgress.equippedCount)}
-                </div>
-            </div>
-        </div>
-    `;
+export function refreshSetsUI() {
+    updateSetsUI();
 }
 
 /**
- * Render set pieces checklist
+ * Get sets statistics for display
  */
-function renderSetPieces(setProgress) {
-    const pieces = ['weapon', 'armor', 'accessory'];
-    const icons = { weapon: '⚔️', armor: '🛡️', accessory: '💍' };
+export function getSetsStatistics() {
+    const progress = getSetCollectionProgress();
+    const activeBonuses = getActiveSetBonuses();
     
-    let html = '<div class="pieces-checklist">';
+    let totalPieces = 0;
+    let ownedPieces = 0;
+    let completedSets = 0;
     
-    for (const piece of pieces) {
-        const owned = setProgress.ownedPieces.includes(piece);
-        const equipped = setProgress.equippedPieces.includes(piece);
-        const statusClass = equipped ? 'equipped' : (owned ? 'owned' : 'missing');
-        const statusIcon = equipped ? '✅' : (owned ? '📦' : '❌');
+    Object.keys(progress).forEach(setId => {
+        const set = progress[setId];
+        totalPieces += set.totalPieces;
+        ownedPieces += set.ownedCount;
         
-        html += `
-            <div class="piece-status ${statusClass}">
-                <span class="piece-icon">${icons[piece]}</span>
-                <span class="piece-name">${piece.charAt(0).toUpperCase() + piece.slice(1)}</span>
-                <span class="piece-status-icon">${statusIcon}</span>
-            </div>
-        `;
-    }
+        if (set.ownedCount === set.totalPieces) {
+            completedSets++;
+        }
+    });
     
-    html += '</div>';
-    return html;
+    return {
+        totalPieces,
+        ownedPieces,
+        completedSets,
+        totalSets: Object.keys(progress).length,
+        activeBonuses: Object.keys(activeBonuses.sets).length
+    };
 }
-
-/**
- * Render set bonuses list
- */
-function renderSetBonusesList(bonuses, equippedCount) {
-    let html = '';
-    
-    for (const [level, bonus] of Object.entries(bonuses)) {
-        const isActive = equippedCount >= parseInt(level);
-        const activeClass = isActive ? 'bonus-active' : 'bonus-inactive';
-        const activeIcon = isActive ? '✅' : '🔒';
-        
-        html += `
-            <div class="set-bonus-item ${activeClass}">
-                <div class="bonus-level-indicator">
-                    <span class="bonus-icon">${activeIcon}</span>
-                    <span class="bonus-level-text">${level}-Piece</span>
-                </div>
-                <div class="bonus-details">
-                    <div class="bonus-name">${bonus.name}</div>
-                    <div class="bonus-desc">${bonus.description}</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    return html;
-}
-
-/**
- * Export for external use
- */
-export { updateSetsUI as refreshSets };
