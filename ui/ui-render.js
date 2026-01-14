@@ -183,9 +183,26 @@ function updateRunHistory() {
         const icon = entry.success ? '✅' : '❌';
         const cssClass = entry.success ? 'success' : 'failure';
         const result = entry.success ? 'Successful' : 'Failed';
-        const rewardsText = entry.success && entry.rewards 
-            ? `+${entry.rewards.gold} Gold, +${entry.rewards.xp} XP${entry.rewards.gems > 0 ? ', +' + entry.rewards.gems + ' Gems' : ''}${entry.rewards.souls > 0 ? ', +' + entry.rewards.souls + ' Souls' : ''}`
-            : 'No rewards';
+        
+        let rewardsText = 'No rewards';
+        if (entry.success && entry.rewards) {
+            const parts = [];
+            parts.push(`+${entry.rewards.gold} Gold`);
+            parts.push(`+${entry.rewards.xp} XP`);
+            if (entry.rewards.gems > 0) parts.push(`+${entry.rewards.gems} Gems`);
+            if (entry.rewards.souls > 0) parts.push(`+${entry.rewards.souls} Souls`);
+            if (entry.rewards.keys > 0) parts.push(`🔑 +${entry.rewards.keys} Keys`);
+            
+            // NEW: Equipment drops
+            if (entry.rewards.equipment) {
+                const eq = entry.rewards.equipment;
+                const setInfo = eq.setName ? ` (${eq.setIcon} ${eq.setName})` : '';
+                parts.push(`🎁 ${eq.icon} ${eq.name}${setInfo}`);
+            }
+            
+            rewardsText = parts.join(', ');
+        }
+        
         const timeAgo = formatTimeAgo(entry.timestamp);
 
         return `
