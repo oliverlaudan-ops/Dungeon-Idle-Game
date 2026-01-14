@@ -9,6 +9,9 @@ import { getEffectiveStats } from '../upgrades/upgrade-manager.js';
 import { getPrestigeBonuses } from '../prestige/prestige-system.js';
 import { processDungeonLoot } from '../equipment/equipment-drops.js';
 
+// Maximum hero level
+const MAX_LEVEL = 100;
+
 /**
  * Process auto-run if enough time has passed
  */
@@ -52,8 +55,12 @@ function executeAutoRun() {
         gameState.resources.gold += rewards.gold;
         gameState.resources.gems += rewards.gems;
         gameState.resources.souls += rewards.souls;
-        gameState.resources.dungeonKeys += rewards.keys; // NEW: Keys!
-        gameState.hero.xp += rewards.xp;
+        gameState.resources.dungeonKeys += rewards.keys;
+        
+        // Only add XP if below max level
+        if (gameState.hero.level < MAX_LEVEL) {
+            gameState.hero.xp += rewards.xp;
+        }
 
         // Update statistics
         gameState.stats.totalGoldEarned += rewards.gold;
@@ -75,7 +82,10 @@ function executeAutoRun() {
         addRunHistoryEntry(true, rewards);
 
         // Console log with equipment info
-        let logMessage = `✅ Auto-run successful! Earned ${rewards.gold} gold, ${rewards.xp} XP`;
+        let logMessage = `✅ Auto-run successful! Earned ${rewards.gold} gold`;
+        if (gameState.hero.level < MAX_LEVEL) {
+            logMessage += `, ${rewards.xp} XP`;
+        }
         if (rewards.keys > 0) {
             logMessage += `, 🔑 ${rewards.keys} KEY(S)`;
         }
@@ -100,8 +110,9 @@ function calculateSuccessChance() {
     // Base 50% + bonuses from stats and upgrades
     let chance = 0.5;
     
-    // Hero level bonus (2% per level)
-    chance += gameState.hero.level * 0.02;
+    // Hero level bonus (2% per level, capped at max level)
+    const levelBonus = Math.min(gameState.hero.level, MAX_LEVEL) * 0.02;
+    chance += levelBonus;
     
     // Hero stats bonus (with upgrades)
     const statBonus = (effectiveStats.attack + effectiveStats.defense) / 1000;
@@ -119,7 +130,7 @@ function calculateSuccessChance() {
  * NOW INCLUDES KEY DROPS!
  */
 function calculateRewards() {
-    const level = gameState.hero.level;
+    const level = Math.min(gameState.hero.level, MAX_LEVEL);
     const effectiveStats = getEffectiveStats();
     const prestigeBonuses = getPrestigeBonuses();
     
@@ -175,7 +186,7 @@ function calculateRewards() {
         xp: finalXP,
         gems: Math.random() < finalGemChance ? 1 : 0,
         souls: Math.random() < finalSoulChance ? 1 : 0,
-        keys: keysDropped // NEW!
+        keys: keysDropped
     };
 }
 
@@ -183,7 +194,14 @@ function calculateRewards() {
  * Check if hero leveled up and handle level up
  */
 function checkLevelUp() {
-    while (gameState.hero.xp >= gameState.hero.maxXp) {
+    // Don't level up past max level
+    if (gameState.hero.level >= MAX_LEVEL) {
+        // Cap XP at max level requirement
+        gameState.hero.xp = Math.min(gameState.hero.xp, gameState.hero.maxXp);
+        return;
+    }
+
+    while (gameState.hero.xp >= gameState.hero.maxXp && gameState.hero.level < MAX_LEVEL) {
         // Level up!
         gameState.hero.xp -= gameState.hero.maxXp;
         gameState.hero.level++;
@@ -201,14 +219,21 @@ function checkLevelUp() {
         gameState.hero.attack += baseAtkGain;
         gameState.hero.defense += baseDefGain;
 
-        // Increase XP required for next level
-        gameState.hero.maxXp = Math.floor(gameState.hero.maxXp * 1.15);
+        // Increase XP required for next level (if not at max)
+        if (gameState.hero.level < MAX_LEVEL) {
+            gameState.hero.maxXp = Math.floor(gameState.hero.maxXp * 1.15);
+        }
 
         console.log(`🎉 Level Up! Now level ${gameState.hero.level}`);
         console.log(`💪 Stats: HP ${gameState.hero.maxHp}, ATK ${gameState.hero.attack}, DEF ${gameState.hero.defense}`);
         
+        // Max level reached!
+        if (gameState.hero.level === MAX_LEVEL) {
+            console.log(`🎆 MAX LEVEL REACHED! You've reached level ${MAX_LEVEL}!`);
+            console.log(`🔑 Use Prestige to continue growing stronger!`);
+        }
         // Milestone notification
-        if (gameState.hero.level % 5 === 0) {
+        else if (gameState.hero.level % 5 === 0) {
             console.log(`🌟 Milestone Level ${gameState.hero.level}! 🔑 Guaranteed key drop!`);
         }
     }
