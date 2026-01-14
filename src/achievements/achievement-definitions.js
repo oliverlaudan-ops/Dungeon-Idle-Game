@@ -7,7 +7,11 @@ export const ACHIEVEMENT_CATEGORIES = {
     PROGRESS: 'progress',
     COMBAT: 'combat',
     WEALTH: 'wealth',
-    MASTERY: 'mastery'
+    MASTERY: 'mastery',
+    PRESTIGE: 'prestige',
+    SKILLS: 'skills',
+    EQUIPMENT: 'equipment',
+    MANUAL_RUN: 'manual_run'
 };
 
 export const ACHIEVEMENTS = {
@@ -50,6 +54,16 @@ export const ACHIEVEMENTS = {
         category: ACHIEVEMENT_CATEGORIES.PROGRESS,
         condition: (state) => state.hero.level >= 50,
         reward: { gold: 10000, gems: 100, souls: 20 },
+        hidden: false
+    },
+    legend: {
+        id: 'legend',
+        name: 'Legend',
+        description: 'Reach Level 100',
+        icon: '🎯',
+        category: ACHIEVEMENT_CATEGORIES.PROGRESS,
+        condition: (state) => state.hero.level >= 100,
+        reward: { gold: 50000, gems: 500, souls: 100 },
         hidden: false
     },
 
@@ -232,6 +246,324 @@ export const ACHIEVEMENTS = {
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         condition: (state) => state.totalPlayTime >= 36000,
         reward: { gold: 25000, gems: 200, souls: 50 },
+        hidden: false
+    },
+
+    // === PRESTIGE ACHIEVEMENTS (NEW!) ===
+    key_finder: {
+        id: 'key_finder',
+        name: 'Key Finder',
+        description: 'Collect your first Dungeon Key',
+        icon: '🔑',
+        category: ACHIEVEMENT_CATEGORIES.PRESTIGE,
+        condition: (state) => (state.stats.totalKeysFound || 0) >= 1,
+        reward: { gold: 500, gems: 10 },
+        hidden: false
+    },
+    key_hoarder: {
+        id: 'key_hoarder',
+        name: 'Key Hoarder',
+        description: 'Collect 10 Dungeon Keys',
+        icon: '🗝️',
+        category: ACHIEVEMENT_CATEGORIES.PRESTIGE,
+        condition: (state) => state.resources.dungeonKeys >= 10,
+        reward: { gold: 2000, gems: 25, souls: 10 },
+        hidden: false
+    },
+    first_prestige: {
+        id: 'first_prestige',
+        name: 'Born Again',
+        description: 'Perform your first Prestige',
+        icon: '✨',
+        category: ACHIEVEMENT_CATEGORIES.PRESTIGE,
+        condition: (state) => (state.prestige?.count || 0) >= 1,
+        reward: { gold: 5000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    prestige_veteran: {
+        id: 'prestige_veteran',
+        name: 'Prestige Veteran',
+        description: 'Prestige 5 times',
+        icon: '🔄',
+        category: ACHIEVEMENT_CATEGORIES.PRESTIGE,
+        condition: (state) => (state.prestige?.count || 0) >= 5,
+        reward: { gold: 15000, gems: 100, souls: 50 },
+        hidden: false
+    },
+    prestige_master: {
+        id: 'prestige_master',
+        name: 'Prestige Master',
+        description: 'Prestige 10 times',
+        icon: '🌠',
+        category: ACHIEVEMENT_CATEGORIES.PRESTIGE,
+        condition: (state) => (state.prestige?.count || 0) >= 10,
+        reward: { gold: 50000, gems: 250, souls: 100 },
+        hidden: false
+    },
+
+    // === SKILLS ACHIEVEMENTS (NEW!) ===
+    skill_unlocked: {
+        id: 'skill_unlocked',
+        name: 'Skill Unlocked',
+        description: 'Unlock your first skill',
+        icon: '🌳',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            return Object.values(skills).some(level => level > 0);
+        },
+        reward: { gold: 300, gems: 10 },
+        hidden: false
+    },
+    skill_apprentice: {
+        id: 'skill_apprentice',
+        name: 'Skill Apprentice',
+        description: 'Unlock 5 skills',
+        icon: '🌿',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            const unlockedCount = Object.values(skills).filter(level => level > 0).length;
+            return unlockedCount >= 5;
+        },
+        reward: { gold: 1500, gems: 25, souls: 5 },
+        hidden: false
+    },
+    warrior_path: {
+        id: 'warrior_path',
+        name: 'Path of the Warrior',
+        description: 'Max out all Warrior skills',
+        icon: '⚔️',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            return ['power_strike', 'battle_hardened', 'berserker_rage'].every(id => (skills[id] || 0) >= 3);
+        },
+        reward: { gold: 5000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    tank_path: {
+        id: 'tank_path',
+        name: 'Path of the Guardian',
+        description: 'Max out all Tank skills',
+        icon: '🛡️',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            return ['iron_skin', 'shield_mastery', 'last_stand'].every(id => (skills[id] || 0) >= 3);
+        },
+        reward: { gold: 5000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    rogue_path: {
+        id: 'rogue_path',
+        name: 'Path of the Shadow',
+        description: 'Max out all Rogue skills',
+        icon: '🗡️',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            return ['critical_strike', 'swift_reflexes', 'assassinate'].every(id => (skills[id] || 0) >= 3);
+        },
+        reward: { gold: 5000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    skill_master: {
+        id: 'skill_master',
+        name: 'Skill Master',
+        description: 'Max out all skills in the skill tree',
+        icon: '🌲',
+        category: ACHIEVEMENT_CATEGORIES.SKILLS,
+        condition: (state) => {
+            const skills = state.skills || {};
+            const allSkills = ['power_strike', 'battle_hardened', 'berserker_rage', 'iron_skin', 'shield_mastery', 'last_stand', 'critical_strike', 'swift_reflexes', 'assassinate'];
+            return allSkills.every(id => (skills[id] || 0) >= 3);
+        },
+        reward: { gold: 25000, gems: 200, souls: 100 },
+        hidden: false
+    },
+
+    // === EQUIPMENT ACHIEVEMENTS (NEW!) ===
+    first_loot: {
+        id: 'first_loot',
+        name: 'First Loot',
+        description: 'Find your first equipment piece',
+        icon: '🎁',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            return inventory.length >= 1;
+        },
+        reward: { gold: 500, gems: 10 },
+        hidden: false
+    },
+    equipment_collector: {
+        id: 'equipment_collector',
+        name: 'Equipment Collector',
+        description: 'Collect 5 equipment pieces',
+        icon: '🎽',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            return inventory.length >= 5;
+        },
+        reward: { gold: 1000, gems: 20, souls: 5 },
+        hidden: false
+    },
+    fully_equipped: {
+        id: 'fully_equipped',
+        name: 'Fully Equipped',
+        description: 'Equip items in all 3 slots',
+        icon: '⚙️',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const equipped = state.equipped || {};
+            return equipped.weapon && equipped.armor && equipped.accessory;
+        },
+        reward: { gold: 1500, gems: 25, souls: 10 },
+        hidden: false
+    },
+    set_bonus_2: {
+        id: 'set_bonus_2',
+        name: 'Set Synergy',
+        description: 'Activate a 2-piece set bonus',
+        icon: '🔗',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const equipped = state.equipped || {};
+            const items = [equipped.weapon, equipped.armor, equipped.accessory].filter(i => i);
+            const setCounts = {};
+            items.forEach(item => {
+                if (item.setId) setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
+            });
+            return Object.values(setCounts).some(count => count >= 2);
+        },
+        reward: { gold: 2000, gems: 30, souls: 15 },
+        hidden: false
+    },
+    set_bonus_3: {
+        id: 'set_bonus_3',
+        name: 'Perfect Set',
+        description: 'Activate a 3-piece set bonus',
+        icon: '🌟',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const equipped = state.equipped || {};
+            const items = [equipped.weapon, equipped.armor, equipped.accessory].filter(i => i);
+            const setCounts = {};
+            items.forEach(item => {
+                if (item.setId) setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
+            });
+            return Object.values(setCounts).some(count => count >= 3);
+        },
+        reward: { gold: 5000, gems: 75, souls: 30 },
+        hidden: false
+    },
+    dragon_collector: {
+        id: 'dragon_collector',
+        name: 'Dragon Collector',
+        description: 'Collect all pieces of the Dragon Set',
+        icon: '🐉',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            const dragonPieces = ['dragon-blade', 'dragon-scale', 'dragon-heart'];
+            return dragonPieces.every(piece => inventory.some(item => item.templateId === piece));
+        },
+        reward: { gold: 3000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    guardian_collector: {
+        id: 'guardian_collector',
+        name: 'Guardian Collector',
+        description: 'Collect all pieces of the Guardian Set',
+        icon: '🛡️',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            const guardianPieces = ['guardian-mace', 'guardian-plate', 'guardian-ring'];
+            return guardianPieces.every(piece => inventory.some(item => item.templateId === piece));
+        },
+        reward: { gold: 3000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    shadow_collector: {
+        id: 'shadow_collector',
+        name: 'Shadow Collector',
+        description: 'Collect all pieces of the Shadow Set',
+        icon: '🌙',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            const shadowPieces = ['shadow-blade', 'shadow-cloak', 'shadow-ring'];
+            return shadowPieces.every(piece => inventory.some(item => item.templateId === piece));
+        },
+        reward: { gold: 3000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    assassin_collector: {
+        id: 'assassin_collector',
+        name: 'Assassin Collector',
+        description: 'Collect all pieces of the Assassin Set',
+        icon: '🗡️',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            const assassinPieces = ['assassin-daggers', 'assassin-leather', 'assassin-pendant'];
+            return assassinPieces.every(piece => inventory.some(item => item.templateId === piece));
+        },
+        reward: { gold: 3000, gems: 50, souls: 20 },
+        hidden: false
+    },
+    legendary_collector: {
+        id: 'legendary_collector',
+        name: 'Legendary Collector',
+        description: 'Collect all pieces from all 4 sets',
+        icon: '🏆',
+        category: ACHIEVEMENT_CATEGORIES.EQUIPMENT,
+        condition: (state) => {
+            const inventory = state.inventory || [];
+            const allPieces = [
+                'dragon-blade', 'dragon-scale', 'dragon-heart',
+                'guardian-mace', 'guardian-plate', 'guardian-ring',
+                'shadow-blade', 'shadow-cloak', 'shadow-ring',
+                'assassin-daggers', 'assassin-leather', 'assassin-pendant'
+            ];
+            return allPieces.every(piece => inventory.some(item => item.templateId === piece));
+        },
+        reward: { gold: 25000, gems: 300, souls: 150 },
+        hidden: false
+    },
+
+    // === MANUAL RUN ACHIEVEMENTS (NEW!) ===
+    manual_explorer: {
+        id: 'manual_explorer',
+        name: 'Manual Explorer',
+        description: 'Complete your first manual dungeon run',
+        icon: '🎮',
+        category: ACHIEVEMENT_CATEGORIES.MANUAL_RUN,
+        condition: (state) => (state.stats.manualRunsCompleted || 0) >= 1,
+        reward: { gold: 500, gems: 15 },
+        hidden: false
+    },
+    difficulty_master: {
+        id: 'difficulty_master',
+        name: 'Difficulty Master',
+        description: 'Complete a manual run on Hard difficulty',
+        icon: '🔥',
+        category: ACHIEVEMENT_CATEGORIES.MANUAL_RUN,
+        condition: (state) => (state.stats.hardRunsCompleted || 0) >= 1,
+        reward: { gold: 2000, gems: 40, souls: 15 },
+        hidden: false
+    },
+    nightmare_survivor: {
+        id: 'nightmare_survivor',
+        name: 'Nightmare Survivor',
+        description: 'Complete a manual run on Nightmare difficulty',
+        icon: '💀',
+        category: ACHIEVEMENT_CATEGORIES.MANUAL_RUN,
+        condition: (state) => (state.stats.nightmareRunsCompleted || 0) >= 1,
+        reward: { gold: 10000, gems: 100, souls: 50 },
         hidden: false
     }
 };
