@@ -1,292 +1,354 @@
 /**
  * Equipment Sets System v1.0
- * Sprint 4: Equipment Sets
- * Adds set bonuses for collecting matching equipment pieces
+ * Handles set bonuses for matching equipment pieces
+ * Sprint 4 - Equipment Sets
  */
 
 import { gameState } from '../core/game-state.js';
 
-/**
- * Equipment Set Definitions
- * Each set has 3 pieces: Weapon, Armor, Accessory
- */
+// Equipment Set Definitions
 export const EQUIPMENT_SETS = {
     dragon: {
         id: 'dragon',
         name: 'Dragon Set',
-        description: 'Forged from dragon scales and fire',
-        theme: 'High damage and critical strikes',
+        description: 'Forged from dragon scales, grants immense offensive power',
         icon: '🐉',
+        theme: 'damage',
         color: '#e74c3c',
         pieces: {
-            weapon: 'dragon-blade',
+            weapon: 'dragon-fang',
             armor: 'dragon-scale',
             accessory: 'dragon-heart'
         },
         bonuses: {
-            2: {
-                name: 'Dragon Blood',
-                description: '+15% Attack, +10% Crit Chance',
-                attackPercent: 0.15,
-                critChance: 0.10
+            '2piece': {
+                name: 'Dragon\'s Fury',
+                description: '+15% Critical Chance, +25% Critical Damage',
+                effects: {
+                    critChance: 0.15,
+                    critMultiplier: 0.25
+                }
             },
-            3: {
-                name: 'Dragon Fury',
-                description: '+30% Attack, +20% Crit Chance, +50% Crit Damage',
-                attackPercent: 0.30,
-                critChance: 0.20,
-                critMultiplier: 0.5
+            '3piece': {
+                name: 'Dragon\'s Wrath',
+                description: '+30% Attack, +25% Critical Chance, +50% Critical Damage',
+                effects: {
+                    attackMultiplier: 0.30,
+                    critChance: 0.25,
+                    critMultiplier: 0.50
+                }
             }
         }
     },
-    
     guardian: {
         id: 'guardian',
         name: 'Guardian Set',
-        description: 'Ancient armor of the sworn protectors',
-        theme: 'Tank and defense focused',
+        description: 'Ancient armor of legendary protectors',
         icon: '🛡️',
+        theme: 'defense',
         color: '#3498db',
         pieces: {
             weapon: 'guardian-mace',
             armor: 'guardian-plate',
-            accessory: 'guardian-ring'
+            accessory: 'guardian-amulet'
         },
         bonuses: {
-            2: {
-                name: 'Guardian Wall',
-                description: '+20% Max HP, +15% Defense',
-                hpPercent: 0.20,
-                defensePercent: 0.15
+            '2piece': {
+                name: 'Guardian\'s Resolve',
+                description: '+30% Max HP, +20% Defense',
+                effects: {
+                    hpMultiplier: 0.30,
+                    defenseMultiplier: 0.20
+                }
             },
-            3: {
-                name: 'Unbreakable',
-                description: '+40% Max HP, +30% Defense, Heal 5% HP per kill',
-                hpPercent: 0.40,
-                defensePercent: 0.30,
-                healOnKill: 0.05
+            '3piece': {
+                name: 'Guardian\'s Blessing',
+                description: '+50% Max HP, +40% Defense, +10% Damage Reduction',
+                effects: {
+                    hpMultiplier: 0.50,
+                    defenseMultiplier: 0.40,
+                    damageReduction: 0.10
+                }
             }
         }
     },
-    
     shadow: {
         id: 'shadow',
         name: 'Shadow Set',
-        description: 'Gear of the shadow walkers',
-        theme: 'Critical hits and evasion',
-        icon: '🌙',
-        color: '#9b59b6',
+        description: 'Crafted for those who strike from darkness',
+        icon: '🌑',
+        theme: 'critical',
+        color: '#8e44ad',
         pieces: {
             weapon: 'shadow-blade',
             armor: 'shadow-cloak',
             accessory: 'shadow-ring'
         },
         bonuses: {
-            2: {
-                name: 'Shadow Step',
-                description: '+20% Crit Chance, +10% Dodge',
-                critChance: 0.20,
-                dodgeChance: 0.10
+            '2piece': {
+                name: 'Shadow\'s Grace',
+                description: '+20% Critical Chance, +15% Dodge Chance',
+                effects: {
+                    critChance: 0.20,
+                    dodgeChance: 0.15
+                }
             },
-            3: {
-                name: 'Shadow Master',
-                description: '+35% Crit Chance, +20% Dodge, First hit always crits',
-                critChance: 0.35,
-                dodgeChance: 0.20,
-                firstStrikeCrit: true
+            '3piece': {
+                name: 'Shadow\'s Mastery',
+                description: '+35% Critical Chance, +25% Dodge, +100% Critical Damage',
+                effects: {
+                    critChance: 0.35,
+                    dodgeChance: 0.25,
+                    critMultiplier: 1.00
+                }
             }
         }
     },
-    
     assassin: {
         id: 'assassin',
         name: 'Assassin Set',
-        description: 'Tools of the silent killers',
-        theme: 'Speed and critical damage',
+        description: 'Swift and deadly, the mark of a master killer',
         icon: '🗡️',
+        theme: 'speed',
         color: '#e67e22',
         pieces: {
-            weapon: 'assassin-daggers',
-            armor: 'assassin-leather',
-            accessory: 'assassin-pendant'
+            weapon: 'assassin-dagger',
+            armor: 'assassin-garb',
+            accessory: 'assassin-charm'
         },
         bonuses: {
-            2: {
-                name: 'Swift Death',
-                description: '+25% Crit Chance, +10% Attack',
-                critChance: 0.25,
-                attackPercent: 0.10
+            '2piece': {
+                name: 'Assassin\'s Swiftness',
+                description: '+20% Attack Speed, +15% Movement Speed',
+                effects: {
+                    attackSpeed: 0.20,
+                    movementSpeed: 0.15
+                }
             },
-            3: {
-                name: 'Silent Killer',
-                description: '+40% Crit Chance, +20% Attack, +100% Crit Damage',
-                critChance: 0.40,
-                attackPercent: 0.20,
-                critMultiplier: 1.0
+            '3piece': {
+                name: 'Assassin\'s Precision',
+                description: '+40% Attack Speed, +25% Movement, +20% Attack',
+                effects: {
+                    attackSpeed: 0.40,
+                    movementSpeed: 0.25,
+                    attackMultiplier: 0.20
+                }
             }
         }
     }
 };
 
 /**
- * Get active set bonuses based on equipped items
- * @returns {Object} Active set bonuses
+ * Get currently active set bonuses based on equipped items
  */
 export function getActiveSetBonuses() {
     const equipped = gameState.equipped || {};
-    const activeSets = {};
-    
-    // Check each set
-    for (const [setId, setData] of Object.entries(EQUIPMENT_SETS)) {
-        const equippedPieces = [];
-        
-        // Check which pieces of this set are equipped
-        if (equipped.weapon?.setId === setId) {
-            equippedPieces.push('weapon');
-        }
-        if (equipped.armor?.setId === setId) {
-            equippedPieces.push('armor');
-        }
-        if (equipped.accessory?.setId === setId) {
-            equippedPieces.push('accessory');
-        }
-        
-        const pieceCount = equippedPieces.length;
-        
-        // Only track sets with 2+ pieces
-        if (pieceCount >= 2) {
-            activeSets[setId] = {
-                name: setData.name,
-                pieceCount,
-                pieces: equippedPieces,
-                bonuses: []
-            };
-            
-            // Add active bonuses
-            if (pieceCount >= 2) {
-                activeSets[setId].bonuses.push({
-                    level: 2,
-                    ...setData.bonuses[2]
-                });
-            }
-            if (pieceCount >= 3) {
-                activeSets[setId].bonuses.push({
-                    level: 3,
-                    ...setData.bonuses[3]
-                });
-            }
-        }
-    }
-    
-    return activeSets;
-}
+    const equippedItems = [
+        equipped.weapon,
+        equipped.armor,
+        equipped.accessory
+    ].filter(item => item !== null);
 
-/**
- * Calculate total set bonuses for hero stats
- * @returns {Object} Combined set bonuses
- */
-export function calculateSetBonuses() {
-    const activeSets = getActiveSetBonuses();
-    
-    const totalBonuses = {
-        attackPercent: 0,
-        defensePercent: 0,
-        hpPercent: 0,
+    if (equippedItems.length === 0) {
+        return { sets: {}, bonuses: {} };
+    }
+
+    // Count pieces per set
+    const setCounts = {};
+    equippedItems.forEach(item => {
+        if (item.setId) {
+            setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
+        }
+    });
+
+    // Determine active bonuses
+    const activeSets = {};
+    const combinedBonuses = {
+        attackMultiplier: 0,
+        defenseMultiplier: 0,
+        hpMultiplier: 0,
         critChance: 0,
         critMultiplier: 0,
         dodgeChance: 0,
-        healOnKill: 0,
-        firstStrikeCrit: false
+        damageReduction: 0,
+        attackSpeed: 0,
+        movementSpeed: 0
     };
-    
-    // Sum up all active bonuses
-    for (const setData of Object.values(activeSets)) {
-        for (const bonus of setData.bonuses) {
-            if (bonus.attackPercent) totalBonuses.attackPercent += bonus.attackPercent;
-            if (bonus.defensePercent) totalBonuses.defensePercent += bonus.defensePercent;
-            if (bonus.hpPercent) totalBonuses.hpPercent += bonus.hpPercent;
-            if (bonus.critChance) totalBonuses.critChance += bonus.critChance;
-            if (bonus.critMultiplier) totalBonuses.critMultiplier += bonus.critMultiplier;
-            if (bonus.dodgeChance) totalBonuses.dodgeChance += bonus.dodgeChance;
-            if (bonus.healOnKill) totalBonuses.healOnKill += bonus.healOnKill;
-            if (bonus.firstStrikeCrit) totalBonuses.firstStrikeCrit = true;
-        }
-    }
-    
-    return totalBonuses;
-}
 
-/**
- * Get set progress for a specific set
- * @param {string} setId - Set identifier
- * @returns {Object} Set progress info
- */
-export function getSetProgress(setId) {
-    const setData = EQUIPMENT_SETS[setId];
-    if (!setData) return null;
-    
-    const inventory = gameState.inventory || [];
-    const ownedPieces = [];
-    
-    // Check inventory for set pieces
-    for (const item of inventory) {
-        if (item.setId === setId) {
-            ownedPieces.push(item.type);
+    Object.keys(setCounts).forEach(setId => {
+        const count = setCounts[setId];
+        const set = EQUIPMENT_SETS[setId];
+        
+        if (!set) return;
+
+        activeSets[setId] = {
+            name: set.name,
+            icon: set.icon,
+            color: set.color,
+            piecesEquipped: count,
+            activeBonuses: []
+        };
+
+        // 2-piece bonus
+        if (count >= 2 && set.bonuses['2piece']) {
+            const bonus = set.bonuses['2piece'];
+            activeSets[setId].activeBonuses.push({
+                pieces: 2,
+                name: bonus.name,
+                description: bonus.description
+            });
+
+            // Add to combined bonuses
+            Object.keys(bonus.effects).forEach(key => {
+                combinedBonuses[key] += bonus.effects[key];
+            });
         }
-    }
-    
-    // Check equipped items
-    const equipped = gameState.equipped || {};
-    const equippedPieces = [];
-    
-    if (equipped.weapon?.setId === setId) equippedPieces.push('weapon');
-    if (equipped.armor?.setId === setId) equippedPieces.push('armor');
-    if (equipped.accessory?.setId === setId) equippedPieces.push('accessory');
-    
+
+        // 3-piece bonus (replaces 2-piece in most cases)
+        if (count >= 3 && set.bonuses['3piece']) {
+            const bonus = set.bonuses['3piece'];
+            
+            // Remove 2-piece bonus effects first
+            if (set.bonuses['2piece']) {
+                Object.keys(set.bonuses['2piece'].effects).forEach(key => {
+                    combinedBonuses[key] -= set.bonuses['2piece'].effects[key];
+                });
+            }
+
+            activeSets[setId].activeBonuses.push({
+                pieces: 3,
+                name: bonus.name,
+                description: bonus.description
+            });
+
+            // Add 3-piece bonuses
+            Object.keys(bonus.effects).forEach(key => {
+                combinedBonuses[key] += bonus.effects[key];
+            });
+        }
+    });
+
     return {
-        setId,
-        name: setData.name,
-        description: setData.description,
-        theme: setData.theme,
-        icon: setData.icon,
-        color: setData.color,
-        ownedPieces,
-        equippedPieces,
-        totalPieces: 3,
-        ownedCount: ownedPieces.length,
-        equippedCount: equippedPieces.length,
-        bonuses: setData.bonuses
+        sets: activeSets,
+        bonuses: combinedBonuses
     };
 }
 
 /**
- * Get all sets progress
- * @returns {Array} Array of set progress objects
+ * Apply set bonuses to hero stats
+ * Called during stat recalculation
  */
-export function getAllSetsProgress() {
-    return Object.keys(EQUIPMENT_SETS).map(setId => getSetProgress(setId));
+export function applySetBonuses(baseStats) {
+    const { bonuses } = getActiveSetBonuses();
+
+    const modifiedStats = { ...baseStats };
+
+    // Apply multiplicative bonuses
+    if (bonuses.attackMultiplier > 0) {
+        modifiedStats.attack = Math.floor(modifiedStats.attack * (1 + bonuses.attackMultiplier));
+    }
+    if (bonuses.defenseMultiplier > 0) {
+        modifiedStats.defense = Math.floor(modifiedStats.defense * (1 + bonuses.defenseMultiplier));
+    }
+    if (bonuses.hpMultiplier > 0) {
+        modifiedStats.maxHp = Math.floor(modifiedStats.maxHp * (1 + bonuses.hpMultiplier));
+        modifiedStats.hp = modifiedStats.maxHp; // Heal to full when bonus changes
+    }
+
+    // Apply additive bonuses
+    if (bonuses.critChance > 0) {
+        modifiedStats.critChance = Math.min(1.0, (modifiedStats.critChance || 0.05) + bonuses.critChance);
+    }
+    if (bonuses.critMultiplier > 0) {
+        modifiedStats.critMultiplier = (modifiedStats.critMultiplier || 2.0) + bonuses.critMultiplier;
+    }
+
+    // Store additional bonuses for combat use
+    modifiedStats.setBonuses = {
+        dodgeChance: bonuses.dodgeChance || 0,
+        damageReduction: bonuses.damageReduction || 0,
+        attackSpeed: bonuses.attackSpeed || 0,
+        movementSpeed: bonuses.movementSpeed || 0
+    };
+
+    return modifiedStats;
 }
 
 /**
- * Check if equipment belongs to a set
- * @param {string} templateId - Equipment template ID
- * @returns {string|null} Set ID or null
+ * Get set collection progress (for UI)
  */
-export function getEquipmentSetId(templateId) {
-    for (const [setId, setData] of Object.entries(EQUIPMENT_SETS)) {
-        if (Object.values(setData.pieces).includes(templateId)) {
-            return setId;
+export function getSetCollectionProgress() {
+    const inventory = gameState.inventory || [];
+    const progress = {};
+
+    Object.keys(EQUIPMENT_SETS).forEach(setId => {
+        const set = EQUIPMENT_SETS[setId];
+        const ownedPieces = [];
+
+        // Check which pieces the player owns
+        Object.keys(set.pieces).forEach(slot => {
+            const templateId = set.pieces[slot];
+            const owned = inventory.some(item => item.setId === setId && item.type === slot);
+            
+            ownedPieces.push({
+                slot,
+                templateId,
+                owned
+            });
+        });
+
+        progress[setId] = {
+            name: set.name,
+            icon: set.icon,
+            color: set.color,
+            theme: set.theme,
+            description: set.description,
+            pieces: ownedPieces,
+            ownedCount: ownedPieces.filter(p => p.owned).length,
+            totalPieces: ownedPieces.length,
+            bonuses: set.bonuses
+        };
+    });
+
+    return progress;
+}
+
+/**
+ * Check if item is part of a set
+ */
+export function getItemSetInfo(templateId) {
+    for (const setId in EQUIPMENT_SETS) {
+        const set = EQUIPMENT_SETS[setId];
+        const pieces = Object.values(set.pieces);
+        
+        if (pieces.includes(templateId)) {
+            return {
+                setId,
+                setName: set.name,
+                setIcon: set.icon,
+                setColor: set.color
+            };
         }
     }
     return null;
 }
 
 /**
- * Get set name for equipment
- * @param {string} templateId - Equipment template ID
- * @returns {string|null} Set name or null
+ * Get all set template IDs for loot generation
  */
-export function getEquipmentSetName(templateId) {
-    const setId = getEquipmentSetId(templateId);
-    return setId ? EQUIPMENT_SETS[setId].name : null;
+export function getAllSetTemplateIds() {
+    const templateIds = [];
+    
+    Object.keys(EQUIPMENT_SETS).forEach(setId => {
+        const set = EQUIPMENT_SETS[setId];
+        Object.values(set.pieces).forEach(templateId => {
+            templateIds.push({
+                templateId,
+                setId,
+                type: Object.keys(set.pieces).find(key => set.pieces[key] === templateId)
+            });
+        });
+    });
+
+    return templateIds;
 }
