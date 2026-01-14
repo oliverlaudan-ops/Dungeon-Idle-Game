@@ -7,6 +7,7 @@ import { gameState } from '../core/game-state.js';
 import { addRunHistoryEntry } from '../../ui/ui-render.js';
 import { getEffectiveStats } from '../upgrades/upgrade-manager.js';
 import { getPrestigeBonuses } from '../prestige/prestige-system.js';
+import { processDungeonLoot } from '../equipment/equipment-drops.js';
 
 /**
  * Process auto-run if enough time has passed
@@ -19,6 +20,16 @@ export function processAutoRun() {
         executeAutoRun();
         gameState.idle.lastAutoRun = now;
     }
+}
+
+/**
+ * Get difficulty tier based on hero level
+ */
+function getDifficultyForLevel(level) {
+    if (level < 10) return 'easy';
+    if (level < 20) return 'medium';
+    if (level < 30) return 'hard';
+    return 'nightmare';
 }
 
 /**
@@ -48,17 +59,30 @@ function executeAutoRun() {
         gameState.stats.totalGoldEarned += rewards.gold;
         gameState.stats.totalRunsCompleted++;
 
+        // Check for equipment drop (NEW for Sprint 4!)
+        const difficulty = getDifficultyForLevel(gameState.hero.level);
+        const droppedEquipment = processDungeonLoot(difficulty);
+        
+        // Add equipment to rewards for display
+        if (droppedEquipment) {
+            rewards.equipment = droppedEquipment;
+        }
+
         // Check for level up
         checkLevelUp();
 
         // Add to history
         addRunHistoryEntry(true, rewards);
 
+        // Console log with equipment info
+        let logMessage = `✅ Auto-run successful! Earned ${rewards.gold} gold, ${rewards.xp} XP`;
         if (rewards.keys > 0) {
-            console.log(`✨ Auto-run successful! Earned ${rewards.gold} gold, ${rewards.xp} XP, 🔑 ${rewards.keys} KEY(S)!`);
-        } else {
-            console.log(`✅ Auto-run successful! Earned ${rewards.gold} gold, ${rewards.xp} XP`);
+            logMessage += `, 🔑 ${rewards.keys} KEY(S)`;
         }
+        if (droppedEquipment) {
+            logMessage += `, 🎁 ${droppedEquipment.name}`;
+        }
+        console.log(logMessage);
     } else {
         gameState.stats.totalDeaths++;
         // Failed run - add to history
