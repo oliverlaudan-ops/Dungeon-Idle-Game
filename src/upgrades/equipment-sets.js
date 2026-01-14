@@ -16,7 +16,7 @@ export const EQUIPMENT_SETS = {
         theme: 'damage',
         color: '#e74c3c',
         pieces: {
-            weapon: 'dragon-fang',
+            weapon: 'dragon-blade',
             armor: 'dragon-scale',
             accessory: 'dragon-heart'
         },
@@ -33,7 +33,7 @@ export const EQUIPMENT_SETS = {
                 name: 'Dragon\'s Wrath',
                 description: '+30% Attack, +25% Critical Chance, +50% Critical Damage',
                 effects: {
-                    attackMultiplier: 0.30,
+                    attackPercent: 0.30,
                     critChance: 0.25,
                     critMultiplier: 0.50
                 }
@@ -50,23 +50,23 @@ export const EQUIPMENT_SETS = {
         pieces: {
             weapon: 'guardian-mace',
             armor: 'guardian-plate',
-            accessory: 'guardian-amulet'
+            accessory: 'guardian-ring'
         },
         bonuses: {
             '2piece': {
                 name: 'Guardian\'s Resolve',
                 description: '+30% Max HP, +20% Defense',
                 effects: {
-                    hpMultiplier: 0.30,
-                    defenseMultiplier: 0.20
+                    hpPercent: 0.30,
+                    defensePercent: 0.20
                 }
             },
             '3piece': {
                 name: 'Guardian\'s Blessing',
                 description: '+50% Max HP, +40% Defense, +10% Damage Reduction',
                 effects: {
-                    hpMultiplier: 0.50,
-                    defenseMultiplier: 0.40,
+                    hpPercent: 0.50,
+                    defensePercent: 0.40,
                     damageReduction: 0.10
                 }
             }
@@ -76,7 +76,7 @@ export const EQUIPMENT_SETS = {
         id: 'shadow',
         name: 'Shadow Set',
         description: 'Crafted for those who strike from darkness',
-        icon: '🌑',
+        icon: '🌙',
         theme: 'critical',
         color: '#8e44ad',
         pieces: {
@@ -112,9 +112,9 @@ export const EQUIPMENT_SETS = {
         theme: 'speed',
         color: '#e67e22',
         pieces: {
-            weapon: 'assassin-dagger',
-            armor: 'assassin-garb',
-            accessory: 'assassin-charm'
+            weapon: 'assassin-daggers',
+            armor: 'assassin-leather',
+            accessory: 'assassin-pendant'
         },
         bonuses: {
             '2piece': {
@@ -131,12 +131,94 @@ export const EQUIPMENT_SETS = {
                 effects: {
                     attackSpeed: 0.40,
                     movementSpeed: 0.25,
-                    attackMultiplier: 0.20
+                    attackPercent: 0.20
                 }
             }
         }
     }
 };
+
+/**
+ * Get set ID from template ID
+ */
+export function getEquipmentSetId(templateId) {
+    for (const setId in EQUIPMENT_SETS) {
+        const set = EQUIPMENT_SETS[setId];
+        const pieces = Object.values(set.pieces);
+        
+        if (pieces.includes(templateId)) {
+            return setId;
+        }
+    }
+    return null;
+}
+
+/**
+ * Calculate set bonuses from currently equipped items
+ */
+export function calculateSetBonuses() {
+    const equipped = gameState.equipped || {};
+    const equippedItems = [
+        equipped.weapon,
+        equipped.armor,
+        equipped.accessory
+    ].filter(item => item !== null);
+
+    if (equippedItems.length === 0) {
+        return null;
+    }
+
+    // Count pieces per set
+    const setCounts = {};
+    equippedItems.forEach(item => {
+        if (item.setId) {
+            setCounts[item.setId] = (setCounts[item.setId] || 0) + 1;
+        }
+    });
+
+    // Aggregate bonuses
+    const bonuses = {
+        attackPercent: 0,
+        defensePercent: 0,
+        hpPercent: 0,
+        critChance: 0,
+        critMultiplier: 0,
+        dodgeChance: 0,
+        damageReduction: 0,
+        attackSpeed: 0,
+        movementSpeed: 0
+    };
+
+    let hasAnyBonus = false;
+
+    Object.keys(setCounts).forEach(setId => {
+        const count = setCounts[setId];
+        const set = EQUIPMENT_SETS[setId];
+        
+        if (!set) return;
+
+        // 3-piece bonus (full set)
+        if (count >= 3 && set.bonuses['3piece']) {
+            const effects = set.bonuses['3piece'].effects;
+            Object.keys(effects).forEach(key => {
+                bonuses[key] += effects[key];
+            });
+            hasAnyBonus = true;
+            console.log(`🎁 ${set.name} (3/3): ${set.bonuses['3piece'].name}`);
+        }
+        // 2-piece bonus
+        else if (count >= 2 && set.bonuses['2piece']) {
+            const effects = set.bonuses['2piece'].effects;
+            Object.keys(effects).forEach(key => {
+                bonuses[key] += effects[key];
+            });
+            hasAnyBonus = true;
+            console.log(`🎁 ${set.name} (2/3): ${set.bonuses['2piece'].name}`);
+        }
+    });
+
+    return hasAnyBonus ? bonuses : null;
+}
 
 /**
  * Get currently active set bonuses based on equipped items
@@ -164,9 +246,9 @@ export function getActiveSetBonuses() {
     // Determine active bonuses
     const activeSets = {};
     const combinedBonuses = {
-        attackMultiplier: 0,
-        defenseMultiplier: 0,
-        hpMultiplier: 0,
+        attackPercent: 0,
+        defensePercent: 0,
+        hpPercent: 0,
         critChance: 0,
         critMultiplier: 0,
         dodgeChance: 0,
@@ -198,23 +280,17 @@ export function getActiveSetBonuses() {
                 description: bonus.description
             });
 
-            // Add to combined bonuses
-            Object.keys(bonus.effects).forEach(key => {
-                combinedBonuses[key] += bonus.effects[key];
-            });
-        }
-
-        // 3-piece bonus (replaces 2-piece in most cases)
-        if (count >= 3 && set.bonuses['3piece']) {
-            const bonus = set.bonuses['3piece'];
-            
-            // Remove 2-piece bonus effects first
-            if (set.bonuses['2piece']) {
-                Object.keys(set.bonuses['2piece'].effects).forEach(key => {
-                    combinedBonuses[key] -= set.bonuses['2piece'].effects[key];
+            // Only add if not getting 3-piece
+            if (count < 3) {
+                Object.keys(bonus.effects).forEach(key => {
+                    combinedBonuses[key] += bonus.effects[key];
                 });
             }
+        }
 
+        // 3-piece bonus (replaces 2-piece)
+        if (count >= 3 && set.bonuses['3piece']) {
+            const bonus = set.bonuses['3piece'];
             activeSets[setId].activeBonuses.push({
                 pieces: 3,
                 name: bonus.name,
@@ -244,14 +320,14 @@ export function applySetBonuses(baseStats) {
     const modifiedStats = { ...baseStats };
 
     // Apply multiplicative bonuses
-    if (bonuses.attackMultiplier > 0) {
-        modifiedStats.attack = Math.floor(modifiedStats.attack * (1 + bonuses.attackMultiplier));
+    if (bonuses.attackPercent > 0) {
+        modifiedStats.attack = Math.floor(modifiedStats.attack * (1 + bonuses.attackPercent));
     }
-    if (bonuses.defenseMultiplier > 0) {
-        modifiedStats.defense = Math.floor(modifiedStats.defense * (1 + bonuses.defenseMultiplier));
+    if (bonuses.defensePercent > 0) {
+        modifiedStats.defense = Math.floor(modifiedStats.defense * (1 + bonuses.defensePercent));
     }
-    if (bonuses.hpMultiplier > 0) {
-        modifiedStats.maxHp = Math.floor(modifiedStats.maxHp * (1 + bonuses.hpMultiplier));
+    if (bonuses.hpPercent > 0) {
+        modifiedStats.maxHp = Math.floor(modifiedStats.maxHp * (1 + bonuses.hpPercent));
         modifiedStats.hp = modifiedStats.maxHp; // Heal to full when bonus changes
     }
 
@@ -341,11 +417,12 @@ export function getAllSetTemplateIds() {
     
     Object.keys(EQUIPMENT_SETS).forEach(setId => {
         const set = EQUIPMENT_SETS[setId];
-        Object.values(set.pieces).forEach(templateId => {
+        Object.keys(set.pieces).forEach(slot => {
+            const templateId = set.pieces[slot];
             templateIds.push({
                 templateId,
                 setId,
-                type: Object.keys(set.pieces).find(key => set.pieces[key] === templateId)
+                type: slot
             });
         });
     });
