@@ -1,9 +1,9 @@
 # 🗺️ Dungeon Idle Game - Development Roadmap
 
-**Last Updated:** January 13, 2026 (07:35 CET)  
+**Last Updated:** January 16, 2026 (09:45 CET)  
 **Current Phase:** Phase 2 - Depth & Progression  
-**Current Sprint:** Sprint 4 - Equipment Sets  
-**Completed Sprints:** 3/9
+**Current Sprint:** Sprint 6 - Dungeon Modifiers  
+**Completed Sprints:** 4/9
 
 ---
 
@@ -21,7 +21,7 @@
 - [x] Difficulty Scaling (Easy/Normal/Hard/Expert)
 - [x] Auto-Run System
 - [x] Upgrades System
-- [x] Achievement System
+- [x] Achievement System (44 total, 8 categories)
 - [x] **Boss Special Abilities (4 types)** ✨
 - [x] **Damage Numbers (floating text)** ✨
 - [x] **Screen Shake effects** ✨
@@ -30,16 +30,22 @@
 - [x] **Prestige System (12 upgrades)** 🌟
 - [x] **Key Currency & Drop System** 🔑
 - [x] **Floor-based Difficulty Scaling** 📈
+- [x] **Equipment Sets System (4 sets, 12 items)** 🎽
+- [x] **Set Bonus System (2-piece & 3-piece)** 🎽
+- [x] **Level Cap at 100** 🔝
 
 ### 🎯 Current Game State
 - Manual Dungeon Runs with full visual effects and boss mechanics ✨
 - Skill Tree provides build customization across 3 paths 🌳
 - Prestige System enables meta-progression with permanent bonuses 🌟
+- Equipment Sets create synergies and collection goals 🎽
+- 44 Achievements covering all features 🏆
 - Equipment persists across sessions
 - Keys are earnable from bosses and floor milestones 🔑
 - Floor scaling provides endless difficulty curve
 - Combat has full visual feedback
-- Ready for Equipment Sets implementation
+- Level cap at 100 encourages prestige
+- Ready for Dungeon Modifiers implementation
 
 ---
 
@@ -197,32 +203,50 @@
 ## **Phase 2: Depth & Progression** 🎮
 **Goal:** Add long-term motivation and build diversity  
 **Timeline:** Week 2-3  
-**Progress:** 0/3 sprints complete (0%)
+**Progress:** ✅ **1/2 sprints complete (50%)**
 
 ### **Sprint 4: Equipment Sets** 👔
-**Status:** 🔴 Not Started  
+**Status:** ✅ **COMPLETE**  
 **Priority:** HIGH  
-**Estimated Time:** 3-4 hours
+**Completed:** January 14, 2026
+**Time Spent:** ~4 hours
 
-**Tasks:**
-- [ ] Implement Set Bonus System
-- [ ] Design Equipment Sets
-  - [ ] Dragon Set (high damage, crit focused)
-  - [ ] Guardian Set (tank/defense focused)
-  - [ ] Shadow Set (crit chance, dodge)
-  - [ ] Mage Set (magic damage, utility)
-- [ ] Add Set Bonuses
-  - [ ] 2-piece bonus
-  - [ ] 3-piece bonus (full set)
-- [ ] Update Loot Tables for set items
-- [ ] Build Set Collection UI
-- [ ] Show active set bonuses in UI
+**Completed Tasks:**
+- [x] Implement Set Bonus System
+- [x] Design Equipment Sets (4 total)
+  - [x] Dragon Set (high damage, crit focused)
+  - [x] Guardian Set (tank/defense focused)
+  - [x] Shadow Set (crit chance, dodge)
+  - [x] Assassin Set (attack speed focused)
+- [x] Add Set Bonuses
+  - [x] 2-piece bonus (moderate boost)
+  - [x] 3-piece bonus (powerful full set bonus)
+- [x] Update Loot Tables for set items
+- [x] Create Equipment Templates (12 items total)
+- [x] Build Set Collection UI
+- [x] Show active set bonuses in UI
+- [x] Equipment drop system (5-15% based on difficulty)
+- [x] Integration with auto-run rewards
+- [x] Display equipment in run history
 
-**Success Criteria:**
-- 3-4 complete equipment sets
-- Set bonuses provide meaningful build options
-- Players have incentive to collect full sets
-- Sets synergize with skill tree choices
+**Implementation Details:**
+- `src/equipment/equipment-sets.js` - Set definitions and templates (12 items)
+- `src/equipment/equipment-drops.js` - Drop system for set items
+- `ui/sets-ui.js` - Set collection and bonus display
+- `equipment-sets-styles.css` - Dedicated styling
+- Dragon Set: High attack/crit (DPS builds)
+- Guardian Set: High HP/defense (Tank builds)
+- Shadow Set: Crit/dodge (Assassin builds)
+- Assassin Set: Attack speed (Fast attack builds)
+- Drop rates: Easy 5%, Normal 8%, Hard 12%, Expert 15%
+- All sets integrate with skill tree choices
+
+**Success Criteria:** ✅ ALL MET
+- ✅ 4 complete equipment sets with unique themes
+- ✅ Set bonuses provide meaningful build options
+- ✅ Players have incentive to collect full sets
+- ✅ Sets synergize with skill tree choices
+- ✅ Drop system feels rewarding but balanced
 
 ---
 
@@ -390,11 +414,13 @@ See Sprint 3 above for full details.
 - Daily return rate
 - Prestige count per player
 - Skill tree diversity (build variety)
+- Set collection completion rate
 
 ### Balance
 - Win rate per difficulty
 - Average run completion time
 - Equipment distribution
+- Set item acquisition rate
 - Skill usage statistics
 - Prestige upgrade popularity
 
@@ -403,6 +429,7 @@ See Sprint 3 above for full details.
 - Deepest floor reached
 - Prestige level distribution
 - Key earning rate
+- Complete sets collected
 
 ---
 
@@ -431,14 +458,15 @@ See Sprint 3 above for full details.
 
 ### Current Technical Debt
 - None significant - codebase is clean and modular
-- Documentation slightly behind (being updated Jan 13)
+- Documentation updated January 16, 2026
 
 ### Recent Achievements
-- Triple sprint completion in one day (Jan 12)!
-- Phase 1 completed (100%)
-- Meta-progression fully implemented
-- Build diversity with skill trees
-- Visual polish with effects system
+- Sprint 4 completed (Equipment Sets)!
+- Phase 2 now 50% complete
+- 44 achievements covering all features
+- Level cap prevents infinite scaling
+- Four complete equipment sets
+- Build synergies with sets + skills
 
 ### Future Considerations
 - Mobile responsiveness
@@ -458,11 +486,11 @@ See Sprint 3 above for full details.
 5. Follow the current sprint tasks
 6. Update all documentation after completing work
 
-**Current Sprint:** Sprint 4 - Equipment Sets  
-**Next Task:** Design 3-4 Equipment Sets with synergies
+**Current Sprint:** Sprint 6 - Dungeon Modifiers  
+**Next Task:** Design 8-10 Dungeon Modifiers with unique effects
 
-**Current Version:** 2.5.0  
-**Current Phase:** Phase 2 - Depth & Progression (0/3 sprints)
+**Current Version:** 2.6.0  
+**Current Phase:** Phase 2 - Depth & Progression (1/2 sprints)
 
 ---
 
@@ -568,6 +596,46 @@ See Sprint 3 above for full details.
 
 ---
 
+### ✅ Sprint 4: Equipment Sets (Jan 14, 2026)
+**What was added:**
+- Equipment Sets System with 4 complete sets
+- 12 Set Items (Dragon, Guardian, Shadow, Assassin)
+- Each set has 3 pieces: Weapon, Armor, Accessory
+- Set Bonus System:
+  - 2-piece bonuses (moderate boost)
+  - 3-piece bonuses (powerful full set bonus)
+- Equipment Templates with unique stats
+- Drop System (5-15% based on difficulty)
+- Auto-run integration for set drops
+- Run history displays equipment rewards
+- Sets UI initialization
+- Achievement expansion (44 total, 8 categories)
+- Level cap at 100
+
+**Files Created:**
+- `src/equipment/equipment-sets.js` - Set definitions
+- `src/equipment/equipment-drops.js` - Drop system
+- `ui/sets-ui.js` - Set UI
+- `equipment-sets-styles.css` - Styling
+
+**Files Modified:**
+- `src/core/game-state.js` - Version 2.6.0
+- `src/idle/auto-run.js` - Equipment drops integration
+- `src/achievements/achievement-manager.js` - New achievements
+- `main.js` - Sets UI initialization
+- `index.html` - Updated version
+
+**Impact:**
+- Collection goals and set hunting
+- Build synergies with skill trees
+- Long-term equipment progression
+- Replayability through set completion
+- Balanced drop rates encourage multiple runs
+
+---
+
 **Remember:** Quality over speed. Each feature should feel polished and not break existing gameplay! 🛡️
 
-**Phase 1 Complete!** 🎉 Moving to Phase 2 - Equipment Sets next!
+**Phase 1 Complete!** 🎉  
+**Phase 2: 50% Complete!** 🚀  
+**Moving to Sprint 6 - Dungeon Modifiers next!**
