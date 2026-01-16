@@ -191,9 +191,25 @@ function calculateRewards() {
 }
 
 /**
- * Check if hero leveled up and handle level up
+ * Calculate XP required for a given level
  */
-function checkLevelUp() {
+function calculateMaxXpForLevel(level) {
+    // Base XP requirement
+    let xp = 100;
+    
+    // Calculate XP for all levels up to current level
+    for (let i = 1; i < level; i++) {
+        xp = Math.floor(xp * 1.15);
+    }
+    
+    return xp;
+}
+
+/**
+ * Check if hero leveled up and handle level up
+ * EXPORTED so it can be called from other modules (e.g., on game load)
+ */
+export function checkLevelUp() {
     // Don't level up past max level
     if (gameState.hero.level >= MAX_LEVEL) {
         // Cap XP at max level requirement
@@ -201,10 +217,20 @@ function checkLevelUp() {
         return;
     }
 
+    // Validate and fix maxXp if it's corrupted
+    const expectedMaxXp = calculateMaxXpForLevel(gameState.hero.level);
+    if (!gameState.hero.maxXp || gameState.hero.maxXp !== expectedMaxXp) {
+        console.warn(`⚠️ Fixing corrupted maxXp: was ${gameState.hero.maxXp}, should be ${expectedMaxXp}`);
+        gameState.hero.maxXp = expectedMaxXp;
+    }
+
+    let leveledUp = false;
+    
     while (gameState.hero.xp >= gameState.hero.maxXp && gameState.hero.level < MAX_LEVEL) {
         // Level up!
         gameState.hero.xp -= gameState.hero.maxXp;
         gameState.hero.level++;
+        leveledUp = true;
 
         // Apply prestige bonuses to base stats
         const prestigeBonuses = getPrestigeBonuses();
@@ -231,10 +257,19 @@ function checkLevelUp() {
         if (gameState.hero.level === MAX_LEVEL) {
             console.log(`🎆 MAX LEVEL REACHED! You've reached level ${MAX_LEVEL}!`);
             console.log(`🔑 Use Prestige to continue growing stronger!`);
+            break; // Stop processing level-ups
         }
         // Milestone notification
         else if (gameState.hero.level % 5 === 0) {
             console.log(`🌟 Milestone Level ${gameState.hero.level}! 🔑 Guaranteed key drop!`);
         }
     }
+    
+    // Prevent negative XP
+    if (gameState.hero.xp < 0) {
+        console.warn(`⚠️ Negative XP detected (${gameState.hero.xp}), resetting to 0`);
+        gameState.hero.xp = 0;
+    }
+    
+    return leveledUp;
 }
