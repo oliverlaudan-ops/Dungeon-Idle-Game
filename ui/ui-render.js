@@ -118,20 +118,20 @@ function updateHeroDisplay() {
     if (nameEl) nameEl.textContent = hero.name;
     if (levelEl) levelEl.textContent = hero.level;
 
-    // XP Bar
+    // XP Bar - FIXED: Use hero.maxXp instead of hero.xpToNextLevel
     const xpTextEl = document.getElementById('xp-text');
     const xpBarEl = document.getElementById('xp-bar');
     const xpNeededEl = document.getElementById('xp-needed');
     
     if (xpTextEl) {
-        xpTextEl.textContent = `${Math.floor(hero.xp)} / ${hero.xpToNextLevel}`;
+        xpTextEl.textContent = `${Math.floor(hero.xp)} / ${hero.maxXp}`;
     }
     if (xpBarEl) {
-        const xpPercent = (hero.xp / hero.xpToNextLevel) * 100;
+        const xpPercent = (hero.xp / hero.maxXp) * 100;
         xpBarEl.style.width = `${Math.min(100, xpPercent)}%`;
     }
     if (xpNeededEl) {
-        const xpLeft = hero.xpToNextLevel - Math.floor(hero.xp);
+        const xpLeft = Math.max(0, hero.maxXp - Math.floor(hero.xp));
         xpNeededEl.textContent = `${xpLeft} XP`;
     }
 
