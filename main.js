@@ -7,7 +7,7 @@ import { gameState, loadGame, saveGame } from './src/core/game-state.js';
 import { initUI } from './ui/ui-init.js';
 import { updateUI } from './ui/ui-render.js';
 import { updateManualRunUIState } from './ui/ui-init.js';
-import { processAutoRun } from './src/idle/auto-run.js';
+import { processAutoRun, checkLevelUp } from './src/idle/auto-run.js';
 import { checkAchievements } from './src/achievements/achievement-manager.js';
 import { showAchievementNotification } from './ui/achievements-ui.js';
 import { initializeInventoryUI } from './ui/inventory-ui.js';
@@ -24,6 +24,12 @@ applySkillBonuses();
 
 // Apply prestige bonuses to hero stats (Sprint 3)
 applyPrestigeBonuses();
+
+// Check for pending level-ups from saved XP (FIX: Process any pending level-ups)
+const hadPendingLevelUps = checkLevelUp();
+if (hadPendingLevelUps) {
+    console.log('✅ Processed pending level-ups from saved game');
+}
 
 // Initialize UI
 initUI();
